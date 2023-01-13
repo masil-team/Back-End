@@ -1,0 +1,26 @@
+# yml
+# mysql
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/masilTest
+    username: root
+    password:
+
+  jpa:
+    properties:
+      hibernate:
+        show-sql: 'true'
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          nodeValue: trace
+          descriptor:
+            sql: DEBUG
+        SQL: DEBUG

@@ -1,7 +1,6 @@
 package com.masil.domain.post.dto;
 
 import com.masil.domain.comment.dto.CommentResponse;
-import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +26,7 @@ public class PostResponse {
         this.viewCount = viewCount;
     }
 
-    public static PostResponse of(Post post) {
+    public static PostResponse from(Post post) {
         return PostResponse.builder()
                 .id(post.getId())
                 .nickname(post.getUser().getNickname())
