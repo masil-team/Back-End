@@ -3,14 +3,23 @@ package com.masil.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.domain.post.controller.PostController;
 import com.masil.domain.post.dto.PostCreateRequest;
+import com.masil.domain.post.dto.PostModifyRequest;
+import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.entity.State;
+import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.post.service.PostService;
 import com.masil.domain.user.entity.User;
 import com.masil.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,26 +27,59 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+//@WebMvcTest({
+//        PostService.class,
+//        UserRepository.class,
+//})
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+//@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class PostControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    public PostRepository postRepository;
 
     @Autowired
     private PostService postService;
     @Autowired
     private UserRepository userRepository;
+
+    @BeforeEach
+    void beforeEach() {
+        // 초기화
+        User user = User.builder()
+                .email("test@123")
+                .build();
+        userRepository.save(user);
+
+        Post post1 = Post.builder()
+                .content("내용1")
+                .user(user)
+                .build();
+
+        Post post2 = Post.builder()
+                .content("내용")
+                .user(user)
+                .build();
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+    }
 
     @Test
     @DisplayName("게시글 생성")
@@ -59,8 +101,8 @@ public class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(PostController.class))
                 .andExpect(handler().methodName("createPost"));
-
     }
+
     @Test
     @DisplayName("게시글 단 건 조회")
     void t2() throws Exception {
@@ -97,5 +139,38 @@ public class PostControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().handlerType(PostController.class));
+    }
+
+    @Test
+    @DisplayName("게시글 수정")
+    void t4() throws Exception {
+        // given
+        PostModifyRequest postModifyRequest = new PostModifyRequest( "수정된 내용");
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/boards/{boardId}/posts/{postId}",1,1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(postModifyRequest)))
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void t5() throws Exception {
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/boards/{boardId}/posts/{postId}",1,1)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(status().is2xxSuccessful());
     }
 }
