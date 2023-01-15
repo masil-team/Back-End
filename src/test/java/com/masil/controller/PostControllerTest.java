@@ -3,6 +3,7 @@ package com.masil.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.domain.post.controller.PostController;
 import com.masil.domain.post.dto.PostCreateRequest;
+
 import com.masil.domain.post.dto.PostModifyRequest;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,12 +29,15 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 //@WebMvcTest({
 //        PostService.class,
@@ -102,6 +107,7 @@ public class PostControllerTest {
                 .andExpect(handler().handlerType(PostController.class))
                 .andExpect(handler().methodName("createPost"));
     }
+
 
     @Test
     @DisplayName("게시글 단 건 조회")
@@ -173,4 +179,5 @@ public class PostControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful());
     }
+
 }

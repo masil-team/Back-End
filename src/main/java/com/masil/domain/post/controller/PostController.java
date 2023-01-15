@@ -1,7 +1,9 @@
 package com.masil.domain.post.controller;
 
 import com.masil.domain.post.dto.PostCreateRequest;
+
 import com.masil.domain.post.dto.PostModifyRequest;
+
 import com.masil.domain.post.dto.PostResponse;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
@@ -28,6 +30,7 @@ public class PostController {
     public ResponseEntity<PostResponse> findPost(@PathVariable Long boardId,
                                                  @PathVariable Long postId) {
         log.info("게시글 단건 조회 시작");
+
         PostResponse postResponse = postService.findPost(postId);
         return ResponseEntity.ok(postResponse);
     }
@@ -36,6 +39,7 @@ public class PostController {
     @GetMapping("/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId) {
         log.info("게시글 다건 조회 시작");
+
         PostsResponse postsResponse = postService.findAllPost();
         return ResponseEntity.ok(postsResponse);
     }
@@ -44,6 +48,7 @@ public class PostController {
     @PostMapping("/{boardId}/posts")
     public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
         log.info("게시글 생성 시작");
+
         User user = userRepository.findById(1L).get(); // 추후 삭제
         postService.createPost(postCreateRequest, user);
         return ResponseEntity.ok().build();
@@ -69,4 +74,5 @@ public class PostController {
         postService.deletePost(postId, user.getId());
         return ResponseEntity.noContent().build();
     }
+
 }

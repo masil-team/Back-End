@@ -42,7 +42,7 @@ public class Post extends BaseEntity {
         this.user = user;
         this.state = State.NORMAL;
     }
-
+    
     public void updateContent(String content){
         this.content = content;
     }
@@ -50,4 +50,5 @@ public class Post extends BaseEntity {
     public void tempDelete() {
         this.state = State.DELETE;
     }
+
 }

@@ -7,6 +7,7 @@ import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.repository.PostRepository;
+
 import com.masil.domain.post.service.PostService;
 import com.masil.domain.user.entity.User;
 import com.masil.domain.user.repository.UserRepository;
