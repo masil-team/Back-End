@@ -4,11 +4,12 @@ import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-
 @Getter
+@SuperBuilder
 @Entity
 public class Comment extends BaseEntity {
 
@@ -17,7 +18,7 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
     private State state;
