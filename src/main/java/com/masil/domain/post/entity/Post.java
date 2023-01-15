@@ -26,6 +26,8 @@ public class Post extends BaseEntity {
 
     private String content;
     private Long viewCount;
+
+    @Enumerated(EnumType.STRING)
     private State state;
 
     @ManyToOne(fetch = LAZY)
@@ -40,4 +42,13 @@ public class Post extends BaseEntity {
         this.user = user;
         this.state = State.NORMAL;
     }
+    
+    public void updateContent(String content){
+        this.content = content;
+    }
+
+    public void tempDelete() {
+        this.state = State.DELETE;
+    }
+
 }

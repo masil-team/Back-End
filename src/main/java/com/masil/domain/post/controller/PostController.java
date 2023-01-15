@@ -1,6 +1,9 @@
 package com.masil.domain.post.controller;
 
 import com.masil.domain.post.dto.PostCreateRequest;
+
+import com.masil.domain.post.dto.PostModifyRequest;
+
 import com.masil.domain.post.dto.PostResponse;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
@@ -26,7 +29,8 @@ public class PostController {
     @GetMapping("/{boardId}/posts/{postId}")
     public ResponseEntity<PostResponse> findPost(@PathVariable Long boardId,
                                                  @PathVariable Long postId) {
-        log.info("게시글 단건 조회 성공");
+        log.info("게시글 단건 조회 시작");
+
         PostResponse postResponse = postService.findPost(postId);
         return ResponseEntity.ok(postResponse);
     }
@@ -34,7 +38,8 @@ public class PostController {
     // 다 건
     @GetMapping("/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId) {
-        log.info("게시글 다건 조회 성공");
+        log.info("게시글 다건 조회 시작");
+
         PostsResponse postsResponse = postService.findAllPost();
         return ResponseEntity.ok(postsResponse);
     }
@@ -42,9 +47,32 @@ public class PostController {
     // 생성
     @PostMapping("/{boardId}/posts")
     public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
-        log.info("게시글 생성 성공");
+        log.info("게시글 생성 시작");
+
         User user = userRepository.findById(1L).get(); // 추후 삭제
         postService.createPost(postCreateRequest, user);
         return ResponseEntity.ok().build();
     }
+
+    // 수정
+    @PatchMapping("/{boardId}/posts/{postId}")
+    public ResponseEntity<Void> modifyPost(@PathVariable Long boardId,
+                                           @PathVariable Long postId,
+                                           @Valid @RequestBody PostModifyRequest postModifyRequest) {
+        log.info("게시글 수정 시작");
+        User user = userRepository.findById(1L).get(); // 추후 삭제
+        postService.modifyPost(postId, postModifyRequest, user.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    // 삭제
+    @DeleteMapping("/{boardId}/posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
+                                           @PathVariable Long postId) {
+        log.info("게시글 삭제 시작");
+        User user = userRepository.findById(1L).get(); // 추후 삭제
+        postService.deletePost(postId, user.getId());
+        return ResponseEntity.noContent().build();
+    }
+
 }
