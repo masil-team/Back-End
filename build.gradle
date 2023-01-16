@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	// [spring rest docs] : Asciidoctor 플러그인 적용
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com'
@@ -12,6 +14,8 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	// [spring rest docs] : Asciidoctor 를 확장하는 종속을 위한 구성
+	asciidoctorExt
 }
 
 repositories {
@@ -29,6 +33,11 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// [spring rest docs]
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+  
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	// jwt
@@ -39,11 +48,34 @@ dependencies {
 	// oauth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind (jackson)
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+ext {
+	// [spring rest docs] : snippet 출력 위치 변수 선언
+	snippetsDir = file('build/generated-snippets')
+}
+
+test {
+	// [spring rest docs]
+	outputs.dir snippetsDir
+}
+
+// [spring rest docs] : asciidoctor 환경설정
+asciidoctor {
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	dependsOn test // 문서가 생기기 전에 테스트 작업 먼저 실행되도록 종속 설정
+}
+
+bootJar {
+	// [spring rest docs] : jar 파일에 패키징, 정적 콘테츠로 제공
+	dependsOn asciidoctor // jar 가 빌드되기 전에 문서가 먼저 실행되도록 종속 설정
+	copy {
+		from asciidoctor.outputDir
+		into "src/main/resources/static/docs"
+	}
+}
+

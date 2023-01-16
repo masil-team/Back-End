@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class Post extends BaseEntity {
     private Long id;
 
     private String content;
-    private Long viewCount;
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int viewCount;
 
     @Enumerated(EnumType.STRING)
     private State state;

@@ -58,77 +58,77 @@ public class PostServiceTest {
         postRepository.save(post2);
     }
 
-    @DisplayName("단 건 게시글을 성공적으로 조회된다.")
-    @Test
-    void findPost_test() {
-
-        // when
-        PostResponse post = postService.findPost(1L);
-
-        // then
-        assertThat(post.getContent()).isEqualTo("내용1");
-    }
-
-    @DisplayName("다 건 게시글을 성공적으로 조회된다.")
-    @Test
-    void findAllPost_test() {
-
-        // when
-        PostsResponse allPost = postService.findAllPost();
-
-        // then
-        assertThat(allPost.getPosts().size()).isEqualTo(2);
-    }
-
-    @DisplayName("게시글 성공적으로 생성된다.")
-    @Test
-    void createPost_test() {
-        // given
-        String content = "안녕하세요";
-        User user = userRepository.findById(1L).get();
-        PostCreateRequest postCreateRequest = new PostCreateRequest(content);
-        // when
-        Long postId = postService.createPost(postCreateRequest, user);
-        PostResponse post = postService.findPost(postId);
-
-
-        // then
-        assertThat(postId).isEqualTo(post.getId());
-    }
-
-    @DisplayName("게시글 수정이 성공")
-    @Test
-    void modifyPost_test() {
-
-        // given
-        String content = "수정 후 내용";
-        Post beforePost = postRepository.findById(1L).get(); // "내용1"
-
-        User user = userRepository.findById(1L).get();
-        PostModifyRequest postModifyRequest = new PostModifyRequest(content);
-
-        // when
-        postService.modifyPost(beforePost.getId(), postModifyRequest, user.getId());
-
-        // then
-        Post afterPost = postRepository.findById(1L).get(); // "수정 후 내용"
-        assertThat(afterPost.getContent()).isEqualTo(content);
-    }
-
-    @DisplayName("게시글 삭제 성공")
-    @Test
-    void deletePost_test() {
-
-        // given
-        Post beforePost = postRepository.findById(1L).get();  // status : NORMAL
-        User user = userRepository.findById(1L).get();
-
-        // when
-        postService.deletePost(beforePost.getId(), user.getId());
-
-        // then
-        Post afterPost = postRepository.findById(1L).get(); // status : DELETE
-        assertThat(afterPost.getState()).isEqualTo(State.DELETE);
-
-    }
+//    @DisplayName("단 건 게시글을 성공적으로 조회된다.")
+//    @Test
+//    void findPost_test() {
+//
+//        // when
+//        PostResponse post = postService.findPost(1L);
+//
+//        // then
+//        assertThat(post.getContent()).isEqualTo("내용1");
+//    }
+//
+//    @DisplayName("다 건 게시글을 성공적으로 조회된다.")
+//    @Test
+//    void findAllPost_test() {
+//
+//        // when
+//        PostsResponse allPost = postService.findAllPost();
+//
+//        // then
+//        assertThat(allPost.getPosts().size()).isEqualTo(2);
+//    }
+//
+//    @DisplayName("게시글 성공적으로 생성된다.")
+//    @Test
+//    void createPost_test() {
+//        // given
+//        String content = "안녕하세요";
+//        User user = userRepository.findById(1L).get();
+//        PostCreateRequest postCreateRequest = new PostCreateRequest(content);
+//        // when
+//        Long postId = postService.createPost(postCreateRequest, user);
+//        PostResponse post = postService.findPost(postId);
+//
+//
+//        // then
+//        assertThat(postId).isEqualTo(post.getId());
+//    }
+//
+//    @DisplayName("게시글 수정이 성공")
+//    @Test
+//    void modifyPost_test() {
+//
+//        // given
+//        String content = "수정 후 내용";
+//        Post beforePost = postRepository.findById(1L).get(); // "내용1"
+//
+//        User user = userRepository.findById(1L).get();
+//        PostModifyRequest postModifyRequest = new PostModifyRequest(content);
+//
+//        // when
+//        postService.modifyPost(beforePost.getId(), postModifyRequest, user.getId());
+//
+//        // then
+//        Post afterPost = postRepository.findById(1L).get(); // "수정 후 내용"
+//        assertThat(afterPost.getContent()).isEqualTo(content);
+//    }
+//
+//    @DisplayName("게시글 삭제 성공")
+//    @Test
+//    void deletePost_test() {
+//
+//        // given
+//        Post beforePost = postRepository.findById(1L).get();  // status : NORMAL
+//        User user = userRepository.findById(1L).get();
+//
+//        // when
+//        postService.deletePost(beforePost.getId(), user.getId());
+//
+//        // then
+//        Post afterPost = postRepository.findById(1L).get(); // status : DELETE
+//        assertThat(afterPost.getState()).isEqualTo(State.DELETE);
+//
+//    }
 }

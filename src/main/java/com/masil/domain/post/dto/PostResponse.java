@@ -14,11 +14,11 @@ public class PostResponse {
     private Long id;
     private String nickname;
     private String content;
-    private Long viewCount;
+    private int viewCount;
     private List<CommentResponse> comments = new ArrayList<>();
 
     @Builder
-    private PostResponse(Long id, String nickname, String content, Long viewCount,  List<CommentResponse> commentsResponse) {
+    private PostResponse(Long id, String nickname, String content, int viewCount,  List<CommentResponse> commentsResponse) {
         this.id = id;
         this.nickname = nickname;
         this.content = content;
