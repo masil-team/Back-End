@@ -1,0 +1,31 @@
+# yml
+# mysql
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/masil
+    username: root
+    password:
+
+  jpa:
+    properties:
+      hibernate:
+        show-sql: 'true'
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: create
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          nodeValue: trace
+          descriptor:
+            sql: DEBUG
+        SQL: DEBUG
+
+jwt:
+  header: Authorization
+  secret: WkhJMjVlYXo4V25xdGxaNW12WFdTRTZTamMwekt5V0FFNHVjdmFUOUM0R2tKQTVCTEw0WTlsYWo5OE5DdGpaWg==
+  access-token-validity-in-seconds: 86400000

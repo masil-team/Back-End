@@ -3,6 +3,7 @@ package com.masil.domain.user.entity;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -13,8 +14,8 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
 @SuperBuilder
+@NoArgsConstructor
 public class User extends BaseEntity {
 
     @Id
@@ -27,4 +28,12 @@ public class User extends BaseEntity {
     private String state;
     private String profileImage;
 
+    @Builder
+    public User(String email, String password, String nickname, String state, String profileImage) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.state = state;
+        this.profileImage = profileImage;
+    }
 }
