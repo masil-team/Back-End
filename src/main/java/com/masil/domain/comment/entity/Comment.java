@@ -4,6 +4,7 @@ import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Getter
 @SuperBuilder
 @Entity
+@RequiredArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
