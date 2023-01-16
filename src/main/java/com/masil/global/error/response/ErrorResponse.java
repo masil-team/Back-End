@@ -1,17 +1,26 @@
 package com.masil.global.error.response;
 
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.validation.FieldError;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
-@NoArgsConstructor
 public class ErrorResponse {
-    private String message;
-    private int status;
-    private List<FieldError> errors;
 
+    private String code;
+    private String message;
+    private Map<String, String> validation = new HashMap<>();
+
+    @Builder
+    public ErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public void addValidation(String field, String errorMessage) {
+        this.validation.put(field, errorMessage);
+    }
 }
 
