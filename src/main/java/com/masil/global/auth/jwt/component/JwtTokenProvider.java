@@ -34,7 +34,7 @@ public class JwtTokenProvider {
         this.accessTokenValidityInSeconds = jwtProperties.getAccessTokenValidityInSeconds();
     }
 
-    public TokenInfo generationToken(Authentication authentication) {
+    public TokenInfo generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

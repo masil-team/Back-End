@@ -3,10 +3,14 @@ package com.masil.domain.user.service;
 import com.masil.domain.user.dto.UserCreateRequest;
 import com.masil.domain.user.dto.UserLoginRequest;
 import com.masil.domain.user.repository.UserRepository;
+import com.masil.global.auth.jwt.dto.TokenInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,10 +50,14 @@ class UserServiceTest {
     void userLoginWhenSuccess () throws Exception {
         //given
 
+        List<String> rolesRequest = new ArrayList<>();
+        rolesRequest.add("USER");
+
         UserCreateRequest create = UserCreateRequest.builder()
                 .email("test@naver.com")
                 .password("test123")
                 .nickname("테스트")
+                .roles(rolesRequest)
                 .build();
 
         userService.signUp(create);
@@ -59,10 +67,14 @@ class UserServiceTest {
                 .password("test123")
                 .build();
 
-        userService.login(loginRequest);
         //when
+        TokenInfo token = userService.login(loginRequest);
 
         //then
+        System.out.println("Token GrantType :" + token.getGrantType());
+        System.out.println("Token AccessToken :" + token.getAccessToken());
+        System.out.println("Token RefreshToken :" + token.getRefreshToken());
+        assertNotNull(token);
     }
 
 

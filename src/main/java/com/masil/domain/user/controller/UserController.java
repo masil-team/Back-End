@@ -3,6 +3,7 @@ package com.masil.domain.user.controller;
 import com.masil.domain.user.dto.UserCreateRequest;
 import com.masil.domain.user.dto.UserLoginRequest;
 import com.masil.domain.user.service.UserService;
+import com.masil.global.auth.jwt.dto.TokenInfo;
 import com.masil.global.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final AuthService authService;
+//    private final AuthService authService;
 
     @GetMapping
     public String hello() {
@@ -28,9 +29,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody UserLoginRequest request) {
-        userService.login(request);
-
+    public TokenInfo login(@Valid @RequestBody UserLoginRequest request) {
+        return userService.login(request);
     }
 
     @GetMapping("/{userId}")
