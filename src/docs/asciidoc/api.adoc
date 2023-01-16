@@ -1,0 +1,22 @@
+= Spring REST Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels:2
+:sectlinks:
+
+[[resources-post]]
+= 게시글
+
+== 1. 글 상세 보기
+
+=== 1.1 글 상세 보기 성공
+
+==== HTTP request
+
+include::{snippets}/post/findOne/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/findOne/http-response.adoc[]
