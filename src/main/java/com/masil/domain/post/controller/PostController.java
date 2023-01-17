@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +24,6 @@ import javax.validation.Valid;
 public class PostController {
 
     private final PostService postService;
-    private final UserRepository userRepository; // 추후 삭제
 
     // 단 건
     @GetMapping("/{boardId}/posts/{postId}")
@@ -46,12 +46,12 @@ public class PostController {
 
     // 생성
     @PostMapping("/{boardId}/posts")
-    public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
+    public ResponseEntity<Void> createPost(@PathVariable Long boardId,
+                                           @Valid @RequestBody PostCreateRequest postCreateRequest) {
         log.info("게시글 생성 시작");
 
-        User user = userRepository.findById(1L).get(); // 추후 삭제
-        postService.createPost(postCreateRequest, user);
-        return ResponseEntity.ok().build();
+        Long postId = postService.createPost(postCreateRequest, 1L); // 추후 변경
+        return ResponseEntity.created(URI.create("/boards/" + boardId + "/posts/" + postId)).build();
     }
 
     // 수정
@@ -60,8 +60,8 @@ public class PostController {
                                            @PathVariable Long postId,
                                            @Valid @RequestBody PostModifyRequest postModifyRequest) {
         log.info("게시글 수정 시작");
-        User user = userRepository.findById(1L).get(); // 추후 삭제
-        postService.modifyPost(postId, postModifyRequest, user.getId());
+
+        postService.modifyPost(postId, postModifyRequest, 1L);
         return ResponseEntity.ok().build();
     }
 
@@ -70,8 +70,7 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
                                            @PathVariable Long postId) {
         log.info("게시글 삭제 시작");
-        User user = userRepository.findById(1L).get(); // 추후 삭제
-        postService.deletePost(postId, user.getId());
+        postService.deletePost(postId, 1L);
         return ResponseEntity.noContent().build();
     }
 

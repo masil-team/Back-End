@@ -27,10 +27,10 @@ public class PostServiceTest extends ServiceTest {
     @Autowired
     public PostRepository postRepository;
 
-    private final String POST_CONTENT_1 = "내용1";
-    private final String POST_CONTENT_2 = "내용2";
-    private final String USER_EMAIL = "email@naver.com";
-    private final String USER_NICKNAME = "test123";
+    private static final String POST_CONTENT_1 = "내용1";
+    private static final String POST_CONTENT_2 = "내용2";
+    private static final String USER_EMAIL = "email@naver.com";
+    private static final String USER_NICKNAME = "test123";
 
     @BeforeEach
     void setUp() {
@@ -88,7 +88,7 @@ public class PostServiceTest extends ServiceTest {
         PostCreateRequest postCreateRequest = new PostCreateRequest(content);
 
         // when
-        Long postId = postService.createPost(postCreateRequest, user);
+        Long postId = postService.createPost(postCreateRequest, 1L);
         PostResponse post = postService.findPost(postId);
 
 

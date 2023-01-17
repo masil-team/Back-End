@@ -20,3 +20,51 @@ include::{snippets}/post/findOne/http-request.adoc[]
 ==== HTTP response
 
 include::{snippets}/post/findOne/http-response.adoc[]
+
+== 2. 글 목록 보기
+
+=== 2.1 글 목록 보기 성공
+
+==== HTTP request
+
+include::{snippets}/post/findAll/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/findAll/http-response.adoc[]
+
+== 3. 글 생성 하기
+
+=== 3.1 글 생성 하기 성공
+
+==== HTTP request
+
+include::{snippets}/post/create/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/create/http-response.adoc[]
+
+== 4. 글 수정 하기
+
+=== 4.1 글 수정 하기 성공
+
+==== HTTP request
+
+include::{snippets}/post/modify/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/modify/http-response.adoc[]
+
+== 5. 글 삭제 하기
+
+=== 5.1 글 삭제 하기 성공
+
+==== HTTP request
+
+include::{snippets}/post/delete/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/delete/http-response.adoc[]

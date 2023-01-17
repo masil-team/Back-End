@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServiceTest {
 
     @Autowired
-    public DatabaseCleaner databaseCleaner;
+    protected DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void beforeEach() {

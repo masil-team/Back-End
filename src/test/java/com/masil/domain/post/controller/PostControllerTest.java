@@ -1,196 +1,233 @@
 package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.entity.Post;
-import com.masil.domain.post.repository.PostRepository;
+import com.masil.domain.post.dto.*;
 import com.masil.domain.post.service.PostService;
-import com.masil.domain.user.entity.User;
 import com.masil.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-//@WebMvcTest({
-//        PostService.class,
-//        UserRepository.class,
-//})
-@ExtendWith(RestDocumentationExtension.class)
+@WebMvcTest({
+        PostController.class,
+})
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
-@AutoConfigureMockMvc
-@Transactional
 @ActiveProfiles("test")
-//@ExtendWith(MockitoExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class PostControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    @Autowired
-    public PostRepository postRepository;
-
-    @Autowired
+    @MockBean
     private PostService postService;
-    @Autowired
-    private UserRepository userRepository;
-//    @BeforeEach
-//    void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-//        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-//                .apply(documentationConfiguration(restDocumentation))
-//                .build();
-//    }
-    @BeforeEach
-    void beforeEach() {
-        // 초기화
-        User user = User.builder()
-                .email("test@123")
-                .nickname("test")
-                .build();
-        userRepository.save(user);
 
-        Post post1 = Post.builder()
-                .content("내용1")
-                .user(user)
-                .build();
+    private static final PostResponse POST_RESPONSE_1 = PostResponse.builder()
+            .id(1L)
+            .nickname("닉네임1")
+            .content("내용1")
+            .viewCount(0)
+            .commentsResponse(null)
+            .build();
+    private static final PostResponse POST_RESPONSE_2 = PostResponse.builder()
+            .id(2L)
+            .nickname("닉네임2")
+            .content("내용2")
+            .viewCount(0)
+            .commentsResponse(null)
+            .build();
 
-        Post post2 = Post.builder()
-                .content("내용")
-                .user(user)
-                .build();
-
-        postRepository.save(post1);
-        postRepository.save(post2);
-    }
-
-//    @Test
-//    @DisplayName("게시글 생성")
-//    void t1() throws Exception {
-//        // given
-//        PostCreateRequest postCreateRequest = new PostCreateRequest( "Hello");
-//
-//        // when, then
-//        ResultActions resultActions = mvc.perform(
-//                        post("/boards/1/posts")
-//                                .accept(MediaType.APPLICATION_JSON)
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(objectMapper.writeValueAsString(postCreateRequest)));
-//
-//        resultActions
-//                /**
-//                 * isCreated() -> 상태코드 201
-//                 * controller에서 created() 201로 받아야 하는 이유 찾기
-//                 */
-//                .andExpect(status().isOk())
-//                .andExpect(handler().handlerType(PostController.class))
-//                .andExpect(handler().methodName("createPost"));
-//    }
-
+//    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
+//    private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
 
     @Test
-    @DisplayName("게시글 단 건 조회")
-    void t2() throws Exception {
+    @DisplayName("게시글 생성을 성공한다.")
+    void createPost_success() throws Exception {
         // given
-        User user = userRepository.findById(1L).get();
-        PostCreateRequest postCreateRequest = new PostCreateRequest("content");
-        Long postId = postService.createPost(postCreateRequest, user);
+        PostCreateRequest postCreateRequest = PostCreateRequestBuilder.build();
 
-        String url = "/boards/1/posts/" + postId;
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(get(url))
-                .andDo(print());
+        given(postService.createPost(any(), any())).willReturn(1L);
 
-        // THEN
+        // when
+        ResultActions resultActions = requestCreatePost(postCreateRequest);
+
+        // then
         resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(handler().handlerType(PostController.class))
-                .andExpect(content().string(containsString("content")))
-                .andDo(document("post/findOne",
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/boards/1/posts/1"))
+                .andDo(document("post/create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        responseFields(
-                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 id"),
-                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임"),
-                                fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                                fieldWithPath("viewCount").type(JsonFieldType.NUMBER).description(0),
-                                fieldWithPath("comments").type(JsonFieldType.NULL).description("댓글")
+                        requestFields(
+                                fieldWithPath("content").description("내용")
                         )
                 ));
     }
 
-//    @Test
-//    @DisplayName("게시글 다 건 조회")
-//    void t3() throws Exception {
-//        // given
-//
-//        String url = "/boards/1/posts/";
-//        // WHEN
-//        ResultActions resultActions = mvc
-//                .perform(get(url))
-//                .andDo(print());
-//
-//        // THEN
-//        resultActions
-//                .andExpect(status().is2xxSuccessful())
-//                .andExpect(handler().handlerType(PostController.class));
-//    }
-//
-//    @Test
-//    @DisplayName("게시글 수정")
-//    void t4() throws Exception {
-//        // given
-//        PostModifyRequest postModifyRequest = new PostModifyRequest( "수정된 내용");
-//
-//        // WHEN
-//        ResultActions resultActions = mvc
-//                .perform(get("/boards/{boardId}/posts/{postId}",1,1)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(postModifyRequest)))
-//                .andDo(print());
-//
-//        // THEN
-//        resultActions
-//                .andExpect(status().is2xxSuccessful());
-//    }
-//
-//    @Test
-//    @DisplayName("게시글 삭제")
-//    void t5() throws Exception {
-//
-//        // WHEN
-//        ResultActions resultActions = mvc
-//                .perform(get("/boards/{boardId}/posts/{postId}",1,1)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print());
-//
-//        // THEN
-//        resultActions
-//                .andExpect(status().is2xxSuccessful());
-//    }
+    @Test
+    @DisplayName("게시글 단 건 조회를 성공한다.")
+    void findPost_success() throws Exception {
+
+        // given
+        given(postService.findPost(any())).willReturn(POST_RESPONSE_1);
+
+        // when
+        ResultActions resultActions = requestFindPost();
+
+        // then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("post/findOne",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("id").description("게시글 id"),
+                                fieldWithPath("nickname").description("닉네임"),
+                                fieldWithPath("content").description("내용"),
+                                fieldWithPath("viewCount").description(0),
+                                fieldWithPath("comments").description("댓글")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("게시글 다 건 조회를 성공한다.")
+    void t3() throws Exception {
+        // given
+        List<PostResponse> postResponse = new ArrayList<>();
+        postResponse.add(POST_RESPONSE_1);
+        postResponse.add(POST_RESPONSE_2);
+        PostsResponse postsResponse = new PostsResponse(postResponse);
+
+        given(postService.findAllPost()).willReturn(postsResponse);
+
+        // when
+        ResultActions resultActions = requestFindAllPost();
+
+        // then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("post/findAll",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("posts.[].id").description("게시글 id 1"),
+                                fieldWithPath("posts.[].nickname").description("닉네임"),
+                                fieldWithPath("posts.[].content").description("내용1"),
+                                fieldWithPath("posts.[].viewCount").description(0),
+                                fieldWithPath("posts.[].comments").description("댓글"),
+                                fieldWithPath("posts.[].id").description("게시글 id 2"),
+                                fieldWithPath("posts.[].nickname").description("닉네임"),
+                                fieldWithPath("posts.[].content").description("내용2"),
+                                fieldWithPath("posts.[].viewCount").description(0),
+                                fieldWithPath("posts.[].comments").description("댓글")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("게시글 수정")
+    void t4() throws Exception {
+        // given
+        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build();
+
+        willDoNothing().given(postService).modifyPost(any(),any(),any());
+
+        // when
+        ResultActions resultActions = requestModifyPost(postModifyRequest);
+
+        // then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("post/modify",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("content").description("수정할 내용")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void t5() throws Exception {
+
+        // given
+        willDoNothing().given(postService).deletePost(any(), any());
+        // when
+        ResultActions resultActions = requestDeletePost();
+
+        // then
+        resultActions
+                .andExpect(status().isNoContent())
+                .andDo(document("post/delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())
+        ));
+    }
+
+    private ResultActions requestCreatePost(PostCreateRequest dto) throws Exception {
+        return mockMvc.perform(post("/boards/1/posts")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andDo(print());
+    }
+
+    private ResultActions requestFindPost() throws Exception {
+        return mockMvc.perform(get("/boards/1/posts/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
+
+    private ResultActions requestFindAllPost() throws Exception {
+        return mockMvc.perform(get("/boards/1/posts/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
+    private ResultActions requestModifyPost(PostModifyRequest dto) throws Exception {
+        return mockMvc.perform(patch("/boards/1/posts/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andDo(print());
+    }
+    private ResultActions requestDeletePost() throws Exception {
+        return mockMvc.perform(delete("/boards/1/posts/1")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
 
 }
