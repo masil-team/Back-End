@@ -29,7 +29,7 @@ public class PostResponse {
     public static PostResponse from(Post post) {
         return PostResponse.builder()
                 .id(post.getId())
-                .nickname(post.getUser().getNickname())
+                .nickname(post.getMember().getNickname())
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
                 .build();

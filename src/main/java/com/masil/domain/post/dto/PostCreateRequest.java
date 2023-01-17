@@ -1,7 +1,7 @@
 package com.masil.domain.post.dto;
 
 import com.masil.domain.post.entity.Post;
-import com.masil.domain.user.entity.User;
+import com.masil.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +20,9 @@ public class PostCreateRequest {
         this.content = content;
     }
 
-    public Post toEntity(User user){
+    public Post toEntity(Member member){
         return Post.builder()
-                .user(user)
+                .member(member)
                 .content(content)
                 .build();
     }

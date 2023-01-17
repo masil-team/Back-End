@@ -8,8 +8,8 @@ import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.domain.user.entity.User;
-import com.masil.domain.user.repository.UserRepository;
+import com.masil.domain.member.entity.Member;
+import com.masil.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     public PostResponse findPost(Long postId) {
         Post post = findPostById(postId);
@@ -37,16 +37,16 @@ public class PostService {
     }
 
     @Transactional
-    public Long createPost(PostCreateRequest postCreateRequest, Long userId){
-        User user = findUserById(userId);
+    public Long createPost(PostCreateRequest postCreateRequest, Long memberId){
+        Member member = findUserById(memberId);
         Post post = postCreateRequest.toEntity(user);
         return postRepository.save(post).getId();
     }
 
     @Transactional
-    public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long userId){
+    public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long memberId){
         Post post = findPostById(postId);
-        findUserById(userId);
+        findUserById(memberId);
 
         post.updateContent(postModifyRequest.getContent());
     }
@@ -65,10 +65,8 @@ public class PostService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
+    private Member findUserById(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(RuntimeException::new);
     }
-
-
 }

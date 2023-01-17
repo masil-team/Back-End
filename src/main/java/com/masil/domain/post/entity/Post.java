@@ -1,13 +1,12 @@
 package com.masil.domain.post.entity;
 
 import com.masil.domain.comment.entity.Comment;
-import com.masil.domain.user.entity.User;
+import com.masil.domain.member.entity.Member;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,15 +32,15 @@ public class Post extends BaseEntity {
     private State state;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "USER_ID")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Post(String content, User user) {
+    private Post(String content, Member member) {
         this.content = content;
-        this.user = user;
+        this.member = member;
         this.state = State.NORMAL;
     }
     
