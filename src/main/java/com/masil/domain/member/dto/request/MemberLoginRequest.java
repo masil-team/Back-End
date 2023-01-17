@@ -1,4 +1,4 @@
-package com.masil.domain.user.dto;
+package com.masil.domain.member.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,14 +6,14 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class UserLoginRequest {
+public class MemberLoginRequest {
     @NotBlank(message = "잘못된 이메일입니다.")
     private final String email;
     @NotBlank(message = "잘못된 비밀번호입니다.")
     private final String password;
 
     @Builder
-    public UserLoginRequest(String email, String password) {
+    public MemberLoginRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }

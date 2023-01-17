@@ -29,3 +29,4 @@ jwt:
   header: Authorization
   secret: WkhJMjVlYXo4V25xdGxaNW12WFdTRTZTamMwekt5V0FFNHVjdmFUOUM0R2tKQTVCTEw0WTlsYWo5OE5DdGpaWg==
   access-token-validity-in-seconds: 86400000
+  refresh-token-expire-time: 86400000
