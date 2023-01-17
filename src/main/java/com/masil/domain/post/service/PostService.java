@@ -37,7 +37,8 @@ public class PostService {
     }
 
     @Transactional
-    public Long createPost(PostCreateRequest postCreateRequest, User user){
+    public Long createPost(PostCreateRequest postCreateRequest, Long userId){
+        User user = findUserById(userId);
         Post post = postCreateRequest.toEntity(user);
         return postRepository.save(post).getId();
     }

@@ -13,7 +13,7 @@ spring:
         show-sql: 'true'
         format_sql: 'true'
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 logging:
   level:
@@ -24,3 +24,7 @@ logging:
           descriptor:
             sql: DEBUG
         SQL: DEBUG
+jwt:
+  header: Authorization
+  secret: WkhJMjVlYXo4V25xdGxaNW12WFdTRTZTamMwekt5V0FFNHVjdmFUOUM0R2tKQTVCTEw0WTlsYWo5OE5DdGpaWg==
+  access-token-validity-in-seconds: 86400000

@@ -4,7 +4,7 @@ import com.masil.domain.user.dto.UserCreateRequest;
 import com.masil.domain.user.dto.UserLoginRequest;
 import com.masil.domain.user.service.UserService;
 import com.masil.global.auth.jwt.dto.TokenInfo;
-import com.masil.global.auth.service.AuthService;
+//import com.masil.global.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
