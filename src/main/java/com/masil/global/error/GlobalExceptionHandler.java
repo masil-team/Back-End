@@ -1,6 +1,5 @@
-package com.masil.global.error.handler;
+package com.masil.global.error;
 
-import com.masil.global.error.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
