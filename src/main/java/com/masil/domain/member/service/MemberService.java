@@ -6,6 +6,7 @@ import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.model.MemberAuthType;
 import com.masil.global.auth.repository.AuthorityRepository;
 import com.masil.global.error.exception.BusinessException;
+import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class MemberService {
         Set<Authority> authorites = new HashSet<>();
 
         authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
-                .orElseThrow(() -> new BusinessException()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
 
         memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
     }
