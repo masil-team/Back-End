@@ -2,12 +2,14 @@ package com.masil.global.auth.service;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
+import com.masil.global.auth.context.CurrentMemberContext;
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.RefreshToken;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import com.masil.global.auth.repository.RefreshTokenRepository;
+import com.masil.global.auth.util.AuthUtil;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -98,6 +100,7 @@ public class AuthService {
 
         log.debug("refresh Origin = {}",orgRefreshToken);
         log.debug("refresh New = {} ",newRefreshToken);
+
         // 6. 저장소 정보 업데이트 (dirtyChecking으로 업데이트)
         refreshToken.updateValue(newRefreshToken);
 
@@ -112,4 +115,15 @@ public class AuthService {
     public void logout() {
     }
 
+    public CurrentMemberContext getCurrentMemberContext() {
+        String currentMemberEmail = AuthUtil.getCurrentMemberEmail();
+
+        Member member = memberRepository.findByEmail(currentMemberEmail)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+
+        return CurrentMemberContext.builder()
+                .id(member.getId())
+                .eamil(member.getEmail())
+                .build();
+    }
 }
