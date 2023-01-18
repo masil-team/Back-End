@@ -41,6 +41,7 @@ public class Member extends BaseEntity {
             joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
     )
+    @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
     @Builder

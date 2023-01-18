@@ -39,7 +39,7 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateRequest postCreateRequest, Long memberId){
         Member member = findUserById(memberId);
-        Post post = postCreateRequest.toEntity(user);
+        Post post = postCreateRequest.toEntity(member);
         return postRepository.save(post).getId();
     }
 
