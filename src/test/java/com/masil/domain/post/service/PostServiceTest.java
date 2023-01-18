@@ -1,7 +1,8 @@
 package com.masil.domain.post.service;
 
-import com.masil.common.DatabaseCleaner;
 import com.masil.common.annotation.ServiceTest;
+import com.masil.domain.member.entity.Member;
+import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.PostCreateRequest;
 import com.masil.domain.post.dto.PostModifyRequest;
 import com.masil.domain.post.dto.PostResponse;
@@ -9,8 +10,6 @@ import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.domain.user.entity.User;
-import com.masil.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class PostServiceTest extends ServiceTest {
     @Autowired
     public PostService postService;
     @Autowired
-    public UserRepository userRepository;
+    public MemberRepository memberRepository;
     @Autowired
     public PostRepository postRepository;
 
@@ -34,19 +33,19 @@ public class PostServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
-        User user = User.builder()
+        Member member = Member.builder()
                 .email(USER_EMAIL)
                 .nickname(USER_NICKNAME)
                 .build();
-        userRepository.save(user);
+        memberRepository.save(member);
 
         Post post1 = Post.builder()
                 .content(POST_CONTENT_1)
-                .user(user)
+                .member(member)
                 .build();
         Post post2 = Post.builder()
                 .content(POST_CONTENT_2)
-                .user(user)
+                .member(member)
                 .build();
         postRepository.save(post1);
         postRepository.save(post2);
@@ -82,7 +81,7 @@ public class PostServiceTest extends ServiceTest {
     @Test
     void createPost_test() {
         // given
-        User user = userRepository.findById(1L).get();
+        Member member = memberRepository.findById(1L).get();
 
         String content = "새로운 내용";
         PostCreateRequest postCreateRequest = new PostCreateRequest(content);
@@ -95,7 +94,7 @@ public class PostServiceTest extends ServiceTest {
         // then
         assertThat(post.getId()).isEqualTo(postId);
         assertThat(post.getContent()).isEqualTo(content);
-        assertThat(post.getNickname()).isEqualTo(user.getNickname());
+        assertThat(post.getNickname()).isEqualTo(member.getNickname());
         assertThat(post.getViewCount()).isEqualTo(0);
     }
 
@@ -104,7 +103,7 @@ public class PostServiceTest extends ServiceTest {
     void modifyPost_test() {
 
         // given
-        User user = userRepository.findById(1L).get();
+        Member member = memberRepository.findById(1L).get();
 
         String content = "수정 후 내용";
         Post beforePost = postRepository.findById(1L).get();
@@ -112,7 +111,7 @@ public class PostServiceTest extends ServiceTest {
         PostModifyRequest postModifyRequest = new PostModifyRequest(content);
 
         // when
-        postService.modifyPost(beforePost.getId(), postModifyRequest, user.getId());
+        postService.modifyPost(beforePost.getId(), postModifyRequest, member.getId());
 
         // then
         Post afterPost = postRepository.findById(1L).get();
@@ -125,10 +124,10 @@ public class PostServiceTest extends ServiceTest {
 
         // given
         Post beforePost = postRepository.findById(1L).get();  // status : NORMAL
-        User user = userRepository.findById(1L).get();
+        Member member = memberRepository.findById(1L).get();
 
         // when
-        postService.deletePost(beforePost.getId(), user.getId());
+        postService.deletePost(beforePost.getId(), member.getId());
 
         // then
         Post afterPost = postRepository.findById(1L).get(); // status : DELETE

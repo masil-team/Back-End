@@ -3,7 +3,6 @@ package com.masil.domain.post.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.service.PostService;
-import com.masil.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
