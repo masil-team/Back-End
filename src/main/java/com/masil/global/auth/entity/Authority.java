@@ -19,7 +19,7 @@ public class Authority {
     @Enumerated(EnumType.STRING)
     private MemberAuthType authorityName;
 
-    public String getAuthorityName() {
+    public String getAuthorityNameToString() {
         return authorityName.toString();
     }
 

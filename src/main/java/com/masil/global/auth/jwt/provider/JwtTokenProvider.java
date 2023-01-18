@@ -50,7 +50,7 @@ public class JwtTokenProvider {
         // ex)  auth : ROLE_USER,ROLE_ADMIN
         claims.put(AUTHORITIES_KEY,
                 auth.stream()
-                        .map(Authority::getAuthorityName)
+                        .map(Authority::getAuthorityNameToString)
                         .collect(Collectors.joining(","))
         );
 

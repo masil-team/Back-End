@@ -10,12 +10,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
@@ -33,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Collections<? extends GrantedAuthority>
         List<SimpleGrantedAuthority> authList = member.getAuthorities()
                 .stream()
-                .map(Authority::getAuthorityName)
+                .map(Authority::getAuthorityNameToString)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 

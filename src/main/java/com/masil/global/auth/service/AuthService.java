@@ -47,12 +47,14 @@ public class AuthService {
         String refreshToken = jwtTokenProvider.createRefreshToken(email, member.getAuthorities());
 
         // 리프레쉬 토큰 DB 저장
-        refreshTokenRepository.save(
+        RefreshToken save = refreshTokenRepository.save(
                 RefreshToken.builder()
                         .key(email)
                         .value(refreshToken)
                         .build()
         );
+
+        log.debug("refreshToken = key : {} , value : {} ", save.getKey(), save.getValue());
 
         return jwtTokenProvider.createTokenResponse(accessToken,refreshToken);
     }
