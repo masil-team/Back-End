@@ -25,16 +25,6 @@ public class MemberService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public void signUp(MemberCreateRequest createRequest) {
-        Set<Authority> authorites = new HashSet<>();
-
-        authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
-
-        memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
-    }
-
     public void getMyUser() {
     }
 

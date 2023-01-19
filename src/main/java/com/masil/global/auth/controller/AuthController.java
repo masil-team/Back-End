@@ -1,5 +1,6 @@
 package com.masil.global.auth.controller;
 
+import com.masil.domain.member.dto.request.MemberCreateRequest;
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
@@ -21,6 +22,10 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/signup")
+    public void signUp(@Valid @RequestBody MemberCreateRequest createRequest) {
+        authService.signUp(createRequest);
+    }
     @PostMapping("/login")
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);

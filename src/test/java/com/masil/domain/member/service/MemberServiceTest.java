@@ -19,26 +19,6 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("회원가입 성공")
-    void saveUserWhenSuccess () throws Exception {
-
-        //given
-        MemberCreateRequest request = MemberCreateRequest.builder()
-                .email("test@naver.com")
-                .nickname("테스트")
-                .password("test123")
-                .build();
-        //when
-        memberService.signUp(request);
-
-        //then
-        assertEquals(1L, memberRepository.findAll().size());
-        assertEquals(request.getEmail(), memberRepository.findAll().get(0).getEmail());
-        assertEquals(request.getNickname(), memberRepository.findAll().get(0).getNickname());
-        assertEquals(request.getPassword(), memberRepository.findAll().get(0).getPassword());
-    }
-
-    @Test
     @DisplayName("이메일 중복으로 인한 회원가입 실패")
     void saveUserFailBecauseDuplicateEmail () throws Exception {
         //given

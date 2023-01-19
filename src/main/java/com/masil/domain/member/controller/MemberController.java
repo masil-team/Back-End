@@ -13,12 +13,6 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
-
-    @PostMapping
-    public void signUp(@Valid @RequestBody MemberCreateRequest createRequest) {
-        memberService.signUp(createRequest);
-    }
-
     @GetMapping("/{memberId}")
     public void findMember() {
         memberService.getMyUser();

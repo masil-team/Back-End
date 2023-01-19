@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,7 +59,7 @@ class AuthServiceTest extends ServiceTest{
                 .nickname(testNickName)
                 .build();
 
-        memberService.signUp(createRequest);
+        authService.signUp(createRequest);
 
         LoginRequest loginRequest = LoginRequest.builder()
                 .email(testEmail)
