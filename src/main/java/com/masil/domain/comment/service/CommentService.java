@@ -6,6 +6,8 @@ import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
+import com.masil.domain.member.entity.Member;
+import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.PostCreateRequest;
 import com.masil.domain.post.dto.PostModifyRequest;
 import com.masil.domain.post.dto.PostResponse;
@@ -39,11 +41,8 @@ public class CommentService {
         // findByNickname 은 추후에 UserRepository 만듬
 //        User user = userRepository.findByNickname(nickname);
 
-        Post posts = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글 쓰기 실패: 해당 게시글이 존재하지 않습니다. id = " +  postId));
-        commentCreateRequest.setPost(posts);
-
-        Comment comment = commentCreateRequest.toEntity();
+        Post post  = findPostById(postId);
+        Comment comment = commentCreateRequest.toEntity(post);
 
         return commentRepository.save(comment).getId();
     }
@@ -60,7 +59,7 @@ public class CommentService {
     }
 
     /**
-     * 댓글 조회 ( 추후 수정 )
+     * 댓글 조회
      */
     public List<CommentResponse> findComments(Long postId){
 
@@ -95,5 +94,6 @@ public class CommentService {
         return postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
     }
+
 
 }

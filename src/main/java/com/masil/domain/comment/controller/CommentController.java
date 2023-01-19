@@ -23,7 +23,7 @@ public class CommentController {
     private final CommentService commentService;
 
     /**
-     * 댓글 조회 ( 추후 작성 )
+     * 댓글 조회
      */
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> findComments(@PathVariable Long postId){
