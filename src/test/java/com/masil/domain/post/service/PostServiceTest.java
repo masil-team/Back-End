@@ -3,10 +3,7 @@ package com.masil.domain.post.service;
 import com.masil.common.annotation.ServiceTest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostResponse;
-import com.masil.domain.post.dto.PostsResponse;
+import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.repository.PostRepository;
@@ -15,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,10 +39,12 @@ public class PostServiceTest extends ServiceTest {
         Member member1 = Member.builder()
                 .email(USER_EMAIL_1)
                 .nickname(USER_NICKNAME_1)
+                .password("123")
                 .build();
         Member member2 = Member.builder()
                 .email(USER_EMAIL_2)
                 .nickname(USER_NICKNAME_2)
+                .password("123")
                 .build();
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -60,30 +61,58 @@ public class PostServiceTest extends ServiceTest {
         postRepository.save(post2);
     }
 
-    @DisplayName("단 건 게시글을 성공적으로 조회된다.")
+    @DisplayName("상세 게시글이 성공적으로 조회된다.")
     @Test
-    void findPost_test() {
+    void findPost_success() {
 
         // when
-        PostResponse post = postService.findPost(1L);
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
 
         // then
-        assertThat(post.getId()).isEqualTo(1L);
-        assertThat(post.getContent()).isEqualTo(POST_CONTENT_1);
-        assertThat(post.getNickname()).isEqualTo(USER_NICKNAME_1);
-        assertThat(post.getViewCount()).isEqualTo(0);
-        assertThat(post.getComments()).isNull();
+        assertThat(postDetailResponse.getId()).isEqualTo(1L);
+        assertThat(postDetailResponse.getMemberId()).isEqualTo(1L);
+        assertThat(postDetailResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postDetailResponse.getContent()).isEqualTo(POST_CONTENT_1);
+        assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
+        assertThat(postDetailResponse.getLikeCount()).isEqualTo(0);
+        assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
+        assertThat(postDetailResponse.getIsLike()).isEqualTo(false);
+    }
+    @DisplayName("본인의 상세 게시글인 경우")
+    @Test
+    void findPost_isOwner() {
+
+        // when
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 1L);
+
+        // then
+        assertThat(postDetailResponse.getIsOwner()).isEqualTo(true);
     }
 
-    @DisplayName("다 건 게시글을 성공적으로 조회된다.")
+    @DisplayName("좋아요한 상세 게시글인 경우")
     @Test
-    void findAllPost_test() {
+    void findPost_isLike() {
+        /**
+         *
+         */
+    }
+
+    @DisplayName("게시글 목록이 성공적으로 조회된다.")
+    @Test
+    void findAllPost_success() {
 
         // when
         PostsResponse allPost = postService.findAllPost();
-
+        PostsElementResponse postsElementResponse = allPost.getPosts().get(0);
         // then
         assertThat(allPost.getPosts().size()).isEqualTo(2);
+        assertThat(postsElementResponse.getId()).isEqualTo(1L);
+        assertThat(postsElementResponse.getMemberId()).isEqualTo(1L);
+        assertThat(postsElementResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postsElementResponse.getContent()).isEqualTo(POST_CONTENT_1);
+        assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
+        assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);
+        assertThat(postsElementResponse.getCommentCount()).isEqualTo(0);
     }
 
     @DisplayName("게시글이 성공적으로 생성된다.")
@@ -97,13 +126,13 @@ public class PostServiceTest extends ServiceTest {
 
         // when
         Long postId = postService.createPost(postCreateRequest, 1L);
-        PostResponse post = postService.findPost(postId);
+        Post post = postRepository.findById(postId).get();
 
 
         // then
         assertThat(post.getId()).isEqualTo(postId);
         assertThat(post.getContent()).isEqualTo(content);
-        assertThat(post.getNickname()).isEqualTo(member.getNickname());
+        assertThat(post.getMember().getId()).isEqualTo(member.getId());
         assertThat(post.getViewCount()).isEqualTo(0);
     }
 

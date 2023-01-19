@@ -9,16 +9,15 @@ import java.util.stream.Collectors;
 @Getter
 public class PostsResponse {
 
-    private List<PostResponse> posts;
+    private List<PostsElementResponse> posts;
 
-    public PostsResponse(List<PostResponse> posts) {
+    public PostsResponse(List<PostsElementResponse> posts) {
         this.posts = posts;
     }
-    public static PostsResponse ofPosts(List<Post> postList) {
-        // post 리스트 -> postResponse 리스트
-        List<PostResponse> postsResponse = postList
+    public static PostsResponse ofPosts(List<Post> posts) {
+        List<PostsElementResponse> postsResponse = posts
                 .stream()
-                .map(PostResponse::from)
+                .map((Post post) -> PostsElementResponse.of(post))
                 .collect(Collectors.toList());
 
         return new PostsResponse(postsResponse);

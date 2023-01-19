@@ -1,7 +1,9 @@
 package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.dto.*;
+import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,11 +19,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -50,19 +52,30 @@ public class PostControllerTest {
     @MockBean
     private PostService postService;
 
-    private static final PostResponse POST_RESPONSE_1 = PostResponse.builder()
+    private static final PostDetailResponse POST_RESPONSE_1 = PostDetailResponse.builder()
             .id(1L)
+            .memberId(1L)
             .nickname("닉네임1")
             .content("내용1")
             .viewCount(0)
-            .commentsResponse(null)
+            .likeCount(0)
+            .isOwner(false)
+            .isLike(false)
+            .createDate(LocalDateTime.now())
+            .modifyDate(LocalDateTime.now())
             .build();
-    private static final PostResponse POST_RESPONSE_2 = PostResponse.builder()
+
+    private static final PostDetailResponse POST_RESPONSE_2 = PostDetailResponse.builder()
             .id(2L)
+            .memberId(1L)
             .nickname("닉네임2")
             .content("내용2")
             .viewCount(0)
-            .commentsResponse(null)
+            .likeCount(0)
+            .isOwner(false)
+            .isLike(false)
+            .createDate(LocalDateTime.now())
+            .modifyDate(LocalDateTime.now())
             .build();
 
 //    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
@@ -93,11 +106,11 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 단 건 조회를 성공한다.")
+    @DisplayName("게시글 상세 조회를 성공한다.")
     void findPost_success() throws Exception {
 
         // given
-        given(postService.findPost(any())).willReturn(POST_RESPONSE_1);
+        given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
         ResultActions resultActions = requestFindPost();
@@ -110,22 +123,39 @@ public class PostControllerTest {
                         preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("id").description("게시글 id"),
+                                fieldWithPath("memberId").description("작성자 id"),
                                 fieldWithPath("nickname").description("닉네임"),
                                 fieldWithPath("content").description("내용"),
-                                fieldWithPath("viewCount").description(0),
-                                fieldWithPath("comments").description("댓글")
+                                fieldWithPath("viewCount").description("조회수"),
+                                fieldWithPath("likeCount").description("좋아요 개수"),
+                                fieldWithPath("isOwner").description("본인 게시글 여부"),
+                                fieldWithPath("isLike").description("게시글 좋아요 여부"),
+                                fieldWithPath("createDate").description("생성 날짜"),
+                                fieldWithPath("modifyDate").description("수정 날짜")
                         )
                 ));
     }
 
     @Test
-    @DisplayName("게시글 다 건 조회를 성공한다.")
+    @DisplayName("게시글 목록 조회를 성공한다.")
     void t3() throws Exception {
         // given
-        List<PostResponse> postResponse = new ArrayList<>();
-        postResponse.add(POST_RESPONSE_1);
-        postResponse.add(POST_RESPONSE_2);
-        PostsResponse postsResponse = new PostsResponse(postResponse);
+        List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            postsElementResponseList.add(PostsElementResponse.builder()
+                    .id((long) i)
+                    .memberId(1L)
+                    .nickname("닉네임")
+                    .content("내용")
+                    .viewCount(0)
+                    .likeCount(0)
+                    .commentCount(0)
+                    .createDate(LocalDateTime.now())
+                    .modifyDate(LocalDateTime.now())
+                    .build());
+        }
+
+        PostsResponse postsResponse = new PostsResponse(postsElementResponseList);
 
         given(postService.findAllPost()).willReturn(postsResponse);
 
@@ -139,20 +169,36 @@ public class PostControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
-                                fieldWithPath("posts.[].id").description("게시글 id 1"),
+                                fieldWithPath("posts.[].id").description("게시글 id"),
+                                fieldWithPath("posts.[].memberId").description("작성자 id"),
                                 fieldWithPath("posts.[].nickname").description("닉네임"),
-                                fieldWithPath("posts.[].content").description("내용1"),
-                                fieldWithPath("posts.[].viewCount").description(0),
-                                fieldWithPath("posts.[].comments").description("댓글"),
-                                fieldWithPath("posts.[].id").description("게시글 id 2"),
+                                fieldWithPath("posts.[].content").description("내용"),
+                                fieldWithPath("posts.[].viewCount").description("조회수"),
+                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
+                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].id").description("게시글 id"),
+                                fieldWithPath("posts.[].memberId").description("작성자 id"),
                                 fieldWithPath("posts.[].nickname").description("닉네임"),
-                                fieldWithPath("posts.[].content").description("내용2"),
-                                fieldWithPath("posts.[].viewCount").description(0),
-                                fieldWithPath("posts.[].comments").description("댓글")
+                                fieldWithPath("posts.[].content").description("내용"),
+                                fieldWithPath("posts.[].viewCount").description("조회수"),
+                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
+                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜")
                         )
                 ));
     }
-
+//    private Long id;
+//    private Long memberId;
+//    private String nickname;
+//    private String content;  // 글자 제한
+//    private int viewCount;
+//    private int likeCount;
+//    private int commentCount;
+//    private LocalDateTime createDate;
+//    private LocalDateTime modifyDate;
     @Test
     @DisplayName("게시글 수정")
     void t4() throws Exception {

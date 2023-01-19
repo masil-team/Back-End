@@ -25,8 +25,12 @@ public class Post extends BaseEntity {
     private Long id;
 
     private String content;
+
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int viewCount;
+
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int likeCount;
 
     @Enumerated(EnumType.STRING)
     private State state;
@@ -34,6 +38,7 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
@@ -54,5 +59,15 @@ public class Post extends BaseEntity {
 
     public boolean isOwner(Long memberId) {
         return this.member.getId() == memberId;
+    }
+
+    public void plusView() {
+        this.viewCount++;
+    }
+    public int getCommentCount() {
+        if (comments == null) {
+            return 0;
+        }
+        return comments.size();
     }
 }

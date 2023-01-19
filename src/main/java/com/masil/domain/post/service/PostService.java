@@ -1,26 +1,22 @@
 package com.masil.domain.post.service;
 
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostModifyRequest;
+import com.masil.domain.post.dto.*;
 
-import com.masil.domain.post.dto.PostResponse;
-import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 
+import com.masil.domain.postlike.repository.PostLikeRepository;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
-import com.masil.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +25,19 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
 
-    public PostResponse findPost(Long postId) {
+    public PostDetailResponse findDetailPost(Long postId, Long memberId) { // memberId 임시값
         Post post = findPostById(postId);
+        post.plusView();
 
-        return PostResponse.from(post);
+        // 본인 글인지 체크
+        boolean isOwner = post.isOwner(memberId);
+
+        // 좋아요한 글인지 체크
+        boolean isLike = postLikeRepository.existsByPostAndMemberId(post, memberId);
+
+        return PostDetailResponse.of(post, isOwner, isLike);
     }
 
     public PostsResponse findAllPost() {

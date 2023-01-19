@@ -4,11 +4,9 @@ import com.masil.domain.post.dto.PostCreateRequest;
 
 import com.masil.domain.post.dto.PostModifyRequest;
 
-import com.masil.domain.post.dto.PostResponse;
+import com.masil.domain.post.dto.PostDetailResponse;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
-import com.masil.domain.member.entity.Member;
-import com.masil.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,20 +23,20 @@ public class PostController {
 
     private final PostService postService;
 
-    // 단 건
+    // 상세 조회
     @GetMapping("/{boardId}/posts/{postId}")
-    public ResponseEntity<PostResponse> findPost(@PathVariable Long boardId,
-                                                 @PathVariable Long postId) {
-        log.info("게시글 단건 조회 시작");
+    public ResponseEntity<PostDetailResponse> findDetailPost(@PathVariable Long boardId,
+                                                             @PathVariable Long postId) {
+        log.info("게시글 상세 조회 시작");
 
-        PostResponse postResponse = postService.findPost(postId);
-        return ResponseEntity.ok(postResponse);
+        PostDetailResponse postDetailResponse = postService.findDetailPost(postId, 1L);
+        return ResponseEntity.ok(postDetailResponse);
     }
 
-    // 다 건
+    // 목록 조회
     @GetMapping("/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId) {
-        log.info("게시글 다건 조회 시작");
+        log.info("게시글 목록 조회 시작");
 
         PostsResponse postsResponse = postService.findAllPost();
         return ResponseEntity.ok(postsResponse);
