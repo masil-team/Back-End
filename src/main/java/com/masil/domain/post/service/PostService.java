@@ -11,11 +11,16 @@ import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 
+import com.masil.global.error.exception.BusinessException;
+import com.masil.global.error.exception.ErrorCode;
+import com.masil.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -48,18 +53,27 @@ public class PostService {
         Post post = findPostById(postId);
         findUserById(memberId);
 
+        validateOwner(memberId, post);
+
         post.updateContent(postModifyRequest.getContent());
     }
 
     @Transactional
-    public void deletePost(Long postId, Long userId) {
+    public void deletePost(Long postId, Long memberId) {
         Post post = findPostById(postId);
-        findUserById(userId);
+        findUserById(memberId);
+
+        validateOwner(memberId, post);
 
         post.tempDelete();
     }
 
-    // 예외 처리
+    private void validateOwner(Long memberId, Post post) {
+        if (!post.isOwner(memberId)) {
+            throw new BusinessException(ErrorCode.HANDLE_ACCESS_DENIED); // 추후 변경
+        }
+    }
+
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);

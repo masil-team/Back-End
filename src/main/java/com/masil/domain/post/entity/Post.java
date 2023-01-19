@@ -52,4 +52,7 @@ public class Post extends BaseEntity {
         this.state = State.DELETE;
     }
 
+    public boolean isOwner(Long memberId) {
+        return this.member.getId() == memberId;
+    }
 }
