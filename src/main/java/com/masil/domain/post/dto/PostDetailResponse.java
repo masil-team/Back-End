@@ -1,6 +1,7 @@
 package com.masil.domain.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 public class PostDetailResponse {
 
     private Long id;
-    private Long memberId;
-    private String nickname;
+    private MemberResponse member;
     private String content;
     private int viewCount;
     private int likeCount;
@@ -29,8 +29,7 @@ public class PostDetailResponse {
     public static PostDetailResponse of(Post post, boolean isOwner, boolean isLike) {
         return PostDetailResponse.builder()
                 .id(post.getId())
-                .memberId(post.getMember().getId())
-                .nickname(post.getMember().getNickname())
+                .member(MemberResponse.of(post.getMember()))
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())

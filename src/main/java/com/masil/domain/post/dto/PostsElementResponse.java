@@ -1,5 +1,6 @@
 package com.masil.domain.post.dto;
 
+import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class PostsElementResponse {
     private Long id;
-    private Long memberId;
-    private String nickname;
+    private MemberResponse member;
     private String content;  // 글자 제한
     private int viewCount;
     private int likeCount;
@@ -27,8 +27,7 @@ public class PostsElementResponse {
     public static PostsElementResponse of(Post post) {
         return PostsElementResponse.builder()
                 .id(post.getId())
-                .memberId(post.getMember().getId())
-                .nickname(post.getMember().getNickname())
+                .member(MemberResponse.of(post.getMember()))
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
