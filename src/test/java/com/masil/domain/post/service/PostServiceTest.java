@@ -70,8 +70,8 @@ public class PostServiceTest extends ServiceTest {
 
         // then
         assertThat(postDetailResponse.getId()).isEqualTo(1L);
-        assertThat(postDetailResponse.getMemberId()).isEqualTo(1L);
-        assertThat(postDetailResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postDetailResponse.getMember().getId()).isEqualTo(1L);
+        assertThat(postDetailResponse.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
         assertThat(postDetailResponse.getContent()).isEqualTo(POST_CONTENT_1);
         assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
         assertThat(postDetailResponse.getLikeCount()).isEqualTo(0);
@@ -107,8 +107,8 @@ public class PostServiceTest extends ServiceTest {
         // then
         assertThat(allPost.getPosts().size()).isEqualTo(2);
         assertThat(postsElementResponse.getId()).isEqualTo(1L);
-        assertThat(postsElementResponse.getMemberId()).isEqualTo(1L);
-        assertThat(postsElementResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postsElementResponse.getMember().getId()).isEqualTo(1L);
+        assertThat(postsElementResponse.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
         assertThat(postsElementResponse.getContent()).isEqualTo(POST_CONTENT_1);
         assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
         assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);

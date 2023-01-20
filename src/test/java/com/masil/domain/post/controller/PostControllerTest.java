@@ -1,6 +1,7 @@
 package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
@@ -52,10 +53,13 @@ public class PostControllerTest {
     @MockBean
     private PostService postService;
 
+    private static final MemberResponse MEMBER_RESPONSE = MemberResponse.builder()
+            .id(1L)
+            .nickname("닉네임1")
+            .build();
     private static final PostDetailResponse POST_RESPONSE_1 = PostDetailResponse.builder()
             .id(1L)
-            .memberId(1L)
-            .nickname("닉네임1")
+            .member(MEMBER_RESPONSE)
             .content("내용1")
             .viewCount(0)
             .likeCount(0)
@@ -67,8 +71,7 @@ public class PostControllerTest {
 
     private static final PostDetailResponse POST_RESPONSE_2 = PostDetailResponse.builder()
             .id(2L)
-            .memberId(1L)
-            .nickname("닉네임2")
+            .member(MEMBER_RESPONSE)
             .content("내용2")
             .viewCount(0)
             .likeCount(0)
@@ -123,8 +126,8 @@ public class PostControllerTest {
                         preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("id").description("게시글 id"),
-                                fieldWithPath("memberId").description("작성자 id"),
-                                fieldWithPath("nickname").description("닉네임"),
+                                fieldWithPath("member.id").description("작성자 id"),
+                                fieldWithPath("member.nickname").description("닉네임"),
                                 fieldWithPath("content").description("내용"),
                                 fieldWithPath("viewCount").description("조회수"),
                                 fieldWithPath("likeCount").description("좋아요 개수"),
@@ -144,8 +147,7 @@ public class PostControllerTest {
         for (int i = 1; i <= 2; i++) {
             postsElementResponseList.add(PostsElementResponse.builder()
                     .id((long) i)
-                    .memberId(1L)
-                    .nickname("닉네임")
+                    .member(MEMBER_RESPONSE)
                     .content("내용")
                     .viewCount(0)
                     .likeCount(0)
@@ -170,8 +172,8 @@ public class PostControllerTest {
                         preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("posts.[].id").description("게시글 id"),
-                                fieldWithPath("posts.[].memberId").description("작성자 id"),
-                                fieldWithPath("posts.[].nickname").description("닉네임"),
+                                fieldWithPath("posts.[].member.id").description("작성자 id"),
+                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
                                 fieldWithPath("posts.[].content").description("내용"),
                                 fieldWithPath("posts.[].viewCount").description("조회수"),
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
@@ -179,8 +181,8 @@ public class PostControllerTest {
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("posts.[].id").description("게시글 id"),
-                                fieldWithPath("posts.[].memberId").description("작성자 id"),
-                                fieldWithPath("posts.[].nickname").description("닉네임"),
+                                fieldWithPath("posts.[].member.id").description("작성자 id"),
+                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
                                 fieldWithPath("posts.[].content").description("내용"),
                                 fieldWithPath("posts.[].viewCount").description("조회수"),
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
