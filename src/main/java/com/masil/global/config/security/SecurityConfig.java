@@ -34,10 +34,17 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests()
-                .anyRequest().permitAll()
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers(
+                        "/auth/*",
+                        "/",
+                        "/boards/*/posts/*",
+                        "/boards/*/posts",
+                        "/posts/*/comments"
+                ).permitAll()
+                .anyRequest().authenticated();
+
 
         return http.build();
     }

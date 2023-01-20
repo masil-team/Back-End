@@ -6,12 +6,6 @@ import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
-import com.masil.domain.member.entity.Member;
-import com.masil.domain.member.repository.MemberRepository;
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostResponse;
-import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -19,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -2,6 +2,7 @@ package com.masil.global.auth.controller;
 
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
+import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,10 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/signup")
+    public void signUp(@Valid @RequestBody SignupRequest createRequest) {
+        authService.signUp(createRequest);
+    }
     @PostMapping("/login")
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);

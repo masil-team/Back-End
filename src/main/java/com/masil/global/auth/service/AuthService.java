@@ -2,14 +2,16 @@ package com.masil.global.auth.service;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
-import com.masil.global.auth.context.CurrentMemberContext;
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
+import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
+import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.entity.RefreshToken;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
+import com.masil.global.auth.model.MemberAuthType;
+import com.masil.global.auth.repository.AuthorityRepository;
 import com.masil.global.auth.repository.RefreshTokenRepository;
-import com.masil.global.auth.util.AuthUtil;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +36,18 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public void signUp(SignupRequest createRequest) {
+        Set<Authority> authorites = new HashSet<>();
+
+        authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
+
+        memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
+    }
 
     @Transactional
     public AuthTokenResponse login(LoginRequest loginRequest) {
@@ -46,15 +64,15 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(email, member.getAuthorities());
         String refreshToken = jwtTokenProvider.createRefreshToken(email, member.getAuthorities());
 
-        // 리프레쉬 토큰 DB 저장
-        RefreshToken save = refreshTokenRepository.save(
-                RefreshToken.builder()
-                        .key(email)
-                        .value(refreshToken)
-                        .build()
-        );
+//        // 리프레쉬 토큰 DB 저장
+//        RefreshToken save = refreshTokenRepository.save(
+//                RefreshToken.builder()
+//                        .key(email)
+//                        .value(refreshToken)
+//                        .build()
+//        );
 
-        log.debug("refreshToken = key : {} , value : {} ", save.getKey(), save.getValue());
+//        log.debug("refreshToken = key : {} , value : {} ", save.getKey(), save.getValue());
 
         return jwtTokenProvider.createTokenResponse(accessToken,refreshToken);
     }
@@ -80,7 +98,7 @@ public class AuthService {
         // 2. Access Token 에서 Member Email 가져오기
         Authentication authentication = jwtTokenProvider.getAuthentication(orgAccessToken);
 
-        log.debug("Authentication = {}",authentication);
+        log.debug("Authentication = {}", authentication);
 
         // 3. 저장소에서 Member Email 를 기반으로 Refresh Token 값 가져옴
         RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
@@ -100,8 +118,8 @@ public class AuthService {
         String newRefreshToken = jwtTokenProvider.createRefreshToken(email, member.getAuthorities());
         AuthTokenResponse tokenResponse = jwtTokenProvider.createTokenResponse(newAccessToken, newRefreshToken);
 
-        log.debug("refresh Origin = {}",orgRefreshToken);
-        log.debug("refresh New = {} ",newRefreshToken);
+        log.debug("refresh Origin = {}", orgRefreshToken);
+        log.debug("refresh New = {} ", newRefreshToken);
 
         // 6. 저장소 정보 업데이트 (dirtyChecking으로 업데이트)
         refreshToken.updateValue(newRefreshToken);
@@ -111,21 +129,10 @@ public class AuthService {
 
     private Member getMember(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(()->new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
     }
 
     public void logout() {
     }
 
-    public CurrentMemberContext getCurrentMemberContext() {
-        String currentMemberEmail = AuthUtil.getCurrentMemberEmail();
-
-        Member member = memberRepository.findByEmail(currentMemberEmail)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
-
-        return CurrentMemberContext.builder()
-                .id(member.getId())
-                .eamil(member.getEmail())
-                .build();
-    }
 }

@@ -1,4 +1,4 @@
-package com.masil.domain.member.dto.request;
+package com.masil.global.auth.dto.request;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.global.auth.entity.Authority;
@@ -11,24 +11,26 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class MemberCreateRequest {
+public class SignupRequest {
 
     @NotBlank(message = "잘못된 이메일 값입니다.")
     private String email;
     @NotBlank(message = "잘못된 패스워드 값입니다.")
     private String password;
+
+    @NotBlank(message = "잘못된 비밀번호 확인 입니다.")
+    private String passwordConfirm;
     @NotBlank(message = "잘못된 닉네임 값입니다.")
     private String nickname;
     private String profileImage;
-    private List<String> roles;
 
     @Builder
-    public MemberCreateRequest(String email, String password, String nickname, String profileImage, List<String> roles) {
+    public SignupRequest(String email, String password, String passwordConfirm, String nickname, String profileImage, List<String> roles) {
         this.email = email;
         this.password = password;
+        this.passwordConfirm = passwordConfirm;
         this.nickname = nickname;
         this.profileImage = profileImage;
-        this.roles = roles;
     }
 
     public Member convertMember(PasswordEncoder encoder , Set<Authority> authorities) {
