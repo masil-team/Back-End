@@ -1,10 +1,10 @@
 package com.masil.global.auth.service;
 
-import com.masil.domain.member.dto.request.MemberCreateRequest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
+import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.entity.RefreshToken;
@@ -40,7 +40,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signUp(MemberCreateRequest createRequest) {
+    public void signUp(SignupRequest createRequest) {
         Set<Authority> authorites = new HashSet<>();
 
         authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)

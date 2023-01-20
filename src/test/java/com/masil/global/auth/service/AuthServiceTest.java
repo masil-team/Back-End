@@ -1,10 +1,10 @@
 package com.masil.global.auth.service;
 
 import com.masil.common.annotation.ServiceTest;
-import com.masil.domain.member.dto.request.MemberCreateRequest;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.member.service.MemberService;
 import com.masil.global.auth.dto.request.LoginRequest;
+import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.model.MemberAuthType;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Commit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,7 +52,7 @@ class AuthServiceTest extends ServiceTest{
         String testPassword = "test@1234";
         String testNickName = "테스트닉네임";
 
-        MemberCreateRequest createRequest = MemberCreateRequest.builder()
+        SignupRequest createRequest = SignupRequest.builder()
                 .email(testEmail)
                 .password(testPassword)
                 .nickname(testNickName)
