@@ -3,19 +3,20 @@ package com.masil.domain.post.service;
 import com.masil.common.annotation.ServiceTest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostResponse;
-import com.masil.domain.post.dto.PostsResponse;
+import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.repository.PostRepository;
+import com.masil.global.error.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PostServiceTest extends ServiceTest {
 
@@ -28,53 +29,90 @@ public class PostServiceTest extends ServiceTest {
 
     private static final String POST_CONTENT_1 = "내용1";
     private static final String POST_CONTENT_2 = "내용2";
-    private static final String USER_EMAIL = "email@naver.com";
-    private static final String USER_NICKNAME = "test123";
+    private static final String USER_EMAIL_1 = "email1@naver.com";
+    private static final String USER_EMAIL_2 = "email2@naver.com";
+    private static final String USER_NICKNAME_1 = "test1";
+    private static final String USER_NICKNAME_2 = "test2";
 
     @BeforeEach
     void setUp() {
-        Member member = Member.builder()
-                .email(USER_EMAIL)
-                .nickname(USER_NICKNAME)
+        Member member1 = Member.builder()
+                .email(USER_EMAIL_1)
+                .nickname(USER_NICKNAME_1)
+                .password("123")
                 .build();
-        memberRepository.save(member);
+        Member member2 = Member.builder()
+                .email(USER_EMAIL_2)
+                .nickname(USER_NICKNAME_2)
+                .password("123")
+                .build();
+        memberRepository.save(member1);
+        memberRepository.save(member2);
 
         Post post1 = Post.builder()
                 .content(POST_CONTENT_1)
-                .member(member)
+                .member(member1)
                 .build();
         Post post2 = Post.builder()
                 .content(POST_CONTENT_2)
-                .member(member)
+                .member(member1)
                 .build();
         postRepository.save(post1);
         postRepository.save(post2);
     }
 
-    @DisplayName("단 건 게시글을 성공적으로 조회된다.")
+    @DisplayName("상세 게시글이 성공적으로 조회된다.")
     @Test
-    void findPost_test() {
+    void findPost_success() {
 
         // when
-        PostResponse post = postService.findPost(1L);
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
 
         // then
-        assertThat(post.getId()).isEqualTo(1L);
-        assertThat(post.getContent()).isEqualTo(POST_CONTENT_1);
-        assertThat(post.getNickname()).isEqualTo(USER_NICKNAME);
-        assertThat(post.getViewCount()).isEqualTo(0);
-        assertThat(post.getComments()).isNull();
+        assertThat(postDetailResponse.getId()).isEqualTo(1L);
+        assertThat(postDetailResponse.getMemberId()).isEqualTo(1L);
+        assertThat(postDetailResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postDetailResponse.getContent()).isEqualTo(POST_CONTENT_1);
+        assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
+        assertThat(postDetailResponse.getLikeCount()).isEqualTo(0);
+        assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
+        assertThat(postDetailResponse.getIsLike()).isEqualTo(false);
+    }
+    @DisplayName("본인의 상세 게시글인 경우")
+    @Test
+    void findPost_isOwner() {
+
+        // when
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 1L);
+
+        // then
+        assertThat(postDetailResponse.getIsOwner()).isEqualTo(true);
     }
 
-    @DisplayName("다 건 게시글을 성공적으로 조회된다.")
+    @DisplayName("좋아요한 상세 게시글인 경우")
     @Test
-    void findAllPost_test() {
+    void findPost_isLike() {
+        /**
+         *
+         */
+    }
+
+    @DisplayName("게시글 목록이 성공적으로 조회된다.")
+    @Test
+    void findAllPost_success() {
 
         // when
         PostsResponse allPost = postService.findAllPost();
-
+        PostsElementResponse postsElementResponse = allPost.getPosts().get(0);
         // then
         assertThat(allPost.getPosts().size()).isEqualTo(2);
+        assertThat(postsElementResponse.getId()).isEqualTo(1L);
+        assertThat(postsElementResponse.getMemberId()).isEqualTo(1L);
+        assertThat(postsElementResponse.getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postsElementResponse.getContent()).isEqualTo(POST_CONTENT_1);
+        assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
+        assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);
+        assertThat(postsElementResponse.getCommentCount()).isEqualTo(0);
     }
 
     @DisplayName("게시글이 성공적으로 생성된다.")
@@ -88,19 +126,19 @@ public class PostServiceTest extends ServiceTest {
 
         // when
         Long postId = postService.createPost(postCreateRequest, 1L);
-        PostResponse post = postService.findPost(postId);
+        Post post = postRepository.findById(postId).get();
 
 
         // then
         assertThat(post.getId()).isEqualTo(postId);
         assertThat(post.getContent()).isEqualTo(content);
-        assertThat(post.getNickname()).isEqualTo(member.getNickname());
+        assertThat(post.getMember().getId()).isEqualTo(member.getId());
         assertThat(post.getViewCount()).isEqualTo(0);
     }
 
     @DisplayName("게시글 수정이 성공적으로 수행된다.")
     @Test
-    void modifyPost_test() {
+    void modifyPost_success() {
 
         // given
         Member member = memberRepository.findById(1L).get();
@@ -117,10 +155,24 @@ public class PostServiceTest extends ServiceTest {
         Post afterPost = postRepository.findById(1L).get();
         assertThat(afterPost.getContent()).isEqualTo(content);
     }
+    @DisplayName("게시글에 권한이 없는 유저가 게시글을 수정할 경우 예외가 발생한다.")
+    @Test
+    void modifyPost_fail() {
+
+        // given
+        String content = "수정 후 내용";
+        Post post = postRepository.findById(1L).get();
+
+        PostModifyRequest postModifyRequest = new PostModifyRequest(content);
+
+        // when, then
+        assertThatThrownBy(() -> postService.modifyPost(post.getId(), postModifyRequest, 2L))
+                .isInstanceOf(BusinessException.class);
+    }
 
     @DisplayName("게시글 삭제 성공")
     @Test
-    void deletePost_test() {
+    void deletePost_success() {
 
         // given
         Post beforePost = postRepository.findById(1L).get();  // status : NORMAL
@@ -132,6 +184,17 @@ public class PostServiceTest extends ServiceTest {
         // then
         Post afterPost = postRepository.findById(1L).get(); // status : DELETE
         assertThat(afterPost.getState()).isEqualTo(State.DELETE);
+    }
 
+    @DisplayName("게시글에 권한이 없는 유저가 게시글을 삭제할 경우 예외가 발생한다")
+    @Test
+    void deletePost_fail() {
+
+        // given
+        Post post = postRepository.findById(1L).get();  // status : NORMAL
+
+        // when, then
+        assertThatThrownBy(() -> postService.deletePost(post.getId(), 2L))
+                .isInstanceOf(BusinessException.class);
     }
 }
