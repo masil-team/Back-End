@@ -2,9 +2,7 @@ package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.dto.*;
-import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
+@MockBean(JpaMetamodelMappingContext.class)
 public class PostControllerTest {
 
     @Autowired
