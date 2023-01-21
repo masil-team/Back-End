@@ -93,7 +93,7 @@ public class PostControllerTest {
         given(postService.createPost(any(), any())).willReturn(1L);
 
         // when
-        ResultActions resultActions = requestCreatePost(postCreateRequest);
+        ResultActions resultActions = requestCreatePost("/boards/1/posts", postCreateRequest);
 
         // then
         resultActions
@@ -116,7 +116,7 @@ public class PostControllerTest {
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
-        ResultActions resultActions = requestFindPost();
+        ResultActions resultActions = requestFindPost("/boards/1/posts/1");
 
         // then
         resultActions
@@ -162,7 +162,7 @@ public class PostControllerTest {
         given(postService.findAllPost(any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = requestFindAllPost();
+        ResultActions resultActions = requestFindAllPost("/boards/1/posts?page=0&size=20");
 
         // then
         resultActions
@@ -203,7 +203,7 @@ public class PostControllerTest {
         willDoNothing().given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost(postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -224,7 +224,7 @@ public class PostControllerTest {
         // given
         willDoNothing().given(postService).deletePost(any(), any());
         // when
-        ResultActions resultActions = requestDeletePost();
+        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
 
         // then
         resultActions
@@ -235,36 +235,36 @@ public class PostControllerTest {
         ));
     }
 
-    private ResultActions requestCreatePost(PostCreateRequest dto) throws Exception {
-        return mockMvc.perform(post("/boards/1/posts")
+    private ResultActions requestCreatePost(String url, PostCreateRequest dto) throws Exception {
+        return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
 
-    private ResultActions requestFindPost() throws Exception {
-        return mockMvc.perform(get("/boards/1/posts/1")
+    private ResultActions requestFindPost(String url) throws Exception {
+        return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
     }
 
-    private ResultActions requestFindAllPost() throws Exception {
-        return mockMvc.perform(get("/boards/1/posts?page=0&size=20")
+    private ResultActions requestFindAllPost(String url) throws Exception {
+        return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
     }
-    private ResultActions requestModifyPost(PostModifyRequest dto) throws Exception {
-        return mockMvc.perform(patch("/boards/1/posts/1")
+    private ResultActions requestModifyPost(String url, PostModifyRequest dto) throws Exception {
+        return mockMvc.perform(patch(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
-    private ResultActions requestDeletePost() throws Exception {
-        return mockMvc.perform(delete("/boards/1/posts/1")
+    private ResultActions requestDeletePost(String url) throws Exception {
+        return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
