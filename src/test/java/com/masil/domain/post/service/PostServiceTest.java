@@ -12,11 +12,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
-import java.time.LocalDateTime;
+import java.awt.print.Pageable;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 public class PostServiceTest extends ServiceTest {
 
@@ -102,8 +105,10 @@ public class PostServiceTest extends ServiceTest {
     void findAllPost_success() {
 
         // when
-        PostsResponse allPost = postService.findAllPost();
-        PostsElementResponse postsElementResponse = allPost.getPosts().get(0);
+        PostsResponse allPost = postService.findAllPost(1L, PageRequest.of(0, 20, DESC, "createDate"));
+        List<PostsElementResponse> postList = allPost.getPosts();
+        PostsElementResponse postsElementResponse = postList.get(postList.size()-1);
+
         // then
         assertThat(allPost.getPosts().size()).isEqualTo(2);
         assertThat(postsElementResponse.getId()).isEqualTo(1L);

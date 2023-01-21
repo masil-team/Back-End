@@ -144,7 +144,7 @@ public class PostControllerTest {
     void t3() throws Exception {
         // given
         List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 2; i >= 1; i--) {
             postsElementResponseList.add(PostsElementResponse.builder()
                     .id((long) i)
                     .member(MEMBER_RESPONSE)
@@ -157,9 +157,9 @@ public class PostControllerTest {
                     .build());
         }
 
-        PostsResponse postsResponse = new PostsResponse(postsElementResponseList);
+        PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
 
-        given(postService.findAllPost()).willReturn(postsResponse);
+        given(postService.findAllPost(any(), any())).willReturn(postsResponse);
 
         // when
         ResultActions resultActions = requestFindAllPost();
@@ -188,19 +188,12 @@ public class PostControllerTest {
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
                                 fieldWithPath("posts.[].commentCount").description("댓글 개수"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
-                                fieldWithPath("posts.[].modifyDate").description("수정 날짜")
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));
     }
-//    private Long id;
-//    private Long memberId;
-//    private String nickname;
-//    private String content;  // 글자 제한
-//    private int viewCount;
-//    private int likeCount;
-//    private int commentCount;
-//    private LocalDateTime createDate;
-//    private LocalDateTime modifyDate;
+
     @Test
     @DisplayName("게시글 수정")
     void t4() throws Exception {
@@ -258,7 +251,7 @@ public class PostControllerTest {
     }
 
     private ResultActions requestFindAllPost() throws Exception {
-        return mockMvc.perform(get("/boards/1/posts/")
+        return mockMvc.perform(get("/boards/1/posts?page=0&size=20")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());

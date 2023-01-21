@@ -9,11 +9,15 @@ import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,10 +39,11 @@ public class PostController {
 
     // 목록 조회
     @GetMapping("/{boardId}/posts")
-    public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId) {
+    public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
+                                                     @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
 
-        PostsResponse postsResponse = postService.findAllPost();
+        PostsResponse postsResponse = postService.findAllPost(boardId, pageable);
         return ResponseEntity.ok(postsResponse);
     }
 

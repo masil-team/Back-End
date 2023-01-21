@@ -2,6 +2,7 @@ package com.masil.domain.post.dto;
 
 import com.masil.domain.post.entity.Post;
 import lombok.Getter;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,16 +11,18 @@ import java.util.stream.Collectors;
 public class PostsResponse {
 
     private List<PostsElementResponse> posts;
+    private Boolean isLast;
 
-    public PostsResponse(List<PostsElementResponse> posts) {
+    public PostsResponse(List<PostsElementResponse> posts, boolean isLast) {
         this.posts = posts;
+        this.isLast = isLast;
     }
-    public static PostsResponse ofPosts(List<Post> posts) {
+    public static PostsResponse ofPosts(Slice<Post> posts) {
         List<PostsElementResponse> postsResponse = posts
                 .stream()
                 .map((Post post) -> PostsElementResponse.of(post))
                 .collect(Collectors.toList());
 
-        return new PostsResponse(postsResponse);
+        return new PostsResponse(postsResponse, posts.isLast());
     }
 }
