@@ -41,6 +41,7 @@ public class SecurityConfig {
                         "/",
                         "/boards/*/posts/*",
                         "/boards/*/posts",
+                        "/posts/*/like",
                         "/posts/*/comments"
                 ).permitAll()
                 .anyRequest().authenticated();

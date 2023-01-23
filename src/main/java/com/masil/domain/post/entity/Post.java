@@ -65,6 +65,12 @@ public class Post extends BaseEntity {
     public void plusView() {
         this.viewCount++;
     }
+    public void plusLike() {
+        this.likeCount++;
+    }
+    public void minusLike() {
+        this.likeCount--;
+    }
     public int getCommentCount() {
         if (comments == null) {
             return 0;

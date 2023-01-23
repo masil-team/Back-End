@@ -17,8 +17,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -48,7 +46,7 @@ public class PostService {
 
     @Transactional
     public Long createPost(PostCreateRequest postCreateRequest, Long memberId){
-        Member member = findUserById(memberId);
+        Member member = findMemberById(memberId);
         Post post = postCreateRequest.toEntity(member);
         return postRepository.save(post).getId();
     }
@@ -56,7 +54,7 @@ public class PostService {
     @Transactional
     public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long memberId){
         Post post = findPostById(postId);
-        findUserById(memberId);
+        findMemberById(memberId);
 
         validateOwner(memberId, post);
 
@@ -66,7 +64,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long postId, Long memberId) {
         Post post = findPostById(postId);
-        findUserById(memberId);
+        findMemberById(memberId);
 
         validateOwner(memberId, post);
 
@@ -84,7 +82,7 @@ public class PostService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
-    private Member findUserById(Long memberId) {
+    private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(RuntimeException::new);
     }
