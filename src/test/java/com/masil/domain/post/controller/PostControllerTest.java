@@ -1,6 +1,7 @@
 package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masil.common.annotation.ControllerMockApiTest;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.service.PostService;
@@ -38,17 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         PostController.class,
 })
 @AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureRestDocs
-@ActiveProfiles("test")
-@ExtendWith(MockitoExtension.class)
-@MockBean(JpaMetamodelMappingContext.class)
-public class PostControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
+public class PostControllerTest extends ControllerMockApiTest {
 
     @MockBean
     private PostService postService;
@@ -61,18 +52,6 @@ public class PostControllerTest {
             .id(1L)
             .member(MEMBER_RESPONSE)
             .content("내용1")
-            .viewCount(0)
-            .likeCount(0)
-            .isOwner(false)
-            .isLike(false)
-            .createDate(LocalDateTime.now())
-            .modifyDate(LocalDateTime.now())
-            .build();
-
-    private static final PostDetailResponse POST_RESPONSE_2 = PostDetailResponse.builder()
-            .id(2L)
-            .member(MEMBER_RESPONSE)
-            .content("내용2")
             .viewCount(0)
             .likeCount(0)
             .isOwner(false)
