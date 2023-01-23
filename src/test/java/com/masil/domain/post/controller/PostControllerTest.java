@@ -2,9 +2,7 @@ package com.masil.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.dto.*;
-import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
+@MockBean(JpaMetamodelMappingContext.class)
 public class PostControllerTest {
 
     @Autowired
@@ -93,7 +93,7 @@ public class PostControllerTest {
         given(postService.createPost(any(), any())).willReturn(1L);
 
         // when
-        ResultActions resultActions = requestCreatePost(postCreateRequest);
+        ResultActions resultActions = requestCreatePost("/boards/1/posts", postCreateRequest);
 
         // then
         resultActions
@@ -116,7 +116,7 @@ public class PostControllerTest {
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
-        ResultActions resultActions = requestFindPost();
+        ResultActions resultActions = requestFindPost("/boards/1/posts/1");
 
         // then
         resultActions
@@ -144,7 +144,7 @@ public class PostControllerTest {
     void t3() throws Exception {
         // given
         List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 2; i >= 1; i--) {
             postsElementResponseList.add(PostsElementResponse.builder()
                     .id((long) i)
                     .member(MEMBER_RESPONSE)
@@ -157,12 +157,12 @@ public class PostControllerTest {
                     .build());
         }
 
-        PostsResponse postsResponse = new PostsResponse(postsElementResponseList);
+        PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
 
-        given(postService.findAllPost()).willReturn(postsResponse);
+        given(postService.findAllPost(any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = requestFindAllPost();
+        ResultActions resultActions = requestFindAllPost("/boards/1/posts?page=0&size=20");
 
         // then
         resultActions
@@ -188,19 +188,12 @@ public class PostControllerTest {
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
                                 fieldWithPath("posts.[].commentCount").description("댓글 개수"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
-                                fieldWithPath("posts.[].modifyDate").description("수정 날짜")
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));
     }
-//    private Long id;
-//    private Long memberId;
-//    private String nickname;
-//    private String content;  // 글자 제한
-//    private int viewCount;
-//    private int likeCount;
-//    private int commentCount;
-//    private LocalDateTime createDate;
-//    private LocalDateTime modifyDate;
+
     @Test
     @DisplayName("게시글 수정")
     void t4() throws Exception {
@@ -210,7 +203,7 @@ public class PostControllerTest {
         willDoNothing().given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost(postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -231,7 +224,7 @@ public class PostControllerTest {
         // given
         willDoNothing().given(postService).deletePost(any(), any());
         // when
-        ResultActions resultActions = requestDeletePost();
+        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
 
         // then
         resultActions
@@ -242,36 +235,36 @@ public class PostControllerTest {
         ));
     }
 
-    private ResultActions requestCreatePost(PostCreateRequest dto) throws Exception {
-        return mockMvc.perform(post("/boards/1/posts")
+    private ResultActions requestCreatePost(String url, PostCreateRequest dto) throws Exception {
+        return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
 
-    private ResultActions requestFindPost() throws Exception {
-        return mockMvc.perform(get("/boards/1/posts/1")
+    private ResultActions requestFindPost(String url) throws Exception {
+        return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
     }
 
-    private ResultActions requestFindAllPost() throws Exception {
-        return mockMvc.perform(get("/boards/1/posts/")
+    private ResultActions requestFindAllPost(String url) throws Exception {
+        return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
     }
-    private ResultActions requestModifyPost(PostModifyRequest dto) throws Exception {
-        return mockMvc.perform(patch("/boards/1/posts/1")
+    private ResultActions requestModifyPost(String url, PostModifyRequest dto) throws Exception {
+        return mockMvc.perform(patch(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
-    private ResultActions requestDeletePost() throws Exception {
-        return mockMvc.perform(delete("/boards/1/posts/1")
+    private ResultActions requestDeletePost(String url) throws Exception {
+        return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());

@@ -12,11 +12,12 @@ import com.masil.domain.postlike.repository.PostLikeRepository;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +41,8 @@ public class PostService {
         return PostDetailResponse.of(post, isOwner, isLike);
     }
 
-    public PostsResponse findAllPost() {
-        List<Post> posts = postRepository.findAll();
+    public PostsResponse findAllPost(Long boardId, Pageable pageable) {
+        Slice<Post> posts = postRepository.findAll(pageable);
         return PostsResponse.ofPosts(posts);
     }
 
