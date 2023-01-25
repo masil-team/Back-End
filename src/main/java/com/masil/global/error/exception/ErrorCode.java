@@ -9,8 +9,9 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(BAD_REQUEST, 1001, " Invalid Input Value"),
     ENTITY_NOT_FOUND(BAD_REQUEST, 1002, " Entity Not Found"),
     SERVER_ERROR(INTERNAL_SERVER_ERROR, 1003, "Server Error"),
-    INVALID_TYPE_VALUE(BAD_REQUEST, 1004, " Invalid Type Value"),
-    HANDLE_ACCESS_DENIED(FORBIDDEN, 1005, "Access is Denied"),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, 1004, "method not allowed"),
+    INVALID_TYPE_VALUE(BAD_REQUEST, 1005, " Invalid Type Value"),
+    HANDLE_ACCESS_DENIED(FORBIDDEN, 1006, "Access is Denied"),
 
     ;
 
