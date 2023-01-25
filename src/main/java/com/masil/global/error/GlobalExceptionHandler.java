@@ -3,6 +3,7 @@ package com.masil.global.error;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.EntityNotFoundException;
 import com.masil.global.error.exception.ErrorCode;
+import com.masil.global.error.exception.NoAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +89,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<ErrorResponse> handleEntityNotFoundException(final EntityNotFoundException e) {
         log.error("handleEntityNotFoundException", e);
+        final ErrorCode errorCode = e.getErrorCode();
+        final ErrorResponse response = ErrorResponse.of(errorCode);
+        return ResponseEntity.status(errorCode.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(NoAuthenticationException.class)
+    protected ResponseEntity<ErrorResponse> handleNoAuthenticationException(final NoAuthenticationException e) {
+        log.error("handleNoAuthenticationException", e);
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse response = ErrorResponse.of(errorCode);
         return ResponseEntity.status(errorCode.getStatus())

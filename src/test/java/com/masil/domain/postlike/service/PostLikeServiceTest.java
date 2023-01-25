@@ -5,10 +5,12 @@ import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.PostDetailResponse;
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.post.service.PostService;
 import com.masil.domain.postlike.dto.PostLikeResponse;
 import com.masil.domain.postlike.entity.PostLike;
+import com.masil.domain.postlike.exception.SelfPostLikeException;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostLikeServiceTest extends ServiceTest {
@@ -104,10 +107,12 @@ class PostLikeServiceTest extends ServiceTest {
     @Test
     void toggleLikePost_isOwner() {
         // then
+        Post post = postRepository.findById(1L).get();
+        Member member = memberRepository.findById(1L).get();
 
-        // when
-
-        // then
+        // then, when
+        assertThatThrownBy(() -> postLikeService.toggleLikePost(post.getId(), member.getId()))
+                .isInstanceOf(SelfPostLikeException.class);
     }
 
 }

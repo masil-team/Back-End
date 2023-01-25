@@ -13,6 +13,15 @@ public enum ErrorCode {
     INVALID_TYPE_VALUE(BAD_REQUEST, 1005, " Invalid Type Value"),
     HANDLE_ACCESS_DENIED(FORBIDDEN, 1006, "Access is Denied"),
 
+    // member
+    MEMBER_NOT_FOUND(NOT_FOUND, 2001, "존재하지 않는 사용자입니다."),
+
+    // post
+    POST_NOT_FOUND(NOT_FOUND, 3001, "존재하지 않는 게시글입니다."),
+    POST_ACCESS_DENIED(FORBIDDEN, 3002, "해당 게시글에 대한 권한이 없습니다"),
+
+    // post like
+    POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다.")
     ;
 
     private HttpStatus status;
