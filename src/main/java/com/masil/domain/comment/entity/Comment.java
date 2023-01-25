@@ -37,6 +37,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int likeCount;
+
     /**
      * 부모 댓글과 자식 추가
      */
@@ -66,5 +69,16 @@ public class Comment extends BaseEntity {
 
     public void tempDelete() {
         this.state = State.DELETE;
+    }
+
+
+    /**
+     * 댓글 좋아요 기능
+     */
+    public void plusLike() {
+        this.likeCount++;
+    }
+    public void minusLike() {
+        this.likeCount--;
     }
 }

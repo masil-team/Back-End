@@ -6,10 +6,12 @@ import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
+import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+
+    private final MemberRepository memberRepository;
 
     /**
      * 댓글 작성
@@ -43,6 +47,7 @@ public class CommentService {
      */
     @Transactional
     public void modifyComment(Long postId, CommentModifyRequest commentModifyRequest, Long commentId){
+        System.out.println("안녕하세요");
         Comment comment = findCommentById(commentId);
         findPostById(postId);
 
@@ -52,10 +57,8 @@ public class CommentService {
     /**
      * 댓글 조회
      */
-    public List<CommentResponse> findComments(Long postId){
-
-        // 조회: 댓글 목록
-        return commentRepository.findAllByPostId(postId)
+    public List<CommentResponse> findComments(Long postId, Pageable pageable){
+        return commentRepository.findAllByPostId(postId, pageable)
                 .stream()
                 .map(comment -> CommentResponse.createCommentDto(comment))
                 .collect(Collectors.toList());
@@ -69,7 +72,6 @@ public class CommentService {
     public void deleteComment(Long postId, Long commentId) {
         Comment comment = findCommentById(commentId);
         findPostById(postId);
-
         comment.tempDelete();
     }
 
@@ -86,5 +88,9 @@ public class CommentService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
+    private Post findMemberById(Long memberId) {
+        return postRepository.findById(memberId)
+                .orElseThrow(RuntimeException::new);
+    }
 
 }
