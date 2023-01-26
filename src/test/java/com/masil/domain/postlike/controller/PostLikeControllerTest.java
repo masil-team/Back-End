@@ -2,6 +2,7 @@ package com.masil.domain.postlike.controller;
 
 import com.masil.common.annotation.ControllerMockApiTest;
 import com.masil.domain.postlike.dto.PostLikeResponse;
+import com.masil.domain.postlike.exception.SelfPostLikeException;
 import com.masil.domain.postlike.service.PostLikeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,30 @@ class PostLikeControllerTest extends ControllerMockApiTest {
                         responseFields(
                                 fieldWithPath("likeCount").description("좋아요 개수"),
                                 fieldWithPath("isLike").description("좋아요 여부")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("본인 글에 좋아요를 누를 경우 예외가 발생한다.")
+    void likePost_selfLike() throws Exception {
+        // given
+        given(postLikeService.toggleLikePost(any(), any()))
+                .willThrow(new SelfPostLikeException());
+
+        // when
+        ResultActions resultActions = requestLikePost("/posts/1/like");
+
+        // then
+        resultActions
+                .andExpect(status().isForbidden())
+                .andDo(document("post/like/selfLike",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
                         )
                 ));
     }

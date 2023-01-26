@@ -1,8 +1,10 @@
 package com.masil.domain.post.service;
 
+import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.post.dto.*;
 
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.member.entity.Member;
@@ -73,7 +75,7 @@ public class PostService {
 
     private void validateOwner(Long memberId, Post post) {
         if (!post.isOwner(memberId)) {
-            throw new BusinessException(ErrorCode.HANDLE_ACCESS_DENIED); // 추후 변경
+            throw new PostAccessDeniedException();
         }
     }
 
@@ -84,6 +86,6 @@ public class PostService {
 
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(MemberNotFoundException::new);
     }
 }

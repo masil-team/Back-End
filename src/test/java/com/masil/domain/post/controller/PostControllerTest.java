@@ -1,23 +1,19 @@
 package com.masil.domain.post.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.masil.common.annotation.ControllerMockApiTest;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.*;
+import com.masil.domain.post.exception.PostAccessDeniedException;
+import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -25,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -117,10 +112,33 @@ public class PostControllerTest extends ControllerMockApiTest {
                         )
                 ));
     }
+    @Test
+    @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다.")
+    void findPost_notFound() throws Exception {
+
+        // given
+        given(postService.findDetailPost(any(), any())).willThrow(new PostNotFoundException());
+
+        // when
+        ResultActions resultActions = requestFindPost("/boards/1/posts/99");
+
+        // then
+        resultActions
+                .andExpect(status().isNotFound())
+                .andDo(document("post/findOne/notFound",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
+    }
 
     @Test
     @DisplayName("게시글 목록 조회를 성공한다.")
-    void t3() throws Exception {
+    void findAllPost_success() throws Exception {
         // given
         List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
         for (int i = 2; i >= 1; i--) {
@@ -175,7 +193,7 @@ public class PostControllerTest extends ControllerMockApiTest {
 
     @Test
     @DisplayName("게시글 수정")
-    void t4() throws Exception {
+    void modifyPost_success() throws Exception {
         // given
         PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build();
 
@@ -197,8 +215,33 @@ public class PostControllerTest extends ControllerMockApiTest {
     }
 
     @Test
+    @DisplayName("게시글 수정 권한이 없을 경우 예외가 발생한다.")
+    void modifyPost_access_denied() throws Exception {
+        // given
+        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build();
+
+        willThrow(new PostAccessDeniedException()).given(postService).modifyPost(any(),any(),any());
+
+        // when
+        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
+
+        // then
+        resultActions
+                .andExpect(status().isForbidden())
+                .andDo(document("post/modify/access-denied",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
+    }
+
+    @Test
     @DisplayName("게시글 삭제")
-    void t5() throws Exception {
+    void deletePost_success() throws Exception {
 
         // given
         willDoNothing().given(postService).deletePost(any(), any());
@@ -209,9 +252,33 @@ public class PostControllerTest extends ControllerMockApiTest {
         resultActions
                 .andExpect(status().isNoContent())
                 .andDo(document("post/delete",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())
-        ));
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())
+                ));
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 권한이 없을 경우 예외가 발생한다.")
+    void deletePost_access_denied() throws Exception {
+
+        // given
+        willThrow(new PostAccessDeniedException()).given(postService).deletePost(any(), any());
+
+        // when
+        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
+
+        // then
+        resultActions
+                .andExpect(status().isForbidden())
+                .andDo(document("post/delete/access_denied",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
     }
 
     private ResultActions requestCreatePost(String url, PostCreateRequest dto) throws Exception {

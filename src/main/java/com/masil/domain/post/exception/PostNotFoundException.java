@@ -1,10 +1,11 @@
 package com.masil.domain.post.exception;
 
-public class PostNotFoundException extends RuntimeException {
+import com.masil.global.error.exception.EntityNotFoundException;
+import com.masil.global.error.exception.ErrorCode;
 
-    private static final String MESSAGE = "게시물을 찾을 수 없습니다.";
+public class PostNotFoundException extends EntityNotFoundException {
 
     public PostNotFoundException() {
-        super(MESSAGE);
+        super(ErrorCode.POST_NOT_FOUND);
     }
 }

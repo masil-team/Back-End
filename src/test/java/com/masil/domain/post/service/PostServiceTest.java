@@ -6,6 +6,8 @@ import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
+import com.masil.domain.post.exception.PostAccessDeniedException;
+import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.global.error.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,6 +83,16 @@ public class PostServiceTest extends ServiceTest {
         assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
         assertThat(postDetailResponse.getIsLike()).isEqualTo(false);
     }
+
+    @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다")
+    @Test
+    void findPost_notFound() {
+
+        // when, then
+        assertThatThrownBy(() -> postService.findDetailPost(100L, 2L))
+                .isInstanceOf(PostNotFoundException.class);
+    }
+
     @DisplayName("본인의 상세 게시글인 경우")
     @Test
     void findPost_isOwner() {
@@ -172,7 +184,7 @@ public class PostServiceTest extends ServiceTest {
 
         // when, then
         assertThatThrownBy(() -> postService.modifyPost(post.getId(), postModifyRequest, 2L))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(PostAccessDeniedException.class);
     }
 
     @DisplayName("게시글 삭제 성공")
@@ -200,6 +212,6 @@ public class PostServiceTest extends ServiceTest {
 
         // when, then
         assertThatThrownBy(() -> postService.deletePost(post.getId(), 2L))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(PostAccessDeniedException.class);
     }
 }
