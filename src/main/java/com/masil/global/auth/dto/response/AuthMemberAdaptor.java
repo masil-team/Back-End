@@ -11,14 +11,13 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
 public class AuthMemberAdaptor extends User {
 
     private CurrentMember member;
 
-    public AuthMemberAdaptor(Member member) {
-        super(member.getEmail(), member.getPassword(), authorities(member.getAuthorities()));
-        this.member = CurrentMember.of(member);
+    public AuthMemberAdaptor(CurrentMember currentMember , Collection<? extends GrantedAuthority> authorities) {
+        super(currentMember.getEmail(), currentMember.getPassword(), authorities);
+        this.member = currentMember;
     }
 
     private static Collection<? extends GrantedAuthority> authorities(Set<Authority> roles) {
@@ -26,5 +25,8 @@ public class AuthMemberAdaptor extends User {
                 .map(Authority::getAuthorityNameToString)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
+    }
+    public CurrentMember getMember() {
+        return member;
     }
 }

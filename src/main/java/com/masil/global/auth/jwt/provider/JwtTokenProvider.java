@@ -3,6 +3,7 @@ package com.masil.global.auth.jwt.provider;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.jwt.properties.JwtProperties;
+import com.masil.global.auth.service.CustomUserDetailsService;
 import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
 import io.jsonwebtoken.*;
@@ -34,12 +35,15 @@ public class JwtTokenProvider {
     private final Key key;
     private final long ACCESS_TOKEN_EXPIRE_TIME;
     private final long REFRESH_TOKEN_EXPIRE_TIME;
+    private final CustomUserDetailsService userDetailsService;
+//    private final CustomUserDetailsService userDetailsService;
 
-    public JwtTokenProvider(JwtProperties jwtProperties) {
+    public JwtTokenProvider(JwtProperties jwtProperties, CustomUserDetailsService userDetailsService) {
         byte[] keyBytes = jwtProperties.getSecret().getBytes();
         key = Keys.hmacShaKeyFor(keyBytes);
         ACCESS_TOKEN_EXPIRE_TIME = jwtProperties.getAccessTokenExpireTime();
         REFRESH_TOKEN_EXPIRE_TIME = jwtProperties.getRefreshTokenExpireTime();
+        this.userDetailsService = userDetailsService;
     }
 
     protected String createToken(String email, Set<Authority> auth, long tokenValid) {
@@ -96,9 +100,10 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+//        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 토큰 정보를 검증하는 메서드
