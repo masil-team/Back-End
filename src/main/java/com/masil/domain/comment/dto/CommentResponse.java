@@ -2,6 +2,7 @@ package com.masil.domain.comment.dto;
 
 
 import com.masil.domain.comment.entity.Comment;
+import com.masil.domain.member.dto.response.MemberResponse;
 import lombok.*;
 
 @AllArgsConstructor
@@ -14,13 +15,26 @@ public class CommentResponse {
     private String content;
     private Long postId;
     private String nickname;
+    private Long memberId;
+
+//    private MemberResponse member;
+
+
+//    @Builder
+//    public CommentResponse(Long id, Long postId, String content, String nickname) {
+//        this.id = id;
+//        this.postId = postId;
+//        this.content = content;
+//        this.nickname = nickname;
+//    }
 
     @Builder
-    public CommentResponse(Long id, Long postId, String content, String nickname) {
+    public CommentResponse(Long id, Long postId, String content, String nickname, Long memberId) {
         this.id = id;
         this.postId = postId;
         this.content = content;
         this.nickname = nickname;
+        this.memberId = memberId;
     }
 
     public static CommentResponse createCommentDto(Comment comment) {
@@ -29,16 +43,7 @@ public class CommentResponse {
                 .postId(comment.getPost().getId())
                 .content(comment.getContent())
                 .nickname(comment.getMember().getNickname())
+                .memberId(comment.getMember().getId())
                 .build();
     }
-    
-    /*
-    public static CommentResponse commentResponse(Comment comment) {
-        return CommentResponse.builder()
-                .id(comment.getId())
-                .nickname(comment.getMember().getNickname())
-                .content(comment.getContent())
-                .build();
-    }
-    */
 }

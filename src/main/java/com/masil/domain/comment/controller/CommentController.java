@@ -7,12 +7,18 @@ import com.masil.domain.comment.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +30,15 @@ public class CommentController {
 
     /**
      * 댓글 조회
+     * 페이징 처리
      */
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> findComments(@PathVariable Long postId){
+    public ResponseEntity<List<CommentResponse>> findComments(@PathVariable Long postId,
+                                                              @PageableDefault(page = 0, size = 5, direction = DESC) Pageable pageable){
+
         log.info("댓글 조회 시작");
-        List<CommentResponse> comments = commentService.findComments(postId);
+
+        List<CommentResponse> comments = commentService.findComments(postId, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
@@ -40,8 +50,8 @@ public class CommentController {
                                                               @Valid @RequestBody CommentCreateRequest commentCreateRequest){
         log.info("댓글 생성 시작");
         commentService.createComment(/*String nickname,*/ postId, commentCreateRequest);
-        // 추후에 created로 수정
-        return ResponseEntity.ok().build();
+        // 01-19 create로 수정
+        return ResponseEntity.created(URI.create("/posts/" + postId + "/comments")).build();
     }
 
     /**
