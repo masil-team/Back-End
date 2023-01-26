@@ -3,12 +3,12 @@ package com.masil.global.auth.jwt.provider;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.jwt.properties.JwtProperties;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
+import com.masil.global.auth.service.CustomUserDetailsService;
+import com.masil.global.error.exception.BusinessException;
+import com.masil.global.error.exception.ErrorCode;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,12 +35,15 @@ public class JwtTokenProvider {
     private final Key key;
     private final long ACCESS_TOKEN_EXPIRE_TIME;
     private final long REFRESH_TOKEN_EXPIRE_TIME;
+    private final CustomUserDetailsService userDetailsService;
+//    private final CustomUserDetailsService userDetailsService;
 
-    public JwtTokenProvider(JwtProperties jwtProperties) {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
+    public JwtTokenProvider(JwtProperties jwtProperties, CustomUserDetailsService userDetailsService) {
+        byte[] keyBytes = jwtProperties.getSecret().getBytes();
         key = Keys.hmacShaKeyFor(keyBytes);
         ACCESS_TOKEN_EXPIRE_TIME = jwtProperties.getAccessTokenExpireTime();
         REFRESH_TOKEN_EXPIRE_TIME = jwtProperties.getRefreshTokenExpireTime();
+        this.userDetailsService = userDetailsService;
     }
 
     protected String createToken(String email, Set<Authority> auth, long tokenValid) {
@@ -97,23 +100,27 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+//        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 토큰 정보를 검증하는 메서드
-
-    public int validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return 1;
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
-            return 2;
-        } catch (Exception e) {
-            log.info("잘못된 토큰입니다.");
-            return -1;
+            return true;
+        } catch (SignatureException ex){
+            throw new BusinessException("Invalid JWT signature", ErrorCode.INVALID_INPUT_VALUE);
+        } catch (MalformedJwtException ex) {
+            throw new BusinessException("Invalid JWT token", ErrorCode.INVALID_INPUT_VALUE);
+        } catch (ExpiredJwtException ex) {
+            throw new BusinessException("Expired JWT token", ErrorCode.INVALID_INPUT_VALUE);
+        } catch (UnsupportedJwtException ex) {
+            throw new BusinessException("Unsupported JWT token", ErrorCode.INVALID_INPUT_VALUE);
+        } catch (IllegalArgumentException ex) {
+            throw new BusinessException("JWT claims string is empty.", ErrorCode.INVALID_INPUT_VALUE);
         }
     }
 

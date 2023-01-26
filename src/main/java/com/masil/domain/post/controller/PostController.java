@@ -7,11 +7,18 @@ import com.masil.domain.post.dto.PostModifyRequest;
 import com.masil.domain.post.dto.PostDetailResponse;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
+import com.masil.global.auth.annotaion.LoginUser;
+import com.masil.global.auth.dto.response.AuthMemberAdaptor;
+import com.masil.global.auth.dto.response.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,9 +47,9 @@ public class PostController {
     // 목록 조회
     @GetMapping("/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
+                                                     @LoginUser CurrentMember member,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
-
         PostsResponse postsResponse = postService.findAllPost(boardId, pageable);
         return ResponseEntity.ok(postsResponse);
     }
