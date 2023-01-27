@@ -19,10 +19,8 @@ public class PostDetailResponse {
     private String content;
     private int viewCount;
     private int likeCount;
-    @Builder.Default
-    private Boolean isOwner = false;
-    @Builder.Default
-    private Boolean isLike = false;
+    private Boolean isOwner;
+    private Boolean isLike;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -38,5 +36,8 @@ public class PostDetailResponse {
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
                 .build();
+    }
+    public static PostDetailResponse of(Post post) {
+        return PostDetailResponse.of(post, false, false);
     }
 }
