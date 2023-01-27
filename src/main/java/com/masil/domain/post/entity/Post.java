@@ -33,7 +33,7 @@ public class Post extends BaseEntity {
     private int likeCount;
 
     @Enumerated(EnumType.STRING)
-    private State state;
+    private State state = State.NORMAL;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -44,10 +44,10 @@ public class Post extends BaseEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Post(String content, Member member) {
+    private Post(String content, Member member, State state) {
         this.content = content;
         this.member = member;
-        this.state = State.NORMAL;
+        this.state = state;
     }
     
     public void updateContent(String content){
