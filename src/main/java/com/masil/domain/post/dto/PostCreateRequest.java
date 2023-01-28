@@ -2,6 +2,7 @@ package com.masil.domain.post.dto;
 
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.member.entity.Member;
+import com.masil.domain.post.entity.State;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class PostCreateRequest {
         return Post.builder()
                 .member(member)
                 .content(content)
+                .state(State.NORMAL)
                 .build();
     }
 }

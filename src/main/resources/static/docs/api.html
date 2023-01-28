@@ -501,8 +501,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /boards/1/posts/1 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -512,7 +513,16 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 291
 
 {
@@ -526,8 +536,8 @@ Content-Length: 291
   "likeCount" : 0,
   "isOwner" : false,
   "isLike" : false,
-  "createDate" : "2023-01-26T00:08:44.6338589",
-  "modifyDate" : "2023-01-26T00:08:44.6338589"
+  "createDate" : "2023-01-28T14:26:04.4092333",
+  "modifyDate" : "2023-01-28T14:26:04.4092333"
 }</code></pre>
 </div>
 </div>
@@ -540,8 +550,9 @@ Content-Length: 291
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /boards/1/posts/99 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -551,7 +562,16 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 98
 
 {
@@ -575,7 +595,7 @@ Content-Length: 98
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /boards/1/posts?page=0&amp;size=20 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
@@ -586,7 +606,16 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 632
 
 {
@@ -600,8 +629,8 @@ Content-Length: 632
     "viewCount" : 0,
     "likeCount" : 0,
     "commentCount" : 0,
-    "createDate" : "2023-01-26T00:08:45.6327219",
-    "modifyDate" : "2023-01-26T00:08:45.6327219"
+    "createDate" : "2023-01-28T14:26:05.0395846",
+    "modifyDate" : "2023-01-28T14:26:05.0395846"
   }, {
     "id" : 1,
     "member" : {
@@ -612,8 +641,8 @@ Content-Length: 632
     "viewCount" : 0,
     "likeCount" : 0,
     "commentCount" : 0,
-    "createDate" : "2023-01-26T00:08:45.6327219",
-    "modifyDate" : "2023-01-26T00:08:45.6327219"
+    "createDate" : "2023-01-28T14:26:05.0395846",
+    "modifyDate" : "2023-01-28T14:26:05.0395846"
   } ],
   "isLast" : true
 }</code></pre>
@@ -633,8 +662,9 @@ Content-Length: 632
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">POST /boards/1/posts HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Content-Length: 38
 Host: localhost:8080
 
@@ -649,7 +679,16 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 201 Created
-Location: /boards/1/posts/1</code></pre>
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Location: /boards/1/posts/1
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 </div>
@@ -666,8 +705,9 @@ Location: /boards/1/posts/1</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /boards/1/posts/1 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Content-Length: 38
 Host: localhost:8080
 
@@ -681,7 +721,16 @@ Host: localhost:8080
 <h4 id="_http_response_5"><a class="link" href="#_http_response_5">HTTP response</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 200 OK</code></pre>
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 </div>
@@ -693,8 +742,9 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /boards/1/posts/1 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Content-Length: 38
 Host: localhost:8080
 
@@ -709,7 +759,16 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 403 Forbidden
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 108
 
 {
@@ -733,8 +792,9 @@ Content-Length: 108
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /boards/1/posts/1 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -743,7 +803,16 @@ Host: localhost:8080</code></pre>
 <h4 id="_http_response_7"><a class="link" href="#_http_response_7">HTTP response</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 204 No Content</code></pre>
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 204 No Content
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 </div>
@@ -755,8 +824,9 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /boards/1/posts/1 HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 Accept: application/json
+Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -766,7 +836,16 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 403 Forbidden
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
 Content-Length: 108
 
 {
@@ -848,7 +927,7 @@ Content-Length: 113
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-01-25 22:59:17 +0900
+Last updated 2023-01-26 23:30:21 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

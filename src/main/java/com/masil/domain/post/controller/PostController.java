@@ -8,17 +8,13 @@ import com.masil.domain.post.dto.PostDetailResponse;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
 import com.masil.global.auth.annotaion.LoginUser;
-import com.masil.global.auth.dto.response.AuthMemberAdaptor;
 import com.masil.global.auth.dto.response.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,50 +33,59 @@ public class PostController {
     // 상세 조회
     @GetMapping("/{boardId}/posts/{postId}")
     public ResponseEntity<PostDetailResponse> findDetailPost(@PathVariable Long boardId,
-                                                             @PathVariable Long postId) {
+                                                             @PathVariable Long postId,
+                                                             @LoginUser CurrentMember currentMember) {
         log.info("게시글 상세 조회 시작");
 
-        PostDetailResponse postDetailResponse = postService.findDetailPost(postId, 1L);
+        Long memberId = currentMember == null ? -1 : currentMember.getId();
+        PostDetailResponse postDetailResponse = postService.findDetailPost(postId, memberId);
         return ResponseEntity.ok(postDetailResponse);
     }
 
     // 목록 조회
     @GetMapping("/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
-                                                     @LoginUser CurrentMember member,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
+
         PostsResponse postsResponse = postService.findAllPost(boardId, pageable);
         return ResponseEntity.ok(postsResponse);
     }
 
     // 생성
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{boardId}/posts")
     public ResponseEntity<Void> createPost(@PathVariable Long boardId,
-                                           @Valid @RequestBody PostCreateRequest postCreateRequest) {
+                                           @Valid @RequestBody PostCreateRequest postCreateRequest,
+                                           @LoginUser CurrentMember currentMember) {
         log.info("게시글 생성 시작");
 
-        Long postId = postService.createPost(postCreateRequest, 1L); // 추후 변경
+        Long postId = postService.createPost(postCreateRequest, currentMember.getId());
         return ResponseEntity.created(URI.create("/boards/" + boardId + "/posts/" + postId)).build();
     }
 
     // 수정
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{boardId}/posts/{postId}")
     public ResponseEntity<Void> modifyPost(@PathVariable Long boardId,
                                            @PathVariable Long postId,
-                                           @Valid @RequestBody PostModifyRequest postModifyRequest) {
+                                           @Valid @RequestBody PostModifyRequest postModifyRequest,
+                                           @LoginUser CurrentMember currentMember) {
         log.info("게시글 수정 시작");
 
-        postService.modifyPost(postId, postModifyRequest, 1L);
+        postService.modifyPost(postId, postModifyRequest, currentMember.getId());
         return ResponseEntity.ok().build();
     }
 
     // 삭제
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{boardId}/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
-                                           @PathVariable Long postId) {
+                                           @PathVariable Long postId,
+                                           @LoginUser CurrentMember currentMember) {
         log.info("게시글 삭제 시작");
-        postService.deletePost(postId, 1L);
+
+        postService.deletePost(postId, currentMember.getId());
         return ResponseEntity.noContent().build();
     }
 

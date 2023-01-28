@@ -32,13 +32,13 @@ public class PostService {
         Post post = findPostById(postId);
         post.plusView();
 
-        // 본인 글인지 체크
-        boolean isOwner = post.isOwner(memberId);
-
-        // 좋아요한 글인지 체크
-        boolean isLike = postLikeRepository.existsByPostAndMemberId(post, memberId);
-
-        return PostDetailResponse.of(post, isOwner, isLike);
+        if (memberId != -1) {
+            return PostDetailResponse.of(post,
+                    post.isOwner(memberId), // 본인 글인지 체크
+                    postLikeRepository.existsByPostAndMemberId(post, memberId) // 좋아요한 글인지 체크
+            );
+        }
+        return PostDetailResponse.of(post);
     }
 
     public PostsResponse findAllPost(Long boardId, Pageable pageable) {
