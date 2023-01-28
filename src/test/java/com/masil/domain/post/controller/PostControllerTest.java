@@ -2,18 +2,23 @@ package com.masil.domain.post.controller;
 
 
 import com.masil.common.annotation.ControllerMockApiTest;
+import com.masil.common.security.WithMockCustomUser;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.service.PostService;
+import com.masil.global.auth.jwt.provider.JwtTokenProvider;
+import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -33,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({
         PostController.class,
 })
-@AutoConfigureMockMvc(addFilters = false)
+//@AutoConfigureMockMvc(addFilters = false)
 public class PostControllerTest extends ControllerMockApiTest {
 
     @MockBean
@@ -55,8 +60,7 @@ public class PostControllerTest extends ControllerMockApiTest {
             .modifyDate(LocalDateTime.now())
             .build();
 
-//    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
-//    private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
+    private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
 
     @Test
     @DisplayName("게시글 생성을 성공한다.")
@@ -243,7 +247,6 @@ public class PostControllerTest extends ControllerMockApiTest {
     @DisplayName("게시글 삭제")
     void deletePost_success() throws Exception {
 
-        // given
         willDoNothing().given(postService).deletePost(any(), any());
         // when
         ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
@@ -285,6 +288,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
@@ -292,7 +296,8 @@ public class PostControllerTest extends ControllerMockApiTest {
     private ResultActions requestFindPost(String url) throws Exception {
         return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 
@@ -306,13 +311,15 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(patch(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
     private ResultActions requestDeletePost(String url) throws Exception {
         return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 
