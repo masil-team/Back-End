@@ -28,6 +28,9 @@ public class CommentLike extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @Column(nullable = false)
+    private boolean status; // true = 좋아요, false = 좋아요 취소
+
     @Builder
     public CommentLike(Comment comment, Member member) {
         this.comment = comment;

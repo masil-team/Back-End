@@ -21,7 +21,11 @@ public enum ErrorCode {
     POST_ACCESS_DENIED(FORBIDDEN, 3002, "해당 게시글에 대한 권한이 없습니다"),
 
     // post like
-    POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다.")
+    POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다."),
+
+    // commentLike
+    COMMENT_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 댓글에는 좋아요를 누를 수 없습니다.")
+
     ;
 
     private HttpStatus status;

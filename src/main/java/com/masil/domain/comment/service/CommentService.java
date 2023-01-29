@@ -6,6 +6,7 @@ import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
+import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
@@ -25,7 +26,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-
     private final MemberRepository memberRepository;
 
     /**
@@ -47,7 +47,6 @@ public class CommentService {
      */
     @Transactional
     public void modifyComment(Long postId, CommentModifyRequest commentModifyRequest, Long commentId){
-        System.out.println("안녕하세요");
         Comment comment = findCommentById(commentId);
         findPostById(postId);
 
@@ -88,8 +87,8 @@ public class CommentService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
-    private Post findMemberById(Long memberId) {
-        return postRepository.findById(memberId)
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(RuntimeException::new);
     }
 

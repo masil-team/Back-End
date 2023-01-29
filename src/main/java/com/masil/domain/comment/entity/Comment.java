@@ -1,5 +1,6 @@
 package com.masil.domain.comment.entity;
 
+import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
@@ -8,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 
@@ -37,8 +37,8 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @Column(columnDefinition = "integer default 0", nullable = false)
-    private int likeCount;
+
+//    private Integer depth; // 댓글 depth
 
     /**
      * 부모 댓글과 자식 추가
@@ -47,20 +47,30 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+//    @Builder.Default
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Comment> children = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private State state;
 
+    /**
+     * commentLikes 추가
+     */
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int likeCount;
+
     @Builder
-    private Comment(Long id, String content, Member member, Post post) {
+    private Comment(Long id, String content, Member member, Post post, Comment parent) {
         this.id = id;
         this.content = content;
         this.member = member;
         this.post = post;
         this.state = State.NORMAL;
+        this.parent = parent;
     }
 
     public void updateContent(String content) {
@@ -71,14 +81,24 @@ public class Comment extends BaseEntity {
         this.state = State.DELETE;
     }
 
+    // 연관관계 편의 메서드 //
+//    public void setParent(Comment parent) {
+//        this.parent = parent;
+//        parent.getChildren().add(this);
+//    }
+
+    public boolean isOwner(Long memberId) {
+        return this.member.getId() == memberId;
+    }
 
     /**
      * 댓글 좋아요 기능
      */
-    public void plusLike() {
-        this.likeCount++;
+    public void increaseLikeCount() {
+        this.likeCount += 1;
     }
-    public void minusLike() {
-        this.likeCount--;
+
+    public void decreaseLikeCount() {
+        this.likeCount -= 1;
     }
 }
