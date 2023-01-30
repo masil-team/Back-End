@@ -57,7 +57,7 @@ public class CommentController {
     /**
      * 댓글 수정
      */
-    @PutMapping("/{postId}/comments/{commentId}")
+    @PatchMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<CommentModifyRequest> modifyComment(@PathVariable Long postId, @Valid @RequestBody CommentModifyRequest commentModifyRequest,
                                                               @PathVariable Long commentId){
         log.info("댓글 수정 시작");
