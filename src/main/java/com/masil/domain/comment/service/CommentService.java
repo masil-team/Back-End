@@ -4,6 +4,7 @@ import com.masil.domain.comment.dto.CommentCreateRequest;
 import com.masil.domain.comment.dto.CommentModifyRequest;
 import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
+import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
 import com.masil.domain.member.entity.Member;
@@ -29,31 +30,6 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     /**
-     * 댓글 작성
-     */
-    @Transactional
-    public Long createComment(/*String nickname,*/ Long postId, CommentCreateRequest commentCreateRequest){
-        // findByNickname 은 추후에 UserRepository 만듬
-//        User user = userRepository.findByNickname(nickname);
-
-        Post post  = findPostById(postId);
-        Comment comment = commentCreateRequest.toEntity(post);
-
-        return commentRepository.save(comment).getId();
-    }
-
-    /**
-     * 댓글 수정
-     */
-    @Transactional
-    public void modifyComment(Long postId, CommentModifyRequest commentModifyRequest, Long commentId){
-        Comment comment = findCommentById(commentId);
-        findPostById(postId);
-
-        comment.updateContent(commentModifyRequest.getContent());
-    }
-
-    /**
      * 댓글 조회
      */
     public List<CommentResponse> findComments(Long postId, Pageable pageable){
@@ -63,15 +39,54 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 댓글 작성
+     */
+    @Transactional
+    public Long createComment(Long postId, CommentCreateRequest commentCreateRequest, Long memberId){
+
+        Post post  = findPostById(postId);
+        Member member = findMemberById(memberId);
+        Comment comment = commentCreateRequest.toEntity(post, member);
+
+        return commentRepository.save(comment).getId();
+    }
+
+    /**
+     * 댓글 수정
+     */
+    @Transactional
+    public void modifyComment(Long postId, CommentModifyRequest commentModifyRequest, Long commentId, Long memberId){
+        Comment comment = findCommentById(commentId);
+        findMemberById(memberId);
+        findPostById(postId);
+
+        validateOwner(memberId, comment);
+
+        comment.updateContent(commentModifyRequest.getContent());
+    }
 
     /**
      * 댓글 삭제
      */
     @Transactional
-    public void deleteComment(Long postId, Long commentId) {
+    public void deleteComment(Long postId, Long commentId, Long memberId) {
         Comment comment = findCommentById(commentId);
+        findMemberById(memberId);
         findPostById(postId);
+
+        validateOwner(memberId, comment);
+
         comment.tempDelete();
+    }
+
+    /**
+     * 자신이 작성한 댓글인지 판단
+     */
+    private void validateOwner(Long memberId, Comment comment) {
+        if (!comment.isOwner(memberId)) {
+            throw new CommentAccessDeniedException();
+        }
     }
 
     /**

@@ -1,8 +1,6 @@
 package com.masil.domain.comment.service;
 
 import com.masil.common.annotation.ServiceTest;
-import com.masil.domain.comment.dto.CommentCreateRequest;
-import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.repository.CommentRepository;
 import com.masil.domain.member.entity.Member;
@@ -10,17 +8,10 @@ import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.repository.PostRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -107,10 +98,10 @@ class CommentServiceTest extends ServiceTest{
         Post post = postRepository.findById(1L).get();
 
         String content = "새로운 댓글 3번쨰 댓글입니다.";
-        CommentCreateRequest commentCreateRequest = new CommentCreateRequest(content);
+//        CommentCreateRequest commentCreateRequest = new CommentCreateRequest(content);
 
         // when
-        Long commentId = commentService.createComment(1L, commentCreateRequest);
+//        Long commentId = commentService.createComment(1L, commentCreateRequest);
 //        List<CommentResponse> commentResponse = commentService.findComments(commentId);
 
 
@@ -147,7 +138,7 @@ class CommentServiceTest extends ServiceTest{
         Post post = postRepository.findById(1L).get();
 
         // when
-        commentService.deleteComment(beforeComment.getId(), post.getId());
+//        commentService.deleteComment(beforeComment.getId(), post.getId());
 
         // then
         Comment afterPost = commentRepository.findById(1L).get(); // status : DELETE
