@@ -1,5 +1,6 @@
 package com.masil.domain.post.entity;
 
+import com.masil.domain.board.entity.Board;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
 import com.masil.global.common.entity.BaseEntity;
@@ -38,6 +39,10 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 
     @Builder.Default
     @OneToMany(mappedBy = "post")
