@@ -1,16 +1,17 @@
 package com.masil.domain.address.service;
 
-import com.masil.domain.address.dto.request.AddressRequest;
-import com.masil.domain.address.dto.request.AddressSearchRequest;
 import com.masil.domain.address.dto.response.AddressResponse;
 import com.masil.domain.address.dto.response.AddressSearchResponse;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AddressServiceImpl implements AddressService {
 
     @Override
-    public List<AddressSearchResponse> search(AddressSearchRequest addressSearchRequest) {
+    public List<AddressSearchResponse> search(String search) {
+
         return null;
     }
 

@@ -10,7 +10,7 @@ public class EmdAddress {
     @Column(name = "emd_address_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String emdName;
 
     @ManyToOne
