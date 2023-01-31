@@ -1,12 +1,12 @@
 package com.masil.domain.comment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masil.common.security.WithMockCustomUser;
 import com.masil.domain.comment.dto.*;
-import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.post.dto.PostsElementResponse;
-import com.masil.domain.post.dto.PostsResponse;
+import com.masil.global.auth.jwt.provider.JwtTokenProvider;
+import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +16,16 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +34,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -40,18 +43,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({
         CommentController.class,
 })
-@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
-@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockBean(JpaMetamodelMappingContext.class)
+@Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockCustomUser // 유저 인증 정보
+@ActiveProfiles("test")
 class CommentControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
+    protected MockMvc mockMvc;
     @Autowired
-    ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
+
+    @MockBean
+    protected JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    protected UserDetailsService userDetailsService;
 
     @MockBean
     private CommentService commentService;
@@ -61,13 +71,15 @@ class CommentControllerTest {
             .nickname("닉네임1")
             .build();
 
+    private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
+
     @Test
     @DisplayName("댓글을 성공적으로 조회한다.")
     void findComments() throws Exception {
         //given
         List<CommentResponse> commentResponseList = new ArrayList<>();
         for (long i = 1; i <= 2 ; i++) {
-            CommentResponse commentResponse = new CommentResponse(i, "내용", 1L, "userA", 1L);
+            CommentResponse commentResponse = new CommentResponse(i, 1L, "내용A", "bw1111", 1L, 0, LocalDateTime.now(), LocalDateTime.now());
             commentResponseList.add(commentResponse);
         }
 
@@ -83,15 +95,21 @@ class CommentControllerTest {
                         preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("[].id").description("댓글 id"),
-                                fieldWithPath("[].content").description("댓글 내용"),
                                 fieldWithPath("[].postId").description("게시글 id"),
+                                fieldWithPath("[].content").description("댓글 내용"),
                                 fieldWithPath("[].nickname").description("닉네임"),
                                 fieldWithPath("[].memberId").description("멤버 id"),
+                                fieldWithPath("[].likeCount").description("좋아요 갯수"),
+                                fieldWithPath("[].createDate").description("생성 날짜"),
+                                fieldWithPath("[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("[].id").description("댓글 id"),
-                                fieldWithPath("[].content").description("댓글 내용"),
                                 fieldWithPath("[].postId").description("게시글 id"),
+                                fieldWithPath("[].content").description("댓글 내용"),
                                 fieldWithPath("[].nickname").description("닉네임"),
-                                fieldWithPath("[].memberId").description("멤버 id")
+                                fieldWithPath("[].memberId").description("멤버 id"),
+                                fieldWithPath("[].likeCount").description("좋아요 갯수"),
+                                fieldWithPath("[].createDate").description("생성 날짜"),
+                                fieldWithPath("[].modifyDate").description("수정 날짜")
                         )
                 ));
     }
@@ -102,7 +120,7 @@ class CommentControllerTest {
         // given
         CommentCreateRequest commentCreateRequest = CommentCreateRequestBuilder.build();
 
-        given(commentService.createComment(any(), any())).willReturn(1L);
+        given(commentService.createComment(any(), any(), any())).willReturn(1L);
 
         // when
         ResultActions resultActions = requestCreateComment(commentCreateRequest);
@@ -126,7 +144,7 @@ class CommentControllerTest {
         // given
         CommentModifyRequest commentModifyRequest = CommentModifyRequestBuilder.build();
 
-        willDoNothing().given(commentService).modifyComment(any(),any(),any());
+        willDoNothing().given(commentService).modifyComment(any(),any(),any(), any());
 
         // when
         ResultActions resultActions = requestModifyComment(commentModifyRequest);
@@ -147,7 +165,7 @@ class CommentControllerTest {
     @DisplayName("댓글을 성공적으로 삭제한다.")
     void deleteComment() throws Exception {
         // given
-        willDoNothing().given(commentService).deleteComment(any(), any());
+        willDoNothing().given(commentService).deleteComment(any(), any(), any());
         // when
         ResultActions resultActions = requestDeleteComment("/posts/1/comments/1");
 
@@ -164,14 +182,16 @@ class CommentControllerTest {
         return mockMvc.perform(post("/posts/1/comments")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
 
     private ResultActions requestModifyComment(CommentModifyRequest dto) throws Exception {
-        return mockMvc.perform(put("/posts/1/comments/1")
+        return mockMvc.perform(patch("/posts/1/comments/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
@@ -179,7 +199,8 @@ class CommentControllerTest {
     private ResultActions requestDeleteComment(String url) throws Exception {
         return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 }
