@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +63,12 @@ public class Comment extends BaseEntity {
     private int likeCount;
 
     @Builder
-    private Comment(Long id, String content, Member member, Post post, Comment parent) {
+    private Comment(Long id, String content, Member member, Post post, State state, Comment parent) {
         this.id = id;
         this.content = content;
         this.member = member;
         this.post = post;
-        this.state = State.NORMAL;
+        this.state = state;
         this.parent = parent;
     }
 
