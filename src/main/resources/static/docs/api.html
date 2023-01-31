@@ -500,7 +500,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h4 id="_http_request"><a class="link" href="#_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /boards/1/posts/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
@@ -523,7 +523,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 291
+Content-Length: 310
 
 {
   "id" : 1,
@@ -531,13 +531,14 @@ Content-Length: 291
     "id" : 1,
     "nickname" : "닉네임1"
   },
+  "boardId" : 1,
   "content" : "내용1",
   "viewCount" : 0,
   "likeCount" : 0,
   "isOwner" : false,
-  "isLike" : false,
-  "createDate" : "2023-01-28T14:26:04.4092333",
-  "modifyDate" : "2023-01-28T14:26:04.4092333"
+  "isLiked" : false,
+  "createDate" : "2023-01-31T23:43:21.0486224",
+  "modifyDate" : "2023-01-31T23:43:21.0486224"
 }</code></pre>
 </div>
 </div>
@@ -549,7 +550,7 @@ Content-Length: 291
 <h4 id="_http_request_2"><a class="link" href="#_http_request_2">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /boards/1/posts/99 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /posts/99 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
@@ -616,33 +617,24 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 632
+Content-Length: 404
 
 {
   "posts" : [ {
-    "id" : 2,
-    "member" : {
-      "id" : 1,
-      "nickname" : "닉네임1"
-    },
-    "content" : "내용",
-    "viewCount" : 0,
-    "likeCount" : 0,
-    "commentCount" : 0,
-    "createDate" : "2023-01-28T14:26:05.0395846",
-    "modifyDate" : "2023-01-28T14:26:05.0395846"
-  }, {
     "id" : 1,
     "member" : {
       "id" : 1,
       "nickname" : "닉네임1"
     },
+    "boardId" : 1,
     "content" : "내용",
     "viewCount" : 0,
     "likeCount" : 0,
     "commentCount" : 0,
-    "createDate" : "2023-01-28T14:26:05.0395846",
-    "modifyDate" : "2023-01-28T14:26:05.0395846"
+    "isOwner" : false,
+    "isLiked" : false,
+    "createDate" : "2023-01-31T23:43:22.0658951",
+    "modifyDate" : "2023-01-31T23:43:22.0658951"
   } ],
   "isLast" : true
 }</code></pre>
@@ -661,15 +653,16 @@ Content-Length: 632
 <h4 id="_http_request_4"><a class="link" href="#_http_request_4">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">POST /boards/1/posts HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">POST /posts HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
-Content-Length: 38
+Content-Length: 56
 Host: localhost:8080
 
 {
-  "content" : "생성될 내용"
+  "content" : "생성될 내용",
+  "boardId" : 1
 }</code></pre>
 </div>
 </div>
@@ -682,7 +675,7 @@ Host: localhost:8080
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Location: /boards/1/posts/1
+Location: /posts/1
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1; mode=block
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -704,15 +697,16 @@ X-Frame-Options: DENY</code></pre>
 <h4 id="_http_request_5"><a class="link" href="#_http_request_5">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /boards/1/posts/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
-Content-Length: 38
+Content-Length: 56
 Host: localhost:8080
 
 {
-  "content" : "수정할 내용"
+  "content" : "수정할 내용",
+  "boardId" : 1
 }</code></pre>
 </div>
 </div>
@@ -741,15 +735,16 @@ X-Frame-Options: DENY</code></pre>
 <h4 id="_http_request_6"><a class="link" href="#_http_request_6">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /boards/1/posts/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
-Content-Length: 38
+Content-Length: 56
 Host: localhost:8080
 
 {
-  "content" : "수정할 내용"
+  "content" : "수정할 내용",
+  "boardId" : 1
 }</code></pre>
 </div>
 </div>
@@ -791,7 +786,7 @@ Content-Length: 108
 <h4 id="_http_request_7"><a class="link" href="#_http_request_7">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /boards/1/posts/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
@@ -823,7 +818,7 @@ X-Frame-Options: DENY</code></pre>
 <h4 id="_http_request_8"><a class="link" href="#_http_request_8">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /boards/1/posts/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /posts/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
 Authorization: Bearer aaaaaaaa.bbbbbbbb.cccccccc
@@ -927,7 +922,7 @@ Content-Length: 113
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-01-26 23:30:21 +0900
+Last updated 2023-01-31 23:19:30 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

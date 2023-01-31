@@ -7,6 +7,7 @@ import com.masil.global.common.entity.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -52,6 +53,12 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @Transient
+    private Boolean isOwner = false;
+
+    @Transient
+    private Boolean isLiked = false;
+
     @Builder
     private Post(String content, Member member, State state, Board board) {
         this.content = content;
@@ -63,6 +70,10 @@ public class Post extends BaseEntity {
     public void updateContentAndBoard(String content, Board board){
         this.content = content;
         this.board = board;
+    }
+    public void updateBoolean(Boolean isOwner, Boolean isLiked){
+        this.isOwner = isOwner;
+        this.isLiked = isLiked;
     }
 
     public void tempDelete() {

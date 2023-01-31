@@ -16,28 +16,28 @@ public class PostDetailResponse {
 
     private Long id;
     private MemberResponse member;
+    private Long boardId;
     private String content;
     private int viewCount;
     private int likeCount;
     private Boolean isOwner;
-    private Boolean isLike;
+    private Boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
-    public static PostDetailResponse of(Post post, boolean isOwner, boolean isLike) {
+    public static PostDetailResponse of(Post post) {
         return PostDetailResponse.builder()
                 .id(post.getId())
                 .member(MemberResponse.of(post.getMember()))
+                .boardId(post.getBoard().getId())
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
-                .isOwner(isOwner)
-                .isLike(isLike)
+                .isOwner(post.getIsOwner())
+                .isLiked(post.getIsLiked())
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
                 .build();
     }
-    public static PostDetailResponse of(Post post) {
-        return PostDetailResponse.of(post, false, false);
-    }
+
 }
