@@ -62,10 +62,11 @@ public class PostService {
     public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long memberId){
         Post post = findPostById(postId);
         findMemberById(memberId);
+        Board board = findBoardById(postModifyRequest.getBoardId());
 
         validateOwner(memberId, post);
 
-        post.updateContent(postModifyRequest.getContent());
+        post.updateContentAndBoard(postModifyRequest.getContent(), board);
     }
 
     @Transactional

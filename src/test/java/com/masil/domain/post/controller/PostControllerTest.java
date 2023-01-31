@@ -205,7 +205,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willDoNothing().given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -214,7 +214,8 @@ public class PostControllerTest extends ControllerMockApiTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("content").description("수정할 내용")
+                                fieldWithPath("content").description("수정할 내용"),
+                                fieldWithPath("boardId").description("카테고리Id")
                         )
                 ));
     }
@@ -228,7 +229,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -250,7 +251,7 @@ public class PostControllerTest extends ControllerMockApiTest {
 
         willDoNothing().given(postService).deletePost(any(), any());
         // when
-        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
+        ResultActions resultActions = requestDeletePost("/posts/1");
 
         // then
         resultActions
@@ -269,7 +270,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).deletePost(any(), any());
 
         // when
-        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
+        ResultActions resultActions = requestDeletePost("/posts/1");
 
         // then
         resultActions

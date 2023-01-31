@@ -64,9 +64,8 @@ public class PostController {
 
     // 수정
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/boards/{boardId}/posts/{postId}")
-    public ResponseEntity<Void> modifyPost(@PathVariable Long boardId,
-                                           @PathVariable Long postId,
+    @PatchMapping("/posts/{postId}")
+    public ResponseEntity<Void> modifyPost(@PathVariable Long postId,
                                            @Valid @RequestBody PostModifyRequest postModifyRequest,
                                            @LoginUser CurrentMember currentMember) {
         log.info("게시글 수정 시작");
@@ -77,9 +76,8 @@ public class PostController {
 
     // 삭제
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/boards/{boardId}/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
-                                           @PathVariable Long postId,
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId,
                                            @LoginUser CurrentMember currentMember) {
         log.info("게시글 삭제 시작");
 

@@ -176,7 +176,7 @@ public class PostServiceTest extends ServiceTest {
         String content = "수정 후 내용";
         Post beforePost = postRepository.findById(1L).get();
 
-        PostModifyRequest postModifyRequest = new PostModifyRequest(content);
+        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
 
         // when
         postService.modifyPost(beforePost.getId(), postModifyRequest, member.getId());
@@ -193,7 +193,7 @@ public class PostServiceTest extends ServiceTest {
         String content = "수정 후 내용";
         Post post = postRepository.findById(1L).get();
 
-        PostModifyRequest postModifyRequest = new PostModifyRequest(content);
+        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
 
         // when, then
         assertThatThrownBy(() -> postService.modifyPost(post.getId(), postModifyRequest, 2L))

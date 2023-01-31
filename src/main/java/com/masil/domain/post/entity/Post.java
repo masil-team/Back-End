@@ -57,8 +57,9 @@ public class Post extends BaseEntity {
         this.board = board;
     }
     
-    public void updateContent(String content){
+    public void updateContentAndBoard(String content, Board board){
         this.content = content;
+        this.board = board;
     }
 
     public void tempDelete() {
