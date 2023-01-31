@@ -71,17 +71,18 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.createPost(any(), any())).willReturn(1L);
 
         // when
-        ResultActions resultActions = requestCreatePost("/boards/1/posts", postCreateRequest);
+        ResultActions resultActions = requestCreatePost("/posts", postCreateRequest);
 
         // then
         resultActions
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/boards/1/posts/1"))
+                .andExpect(header().string("Location", "/posts/1"))
                 .andDo(document("post/create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("content").description("내용")
+                                fieldWithPath("content").description("내용"),
+                                fieldWithPath("boardId").description("카테고리Id")
                         )
                 ));
     }
@@ -94,7 +95,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
-        ResultActions resultActions = requestFindPost("/boards/1/posts/1");
+        ResultActions resultActions = requestFindPost("/posts/1");
 
         // then
         resultActions
@@ -124,7 +125,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.findDetailPost(any(), any())).willThrow(new PostNotFoundException());
 
         // when
-        ResultActions resultActions = requestFindPost("/boards/1/posts/99");
+        ResultActions resultActions = requestFindPost("/posts/99");
 
         // then
         resultActions
@@ -204,7 +205,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willDoNothing().given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -213,7 +214,8 @@ public class PostControllerTest extends ControllerMockApiTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("content").description("수정할 내용")
+                                fieldWithPath("content").description("수정할 내용"),
+                                fieldWithPath("boardId").description("카테고리Id")
                         )
                 ));
     }
@@ -227,7 +229,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/boards/1/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -249,7 +251,7 @@ public class PostControllerTest extends ControllerMockApiTest {
 
         willDoNothing().given(postService).deletePost(any(), any());
         // when
-        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
+        ResultActions resultActions = requestDeletePost("/posts/1");
 
         // then
         resultActions
@@ -268,7 +270,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).deletePost(any(), any());
 
         // when
-        ResultActions resultActions = requestDeletePost("/boards/1/posts/1");
+        ResultActions resultActions = requestDeletePost("/posts/1");
 
         // then
         resultActions

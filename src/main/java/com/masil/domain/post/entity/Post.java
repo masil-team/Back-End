@@ -1,5 +1,6 @@
 package com.masil.domain.post.entity;
 
+import com.masil.domain.board.entity.Board;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
 import com.masil.global.common.entity.BaseEntity;
@@ -32,6 +33,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int likeCount;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private State state = State.NORMAL;
 
@@ -39,19 +41,25 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
+
     @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Post(String content, Member member, State state) {
+    private Post(String content, Member member, State state, Board board) {
         this.content = content;
         this.member = member;
         this.state = state;
+        this.board = board;
     }
     
-    public void updateContent(String content){
+    public void updateContentAndBoard(String content, Board board){
         this.content = content;
+        this.board = board;
     }
 
     public void tempDelete() {
