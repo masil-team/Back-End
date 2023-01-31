@@ -1,7 +1,6 @@
 package com.masil.domain.address.dto.response;
 
-public class AddressSearchResponse {
-
+public class AddressResponse {
     private String id;
 
     private String sidoName;
@@ -9,4 +8,5 @@ public class AddressSearchResponse {
     private String sggName;
 
     private String emdName;
+
 }
