@@ -7,6 +7,7 @@ import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.post.dto.*;
 
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -34,10 +35,13 @@ public class PostService {
 
     public PostDetailResponse findDetailPost(Long postId, Long memberId) { // memberId 임시값
         Post post = findPostById(postId);
+        checkPostState(post);
+
         post.plusView();
 
         if (memberId != -1) {
-            return PostDetailResponse.of(post,
+            return PostDetailResponse.of(
+                    post,
                     post.isOwner(memberId), // 본인 글인지 체크
                     postLikeRepository.existsByPostAndMemberId(post, memberId) // 좋아요한 글인지 체크
             );
@@ -45,8 +49,9 @@ public class PostService {
         return PostDetailResponse.of(post);
     }
 
+
     public PostsResponse findAllPost(Long boardId, Pageable pageable) {
-        Slice<Post> posts = postRepository.findAllByBoardId(boardId, pageable);
+        Slice<Post> posts = postRepository.findAllByBoardIdAndState(boardId, State.NORMAL, pageable);
         return PostsResponse.ofPosts(posts);
     }
 
@@ -79,6 +84,11 @@ public class PostService {
         post.tempDelete();
     }
 
+    private void checkPostState(Post post) {
+        if (post.isDeleted()) {
+            throw new PostNotFoundException();
+        }
+    }
     private void validateOwner(Long memberId, Post post) {
         if (!post.isOwner(memberId)) {
             throw new PostAccessDeniedException();

@@ -105,6 +105,19 @@ public class PostServiceTest extends ServiceTest {
                 .isInstanceOf(PostNotFoundException.class);
     }
 
+    @DisplayName("삭제 상태인 게시글인 경우 예외가 발생한다")
+    @Test
+    void findPost_isDeleted() {
+
+        // given
+        Post post = postRepository.findById(1L).get();
+        post.tempDelete();
+
+        // when, then
+        assertThatThrownBy(() -> postService.findDetailPost(1L, 2L))
+                .isInstanceOf(PostNotFoundException.class);
+    }
+
     @DisplayName("본인의 상세 게시글인 경우")
     @Test
     void findPost_isOwner() {
@@ -142,6 +155,23 @@ public class PostServiceTest extends ServiceTest {
         assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
         assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);
         assertThat(postsElementResponse.getCommentCount()).isEqualTo(0);
+    }
+
+    @DisplayName("게시글 목록에서 상태가 DELETE인 컬럼은 제외하고 조회된다.")
+    @Test
+    void findAllPost_State() {
+
+        // given
+        Post post = postRepository.findById(1L).get();
+        post.tempDelete();
+
+        // when
+        PostsResponse allPost = postService.findAllPost(1L, PageRequest.of(0, 8, DESC, "createDate"));
+        List<PostsElementResponse> postList = allPost.getPosts();
+
+        // then
+        assertThat(allPost.getPosts().size()).isEqualTo(1);
+        assertThat(postList.get(0).getId()).isEqualTo(2L);
     }
 
     @DisplayName("게시글이 성공적으로 생성된다.")

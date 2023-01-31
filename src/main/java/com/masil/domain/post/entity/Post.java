@@ -85,4 +85,8 @@ public class Post extends BaseEntity {
         }
         return comments.size();
     }
+
+    public boolean isDeleted() {
+        return this.state == State.DELETE;
+    }
 }
