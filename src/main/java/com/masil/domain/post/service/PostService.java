@@ -1,5 +1,8 @@
 package com.masil.domain.post.service;
 
+import com.masil.domain.board.entity.Board;
+import com.masil.domain.board.exception.BoardNotFoundException;
+import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.post.dto.*;
 
@@ -27,6 +30,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
+    private final BoardRepository boardRepository;
 
     public PostDetailResponse findDetailPost(Long postId, Long memberId) { // memberId 임시값
         Post post = findPostById(postId);
@@ -42,14 +46,15 @@ public class PostService {
     }
 
     public PostsResponse findAllPost(Long boardId, Pageable pageable) {
-        Slice<Post> posts = postRepository.findAll(pageable);
+        Slice<Post> posts = postRepository.findAllByBoardId(boardId, pageable);
         return PostsResponse.ofPosts(posts);
     }
 
     @Transactional
     public Long createPost(PostCreateRequest postCreateRequest, Long memberId){
         Member member = findMemberById(memberId);
-        Post post = postCreateRequest.toEntity(member);
+        Board board = findBoardById(postCreateRequest.getBoardId());
+        Post post = postCreateRequest.toEntity(member, board);
         return postRepository.save(post).getId();
     }
 
@@ -87,5 +92,9 @@ public class PostService {
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
+    }
+    private Board findBoardById(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(BoardNotFoundException::new);
     }
 }

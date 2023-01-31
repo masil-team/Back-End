@@ -1,6 +1,7 @@
 package com.masil.domain.board.entity;
 
 import com.masil.global.common.entity.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -19,4 +20,10 @@ public class Board extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    @Builder
+    private Board(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

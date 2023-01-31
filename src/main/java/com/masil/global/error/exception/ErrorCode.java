@@ -24,9 +24,10 @@ public enum ErrorCode {
     POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다."),
 
     // commentLike
-    COMMENT_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 댓글에는 좋아요를 누를 수 없습니다.")
+    COMMENT_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 댓글에는 좋아요를 누를 수 없습니다."),
 
-    ;
+    // board
+    BOARD_NOT_FOUND(NOT_FOUND, 9001, "존재하지 않는 카테고리입니다.");
 
     private HttpStatus status;
     private final int code;

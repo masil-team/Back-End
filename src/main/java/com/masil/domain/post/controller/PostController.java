@@ -24,16 +24,15 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/boards")
+@RequestMapping()
 @Slf4j
 public class PostController {
 
     private final PostService postService;
 
     // 상세 조회
-    @GetMapping("/{boardId}/posts/{postId}")
-    public ResponseEntity<PostDetailResponse> findDetailPost(@PathVariable Long boardId,
-                                                             @PathVariable Long postId,
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<PostDetailResponse> findDetailPost(@PathVariable Long postId,
                                                              @LoginUser CurrentMember currentMember) {
         log.info("게시글 상세 조회 시작");
 
@@ -43,7 +42,7 @@ public class PostController {
     }
 
     // 목록 조회
-    @GetMapping("/{boardId}/posts")
+    @GetMapping("/boards/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
@@ -54,19 +53,18 @@ public class PostController {
 
     // 생성
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{boardId}/posts")
-    public ResponseEntity<Void> createPost(@PathVariable Long boardId,
-                                           @Valid @RequestBody PostCreateRequest postCreateRequest,
+    @PostMapping("/posts")
+    public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest,
                                            @LoginUser CurrentMember currentMember) {
         log.info("게시글 생성 시작");
 
         Long postId = postService.createPost(postCreateRequest, currentMember.getId());
-        return ResponseEntity.created(URI.create("/boards/" + boardId + "/posts/" + postId)).build();
+        return ResponseEntity.created(URI.create("/posts/" + postId)).build();
     }
 
     // 수정
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{boardId}/posts/{postId}")
+    @PatchMapping("/boards/{boardId}/posts/{postId}")
     public ResponseEntity<Void> modifyPost(@PathVariable Long boardId,
                                            @PathVariable Long postId,
                                            @Valid @RequestBody PostModifyRequest postModifyRequest,
@@ -79,7 +77,7 @@ public class PostController {
 
     // 삭제
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{boardId}/posts/{postId}")
+    @DeleteMapping("/boards/{boardId}/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long boardId,
                                            @PathVariable Long postId,
                                            @LoginUser CurrentMember currentMember) {

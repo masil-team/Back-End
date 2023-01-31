@@ -33,6 +33,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int likeCount;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private State state = State.NORMAL;
 
@@ -49,10 +50,11 @@ public class Post extends BaseEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    private Post(String content, Member member, State state) {
+    private Post(String content, Member member, State state, Board board) {
         this.content = content;
         this.member = member;
         this.state = state;
+        this.board = board;
     }
     
     public void updateContent(String content){

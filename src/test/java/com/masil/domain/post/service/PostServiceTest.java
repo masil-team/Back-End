@@ -1,6 +1,8 @@
 package com.masil.domain.post.service;
 
 import com.masil.common.annotation.ServiceTest;
+import com.masil.domain.board.entity.Board;
+import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Commit;
 
 import java.awt.print.Pageable;
 import java.util.List;
@@ -26,11 +29,13 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class PostServiceTest extends ServiceTest {
 
     @Autowired
-    public PostService postService;
+    private PostService postService;
     @Autowired
-    public MemberRepository memberRepository;
+    private MemberRepository memberRepository;
     @Autowired
-    public PostRepository postRepository;
+    private PostRepository postRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     private static final String POST_CONTENT_1 = "내용1";
     private static final String POST_CONTENT_2 = "내용2";
@@ -41,6 +46,11 @@ public class PostServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
+        Board board = Board.builder()
+                .id(1L)
+                .name("ALL")
+                .build();
+        boardRepository.save(board);
         Member member1 = Member.builder()
                 .email(USER_EMAIL_1)
                 .nickname(USER_NICKNAME_1)
@@ -57,10 +67,12 @@ public class PostServiceTest extends ServiceTest {
         Post post1 = Post.builder()
                 .content(POST_CONTENT_1)
                 .member(member1)
+                .board(board)
                 .build();
         Post post2 = Post.builder()
                 .content(POST_CONTENT_2)
                 .member(member1)
+                .board(board)
                 .build();
         postRepository.save(post1);
         postRepository.save(post2);
@@ -117,7 +129,7 @@ public class PostServiceTest extends ServiceTest {
     void findAllPost_success() {
 
         // when
-        PostsResponse allPost = postService.findAllPost(1L, PageRequest.of(0, 20, DESC, "createDate"));
+        PostsResponse allPost = postService.findAllPost(1L, PageRequest.of(0, 8, DESC, "createDate"));
         List<PostsElementResponse> postList = allPost.getPosts();
         PostsElementResponse postsElementResponse = postList.get(postList.size()-1);
 
@@ -139,8 +151,7 @@ public class PostServiceTest extends ServiceTest {
         Member member = memberRepository.findById(1L).get();
 
         String content = "새로운 내용";
-        PostCreateRequest postCreateRequest = new PostCreateRequest(content);
-
+        PostCreateRequest postCreateRequest = PostCreateRequestBuilder.build(content);
         // when
         Long postId = postService.createPost(postCreateRequest, 1L);
         Post post = postRepository.findById(postId).get();
@@ -151,6 +162,8 @@ public class PostServiceTest extends ServiceTest {
         assertThat(post.getContent()).isEqualTo(content);
         assertThat(post.getMember().getId()).isEqualTo(member.getId());
         assertThat(post.getViewCount()).isEqualTo(0);
+        assertThat(post.getBoard().getId()).isEqualTo(1L);
+        assertThat(post.getState()).isEqualTo(State.NORMAL);
     }
 
     @DisplayName("게시글 수정이 성공적으로 수행된다.")
