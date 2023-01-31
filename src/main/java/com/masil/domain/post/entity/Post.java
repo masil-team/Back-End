@@ -21,6 +21,8 @@ import static javax.persistence.FetchType.LAZY;
 @RequiredArgsConstructor
 public class Post extends BaseEntity {
 
+    private static final int PREVIEW_LENGTH = 400;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -89,5 +91,8 @@ public class Post extends BaseEntity {
 
     public boolean isDeleted() {
         return this.state == State.DELETE;
+    }
+    public String getPostPreview() {
+        return this.content.substring(0, Math.min(PREVIEW_LENGTH, content.length()));
     }
 }

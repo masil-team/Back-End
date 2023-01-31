@@ -20,7 +20,7 @@ public class PostsResponse {
     public static PostsResponse ofPosts(Slice<Post> posts) {
         List<PostsElementResponse> postsResponse = posts
                 .stream()
-                .map((Post post) -> PostsElementResponse.of(post))
+                .map(post -> PostsElementResponse.of(post))
                 .collect(Collectors.toList());
 
         return new PostsResponse(postsResponse, posts.isLast());

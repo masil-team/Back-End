@@ -25,10 +25,12 @@ public class PostsElementResponse {
     private LocalDateTime modifyDate;
 
     public static PostsElementResponse of(Post post) {
+
+
         return PostsElementResponse.builder()
                 .id(post.getId())
                 .member(MemberResponse.of(post.getMember()))
-                .content(post.getContent())
+                .content(post.getPostPreview())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
