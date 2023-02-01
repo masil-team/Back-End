@@ -7,6 +7,7 @@ import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.post.dto.*;
 
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -14,13 +15,14 @@ import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 
 import com.masil.domain.postlike.repository.PostLikeRepository;
-import com.masil.global.error.exception.BusinessException;
-import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +36,28 @@ public class PostService {
 
     public PostDetailResponse findDetailPost(Long postId, Long memberId) { // memberId 임시값
         Post post = findPostById(postId);
+        checkPostState(post);
+
+        // 로그인 상태인 경우
+        if (memberId != null) {
+            updatePostBoolean(memberId, post);
+        }
+
         post.plusView();
 
-        if (memberId != -1) {
-            return PostDetailResponse.of(post,
-                    post.isOwner(memberId), // 본인 글인지 체크
-                    postLikeRepository.existsByPostAndMemberId(post, memberId) // 좋아요한 글인지 체크
-            );
-        }
         return PostDetailResponse.of(post);
     }
 
-    public PostsResponse findAllPost(Long boardId, Pageable pageable) {
-        Slice<Post> posts = postRepository.findAllByBoardId(boardId, pageable);
+    public PostsResponse findAllPost(Long boardId, Long memberId, Pageable pageable) {
+        Slice<Post> posts = postRepository.findAllByBoardIdAndState(boardId, State.NORMAL, pageable);
+
+        // 로그인 상태인 경우
+        if (memberId != null) {
+            for (Post post : posts) {
+                updatePostBoolean(memberId, post);
+            }
+        }
+
         return PostsResponse.ofPosts(posts);
     }
 
@@ -79,6 +90,17 @@ public class PostService {
         post.tempDelete();
     }
 
+    private void updatePostBoolean(Long memberId, Post post) {
+        boolean isOwnPost = post.isOwner(memberId);
+        boolean isLiked = postLikeRepository.existsByPostAndMemberId(post, memberId);
+        post.updateBoolean(isOwnPost, isLiked);
+    }
+
+    private void checkPostState(Post post) {
+        if (post.isDeleted()) {
+            throw new PostNotFoundException();
+        }
+    }
     private void validateOwner(Long memberId, Post post) {
         if (!post.isOwner(memberId)) {
             throw new PostAccessDeniedException();

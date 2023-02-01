@@ -11,7 +11,9 @@ import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.global.error.exception.BusinessException;
+import com.masil.domain.postlike.entity.PostLike;
+import com.masil.domain.postlike.repository.PostLikeRepository;
+import com.masil.domain.postlike.service.PostLikeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Commit;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +37,8 @@ public class PostServiceTest extends ServiceTest {
     private PostRepository postRepository;
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private PostLikeService postLikeService;
 
     private static final String POST_CONTENT_1 = "내용1";
     private static final String POST_CONTENT_2 = "내용2";
@@ -89,11 +92,12 @@ public class PostServiceTest extends ServiceTest {
         assertThat(postDetailResponse.getId()).isEqualTo(1L);
         assertThat(postDetailResponse.getMember().getId()).isEqualTo(1L);
         assertThat(postDetailResponse.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(postDetailResponse.getBoardId()).isEqualTo(1L);
         assertThat(postDetailResponse.getContent()).isEqualTo(POST_CONTENT_1);
         assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
         assertThat(postDetailResponse.getLikeCount()).isEqualTo(0);
         assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
-        assertThat(postDetailResponse.getIsLike()).isEqualTo(false);
+        assertThat(postDetailResponse.getIsLiked()).isEqualTo(false);
     }
 
     @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다")
@@ -102,6 +106,19 @@ public class PostServiceTest extends ServiceTest {
 
         // when, then
         assertThatThrownBy(() -> postService.findDetailPost(100L, 2L))
+                .isInstanceOf(PostNotFoundException.class);
+    }
+
+    @DisplayName("삭제 상태인 게시글인 경우 예외가 발생한다")
+    @Test
+    void findPost_isDeleted() {
+
+        // given
+        Post post = postRepository.findById(1L).get();
+        post.tempDelete();
+
+        // when, then
+        assertThatThrownBy(() -> postService.findDetailPost(1L, 2L))
                 .isInstanceOf(PostNotFoundException.class);
     }
 
@@ -119,9 +136,14 @@ public class PostServiceTest extends ServiceTest {
     @DisplayName("좋아요한 상세 게시글인 경우")
     @Test
     void findPost_isLike() {
-        /**
-         *
-         */
+        // given
+        postLikeService.toggleLikePost(1L, 2L);
+
+        // when
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
+
+        // then
+        assertThat(postDetailResponse.getIsLiked()).isEqualTo(true);
     }
 
     @DisplayName("게시글 목록이 성공적으로 조회된다.")
@@ -129,7 +151,7 @@ public class PostServiceTest extends ServiceTest {
     void findAllPost_success() {
 
         // when
-        PostsResponse allPost = postService.findAllPost(1L, PageRequest.of(0, 8, DESC, "createDate"));
+        PostsResponse allPost = postService.findAllPost(1L, 1L, PageRequest.of(0, 8, DESC, "createDate"));
         List<PostsElementResponse> postList = allPost.getPosts();
         PostsElementResponse postsElementResponse = postList.get(postList.size()-1);
 
@@ -142,6 +164,25 @@ public class PostServiceTest extends ServiceTest {
         assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
         assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);
         assertThat(postsElementResponse.getCommentCount()).isEqualTo(0);
+        assertThat(postsElementResponse.getIsOwner()).isEqualTo(true);
+        assertThat(postsElementResponse.getIsLiked()).isEqualTo(false);
+    }
+
+    @DisplayName("게시글 목록에서 상태가 DELETE인 컬럼은 제외하고 조회된다.")
+    @Test
+    void findAllPost_State() {
+
+        // given
+        Post post = postRepository.findById(1L).get();
+        post.tempDelete();
+
+        // when
+        PostsResponse allPost = postService.findAllPost(1L, null, PageRequest.of(0, 8, DESC, "createDate"));
+        List<PostsElementResponse> postList = allPost.getPosts();
+
+        // then
+        assertThat(allPost.getPosts().size()).isEqualTo(1);
+        assertThat(postList.get(0).getId()).isEqualTo(2L);
     }
 
     @DisplayName("게시글이 성공적으로 생성된다.")

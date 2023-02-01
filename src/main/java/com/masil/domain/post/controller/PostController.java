@@ -36,7 +36,7 @@ public class PostController {
                                                              @LoginUser CurrentMember currentMember) {
         log.info("게시글 상세 조회 시작");
 
-        Long memberId = currentMember == null ? -1 : currentMember.getId();
+        Long memberId = (currentMember != null) ? currentMember.getId() : null;
         PostDetailResponse postDetailResponse = postService.findDetailPost(postId, memberId);
         return ResponseEntity.ok(postDetailResponse);
     }
@@ -44,10 +44,12 @@ public class PostController {
     // 목록 조회
     @GetMapping("/boards/{boardId}/posts")
     public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
+                                                     @LoginUser CurrentMember currentMember,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
 
-        PostsResponse postsResponse = postService.findAllPost(boardId, pageable);
+        Long memberId = (currentMember != null) ? currentMember.getId() : null;
+        PostsResponse postsResponse = postService.findAllPost(boardId, memberId, pageable);
         return ResponseEntity.ok(postsResponse);
     }
 

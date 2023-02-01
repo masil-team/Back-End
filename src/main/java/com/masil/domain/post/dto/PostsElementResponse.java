@@ -12,15 +12,13 @@ import java.time.LocalDateTime;
 public class PostsElementResponse {
     private Long id;
     private MemberResponse member;
-    private String content;  // 글자 제한
+    private Long boardId;
+    private String content;
     private int viewCount;
     private int likeCount;
     private int commentCount;
-//    @Builder.Default
-//    private Boolean isOwner = false;
-//    @Builder.Default
-//    private Boolean isLike = false;
-//    private Long boardId;
+    private Boolean isOwner;
+    private Boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -28,12 +26,13 @@ public class PostsElementResponse {
         return PostsElementResponse.builder()
                 .id(post.getId())
                 .member(MemberResponse.of(post.getMember()))
-                .content(post.getContent())
+                .boardId(post.getBoard().getId())
+                .content(post.getPostPreview())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
-//                .isOwner(isOwner)
-//                .isLike(isLike)
+                .isOwner(post.getIsOwner())
+                .isLiked(post.getIsLiked())
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
                 .build();

@@ -7,6 +7,7 @@ import com.masil.global.common.entity.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -21,10 +22,13 @@ import static javax.persistence.FetchType.LAZY;
 @RequiredArgsConstructor
 public class Post extends BaseEntity {
 
+    private static final int PREVIEW_LENGTH = 400;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(columnDefinition = "integer default 0", nullable = false)
@@ -49,6 +53,12 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @Transient
+    private Boolean isOwner = false;
+
+    @Transient
+    private Boolean isLiked = false;
+
     @Builder
     private Post(String content, Member member, State state, Board board) {
         this.content = content;
@@ -60,6 +70,12 @@ public class Post extends BaseEntity {
     public void updateContentAndBoard(String content, Board board){
         this.content = content;
         this.board = board;
+
+    }
+    public void updateBoolean(Boolean isOwner, Boolean isLiked){
+        this.isOwner = isOwner;
+        this.isLiked = isLiked;
+
     }
 
     public void tempDelete() {
@@ -84,5 +100,12 @@ public class Post extends BaseEntity {
             return 0;
         }
         return comments.size();
+    }
+
+    public boolean isDeleted() {
+        return this.state == State.DELETE;
+    }
+    public String getPostPreview() {
+        return this.content.substring(0, Math.min(PREVIEW_LENGTH, content.length()));
     }
 }

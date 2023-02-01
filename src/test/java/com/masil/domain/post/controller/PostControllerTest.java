@@ -2,23 +2,18 @@ package com.masil.domain.post.controller;
 
 
 import com.masil.common.annotation.ControllerMockApiTest;
-import com.masil.common.security.WithMockCustomUser;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.service.PostService;
-import com.masil.global.auth.jwt.provider.JwtTokenProvider;
-import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -51,11 +46,12 @@ public class PostControllerTest extends ControllerMockApiTest {
     private static final PostDetailResponse POST_RESPONSE_1 = PostDetailResponse.builder()
             .id(1L)
             .member(MEMBER_RESPONSE)
+            .boardId(1L)
             .content("내용1")
             .viewCount(0)
             .likeCount(0)
             .isOwner(false)
-            .isLike(false)
+            .isLiked(false)
             .createDate(LocalDateTime.now())
             .modifyDate(LocalDateTime.now())
             .build();
@@ -107,11 +103,12 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("id").description("게시글 id"),
                                 fieldWithPath("member.id").description("작성자 id"),
                                 fieldWithPath("member.nickname").description("닉네임"),
+                                fieldWithPath("boardId").description("카테고리Id"),
                                 fieldWithPath("content").description("내용"),
                                 fieldWithPath("viewCount").description("조회수"),
                                 fieldWithPath("likeCount").description("좋아요 개수"),
                                 fieldWithPath("isOwner").description("본인 게시글 여부"),
-                                fieldWithPath("isLike").description("게시글 좋아요 여부"),
+                                fieldWithPath("isLiked").description("게시글 좋아요 여부"),
                                 fieldWithPath("createDate").description("생성 날짜"),
                                 fieldWithPath("modifyDate").description("수정 날짜")
                         )
@@ -146,22 +143,25 @@ public class PostControllerTest extends ControllerMockApiTest {
     void findAllPost_success() throws Exception {
         // given
         List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
-        for (int i = 2; i >= 1; i--) {
-            postsElementResponseList.add(PostsElementResponse.builder()
-                    .id((long) i)
-                    .member(MEMBER_RESPONSE)
-                    .content("내용")
-                    .viewCount(0)
-                    .likeCount(0)
-                    .commentCount(0)
-                    .createDate(LocalDateTime.now())
-                    .modifyDate(LocalDateTime.now())
-                    .build());
-        }
+
+        postsElementResponseList.add(PostsElementResponse.builder()
+                .id(1L)
+                .member(MEMBER_RESPONSE)
+                .boardId(1L)
+                .content("내용")
+                .viewCount(0)
+                .likeCount(0)
+                .commentCount(0)
+                .isOwner(false)
+                .isLiked(false)
+                .createDate(LocalDateTime.now())
+                .modifyDate(LocalDateTime.now())
+                .build());
+
 
         PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
 
-        given(postService.findAllPost(any(), any())).willReturn(postsResponse);
+        given(postService.findAllPost(any(), any(), any())).willReturn(postsResponse);
 
         // when
         ResultActions resultActions = requestFindAllPost("/boards/1/posts?page=0&size=20");
@@ -176,19 +176,13 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].id").description("게시글 id"),
                                 fieldWithPath("posts.[].member.id").description("작성자 id"),
                                 fieldWithPath("posts.[].member.nickname").description("닉네임"),
+                                fieldWithPath("posts.[].boardId").description("카테고리Id"),
                                 fieldWithPath("posts.[].content").description("내용"),
                                 fieldWithPath("posts.[].viewCount").description("조회수"),
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
                                 fieldWithPath("posts.[].commentCount").description("댓글 개수"),
-                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
-                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("posts.[].id").description("게시글 id"),
-                                fieldWithPath("posts.[].member.id").description("작성자 id"),
-                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
-                                fieldWithPath("posts.[].content").description("내용"),
-                                fieldWithPath("posts.[].viewCount").description("조회수"),
-                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
-                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].isOwner").description("본인 글 여부"),
+                                fieldWithPath("posts.[].isLiked").description("좋아요 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
