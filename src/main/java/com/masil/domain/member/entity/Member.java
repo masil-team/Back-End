@@ -2,6 +2,7 @@ package com.masil.domain.member.entity;
 
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Entity
 @Getter
 @SuperBuilder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
     @Id
@@ -43,6 +44,11 @@ public class Member extends BaseEntity {
     )
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_address_id")
+    private MemberAddress memberAddress;
+
 
     @Builder
     public Member(String email, String password, String nickname, String state, String profileImage, Set<Authority> authorities) {
