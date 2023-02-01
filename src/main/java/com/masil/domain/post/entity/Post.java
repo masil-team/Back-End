@@ -70,10 +70,12 @@ public class Post extends BaseEntity {
     public void updateContentAndBoard(String content, Board board){
         this.content = content;
         this.board = board;
+
     }
     public void updateBoolean(Boolean isOwner, Boolean isLiked){
         this.isOwner = isOwner;
         this.isLiked = isLiked;
+
     }
 
     public void tempDelete() {

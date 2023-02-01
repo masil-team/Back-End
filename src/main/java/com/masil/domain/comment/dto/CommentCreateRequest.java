@@ -3,7 +3,7 @@ package com.masil.domain.comment.dto;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.entity.Post;
-
+import com.masil.domain.post.entity.State;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +24,12 @@ public class CommentCreateRequest {
     }
 
     //dto -> toEntity
-    public Comment toEntity(Post post/* Member member*/){
+    public Comment toEntity(Post post, Member member){
         return Comment.builder()
                 .content(content)
                 .post(post)
-//                .member(member)
+                .state(State.NORMAL)
+                .member(member)
                 .build();
     }
 }

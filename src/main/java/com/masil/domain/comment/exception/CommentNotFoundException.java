@@ -1,9 +1,10 @@
 package com.masil.domain.comment.exception;
 
-public class CommentNotFoundException extends RuntimeException {
-    private static final String MESSAGE = "댓글을 찾을 수 없습니다.";
+import com.masil.global.error.exception.EntityNotFoundException;
+import com.masil.global.error.exception.ErrorCode;
 
+public class CommentNotFoundException extends EntityNotFoundException {
     public CommentNotFoundException() {
-        super(MESSAGE);
+        super(ErrorCode.COMMENT_NOT_FOUND);
     }
 }
