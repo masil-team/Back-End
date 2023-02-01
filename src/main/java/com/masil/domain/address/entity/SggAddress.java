@@ -1,9 +1,12 @@
 package com.masil.domain.address.entity;
 
+import lombok.Getter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "sgg_address_test")
+@Getter
 public class SggAddress {
 
     @Id
