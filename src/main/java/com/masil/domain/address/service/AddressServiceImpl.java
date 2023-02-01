@@ -6,13 +6,14 @@ import com.masil.domain.address.repository.EmdAddressRepository;
 import com.masil.domain.address.repository.SggAddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AddressServiceImpl implements AddressService {
 
     private final EmdAddressRepository emdAddressRepository;
@@ -20,10 +21,10 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public List<AddressSearchResponse> search(String search) {
+    public List<AddressSearchResponse> search(String keyword) {
 
-        List<AddressSearchResponse> searchResult = searchBySggAddress(search);
-        searchResult.addAll(searchByEmdAddress(search));
+        List<AddressSearchResponse> searchResult = searchBySggAddress(keyword);
+        searchResult.addAll(searchByEmdAddress(keyword));
 
         return searchResult;
     }

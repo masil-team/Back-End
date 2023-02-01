@@ -22,8 +22,8 @@ public class AddressController {
     private final MemberService memberService;
 
     @GetMapping("/search")
-    public List<AddressSearchResponse> search(@RequestParam @NotBlank(message = "잘못된 검색어입니다") String search) {
-        return addressService.search(search);
+    public List<AddressSearchResponse> search(@NotBlank String keyword) {
+        return addressService.search(keyword);
     }
 
     @GetMapping("/{addressId}")
