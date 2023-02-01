@@ -3,11 +3,8 @@ package com.masil.domain.postlike.service;
 import com.masil.common.annotation.ServiceTest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
-import com.masil.domain.post.dto.PostDetailResponse;
 import com.masil.domain.post.entity.Post;
-import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.domain.post.service.PostService;
 import com.masil.domain.postlike.dto.PostLikeResponse;
 import com.masil.domain.postlike.entity.PostLike;
 import com.masil.domain.postlike.exception.SelfPostLikeException;
@@ -16,11 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Commit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PostLikeServiceTest extends ServiceTest {
 

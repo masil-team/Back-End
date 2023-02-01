@@ -1,10 +1,8 @@
 package com.masil.domain.post.controller;
 
 import com.masil.domain.post.dto.PostCreateRequest;
-
-import com.masil.domain.post.dto.PostModifyRequest;
-
 import com.masil.domain.post.dto.PostDetailResponse;
+import com.masil.domain.post.dto.PostModifyRequest;
 import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.service.PostService;
 import com.masil.global.auth.annotaion.LoginUser;

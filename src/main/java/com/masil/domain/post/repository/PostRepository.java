@@ -1,9 +1,7 @@
 package com.masil.domain.post.repository;
 
 import com.masil.domain.post.entity.Post;
-
 import com.masil.domain.post.entity.State;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

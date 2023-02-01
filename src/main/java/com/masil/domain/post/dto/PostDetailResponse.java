@@ -1,13 +1,10 @@
 package com.masil.domain.post.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 @Getter
