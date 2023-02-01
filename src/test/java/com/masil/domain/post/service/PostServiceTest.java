@@ -11,15 +11,12 @@ import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.domain.postlike.entity.PostLike;
-import com.masil.domain.postlike.repository.PostLikeRepository;
 import com.masil.domain.postlike.service.PostLikeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Commit;
 
 import java.util.List;
 

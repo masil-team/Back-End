@@ -1,8 +1,8 @@
 package com.masil.domain.post.dto;
 
 import com.masil.domain.board.entity.Board;
-import com.masil.domain.post.entity.Post;
 import com.masil.domain.member.entity.Member;
+import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
