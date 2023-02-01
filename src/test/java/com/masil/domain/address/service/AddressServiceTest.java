@@ -1,9 +1,6 @@
 package com.masil.domain.address.service;
 
-import com.masil.common.annotation.ServiceTest;
 import com.masil.domain.address.dto.response.AddressSearchResponse;
-import com.masil.domain.address.repository.EmdAddressRepository;
-import com.masil.domain.address.repository.SggAddressRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @SpringBootTest
