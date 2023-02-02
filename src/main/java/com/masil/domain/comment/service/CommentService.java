@@ -1,5 +1,6 @@
 package com.masil.domain.comment.service;
 
+import com.masil.domain.comment.dto.ChildrenCreateRequest;
 import com.masil.domain.comment.dto.CommentCreateRequest;
 import com.masil.domain.comment.dto.CommentModifyRequest;
 import com.masil.domain.comment.dto.CommentResponse;
@@ -33,9 +34,9 @@ public class CommentService {
      * 댓글 조회
      */
     public List<CommentResponse> findComments(Long postId, Pageable pageable){
-        return commentRepository.findAllByPostId(postId, pageable)
-                .stream()
-                .map(comment -> CommentResponse.createCommentDto(comment))
+
+        return commentRepository.findAllByPostIdAndParentIdNullAndStateIsNotNull(postId, pageable).stream()
+                .map(comment -> CommentResponse.responseCommentDto(comment))
                 .collect(Collectors.toList());
     }
 
@@ -50,6 +51,21 @@ public class CommentService {
         Comment comment = commentCreateRequest.toEntity(post, member);
 
         return commentRepository.save(comment).getId();
+    }
+
+    /**
+     * 대댓글 작성
+     */
+    @Transactional
+    public Long createChildrenComment(Long postId, Long commentId, ChildrenCreateRequest childrenCreateRequest, Long memberId){
+
+        Post post = findPostById(postId);
+        Comment parent = findCommentById(commentId);
+        Member member = findMemberById(memberId);
+
+        Comment reply = childrenCreateRequest.toEntity(post, parent, member);
+
+        return commentRepository.save(reply).getId();
     }
 
     /**
@@ -92,6 +108,7 @@ public class CommentService {
     /**
      * 예외 처리
      */
+
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);

@@ -9,10 +9,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -36,13 +39,13 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-
 //    private Integer depth; // 댓글 depth
 
     /**
      * 부모 댓글과 자식 추가
+     * 셀프 조인
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
@@ -63,8 +66,7 @@ public class Comment extends BaseEntity {
     private int likeCount;
 
     @Builder
-    private Comment(Long id, String content, Member member, Post post, State state, Comment parent) {
-        this.id = id;
+    private Comment(String content, Member member, Post post, State state, Comment parent) {
         this.content = content;
         this.member = member;
         this.post = post;
@@ -77,15 +79,12 @@ public class Comment extends BaseEntity {
     }
 
     public void tempDelete() {
-        this.state = State.DELETE;
+        this.state = null; // 추후 변경
     }
 
-    // 연관관계 편의 메서드 //
-//    public void setParent(Comment parent) {
-//        this.parent = parent;
-//        parent.getChildren().add(this);
-//    }
-
+    /**
+     * 자신이 맞는지 알아보는 로직
+     */
     public boolean isOwner(Long memberId) {
         return this.member.getId() == memberId;
     }
@@ -100,4 +99,17 @@ public class Comment extends BaseEntity {
     public void decreaseLikeCount() {
         this.likeCount -= 1;
     }
+
+    /**
+     * 대댓글 기능
+     */
+
+    public boolean isParent() {
+        return Objects.isNull(parent);
+    }
+
+    public boolean hasNoReply() {
+        return children.isEmpty();
+    }
+
 }
