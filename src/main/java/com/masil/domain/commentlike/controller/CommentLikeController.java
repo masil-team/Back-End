@@ -1,5 +1,6 @@
 package com.masil.domain.commentlike.controller;
 
+import com.masil.domain.commentlike.dto.CommentLikeResponse;
 import com.masil.domain.commentlike.service.CommentLikeService;
 import com.masil.global.auth.annotaion.LoginUser;
 import com.masil.global.auth.dto.response.CurrentMember;
@@ -17,10 +18,10 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     @PutMapping("/comments/{commentId}/addLike")
-    public ResponseEntity likeComment(@PathVariable Long commentId,
-                                      @LoginUser CurrentMember currentMember) {
-        commentLikeService.updateLikeOfComment(commentId, currentMember.getId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CommentLikeResponse> likeComment(@PathVariable Long commentId,
+                                                           @LoginUser CurrentMember currentMember) {
+        CommentLikeResponse commentLikeResponse = commentLikeService.updateLikeOfComment(commentId, currentMember.getId());
+        return ResponseEntity.ok(commentLikeResponse);
     }
 }
 

@@ -1,5 +1,6 @@
 package com.masil.domain.comment.controller;
 
+import com.masil.domain.comment.dto.ChildrenCreateRequest;
 import com.masil.domain.comment.dto.CommentCreateRequest;
 import com.masil.domain.comment.dto.CommentModifyRequest;
 import com.masil.domain.comment.dto.CommentResponse;
@@ -55,6 +56,21 @@ public class CommentController {
         commentService.createComment(postId, commentCreateRequest, currentMember.getId());
         // 01-19 create로 수정
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments")).build();
+    }
+
+    /**
+     * 대댓글 작성
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{postId}/reply/{commentId}")
+    public ResponseEntity<ChildrenCreateRequest> createChildrenComment(@PathVariable Long postId,
+                                                                       @PathVariable Long commentId,
+                                                                       @Valid @RequestBody ChildrenCreateRequest childrenCreateRequest,
+                                                                       @LoginUser CurrentMember currentMember){
+        log.info("대댓글 생성 시작");
+        commentService.createChildrenComment(postId, commentId, childrenCreateRequest, currentMember.getId());
+        // 01-19 create로 수정
+        return ResponseEntity.created(URI.create("/posts/" + postId + "/reply/" + commentId)).build();
     }
 
     /**

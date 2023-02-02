@@ -3,6 +3,7 @@ package com.masil.domain.commentlike.service;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
+import com.masil.domain.commentlike.dto.CommentLikeResponse;
 import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.commentlike.exception.SelfCommentLikeException;
 import com.masil.domain.commentlike.repository.CommentLikeRepository;
@@ -29,7 +30,7 @@ public class CommentLikeService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public String updateLikeOfComment(Long commentId, Long memberId) {
+    public CommentLikeResponse updateLikeOfComment(Long commentId, Long memberId) {
 
         Comment comment = findCommentById(commentId);
         Member member = findMemberById(memberId);
@@ -46,18 +47,18 @@ public class CommentLikeService {
         return removeLike(comment, member);
     }
 
-    public String addLike(Comment comment, Member member) {
-        CommentLike commentLike = new CommentLike(comment, member); // true 처리
-        commentLikeRepository.save(commentLike);
-        return SUCCESS_LIKE_BOARD;
+    public CommentLikeResponse addLike(Comment comment, Member member) {
+        CommentLike commentLike = new CommentLike(comment, member);
+        commentLikeRepository.save(commentLike); // true 처리
+        return CommentLikeResponse.of(comment.getLikeCount(), true);
     }
 
-    public String removeLike(Comment comment, Member member) {
+    public CommentLikeResponse removeLike(Comment comment, Member member) {
         CommentLike commentLike = commentLikeRepository.findByMemberAndComment(member, comment)
                 .orElseThrow(() -> {throw new IllegalArgumentException("'좋아요' 기록을 찾을 수 없습니다.");
         });
-        commentLikeRepository.delete(commentLike);
-        return SUCCESS_UNLIKE_BOARD;
+        commentLikeRepository.delete(commentLike); // false 처리
+        return CommentLikeResponse.of(comment.getLikeCount(), false);
     }
 
     public boolean hasLikeComment(Comment comment, Member member) {

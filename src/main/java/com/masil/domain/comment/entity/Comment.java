@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -36,13 +37,13 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-
 //    private Integer depth; // 댓글 depth
 
     /**
      * 부모 댓글과 자식 추가
+     * 셀프 조인
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
@@ -63,8 +64,7 @@ public class Comment extends BaseEntity {
     private int likeCount;
 
     @Builder
-    private Comment(Long id, String content, Member member, Post post, State state, Comment parent) {
-        this.id = id;
+    private Comment(String content, Member member, Post post, State state, Comment parent) {
         this.content = content;
         this.member = member;
         this.post = post;
@@ -80,12 +80,9 @@ public class Comment extends BaseEntity {
         this.state = State.DELETE;
     }
 
-    // 연관관계 편의 메서드 //
-//    public void setParent(Comment parent) {
-//        this.parent = parent;
-//        parent.getChildren().add(this);
-//    }
-
+    /**
+     * 자신이 맞는지 알아보는 로직
+     */
     public boolean isOwner(Long memberId) {
         return this.member.getId() == memberId;
     }
