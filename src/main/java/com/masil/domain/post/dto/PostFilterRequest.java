@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 @Getter
 public class PostFilterRequest {
 
+    private static final int SGG_ADDRESS_ID_LENGTH = 5;
+    private static final int EMD_ADDRESS_ID_LENGTH = 8;
+
     private Long boardId;
 
     private Integer rCode;
@@ -20,6 +23,6 @@ public class PostFilterRequest {
     }
 
     public boolean isEmdAddress() {
-        return String.valueOf(rCode).length() > 5;
+        return String.valueOf(rCode).length() > SGG_ADDRESS_ID_LENGTH;
     }
 }
