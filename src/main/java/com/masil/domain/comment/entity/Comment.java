@@ -97,17 +97,4 @@ public class Comment extends BaseEntity {
     public void decreaseLikeCount() {
         this.likeCount -= 1;
     }
-
-    /**
-     * 대댓글 기능
-     */
-
-    public boolean isParent() {
-        return Objects.isNull(parent);
-    }
-
-    public boolean hasNoReply() {
-        return children.isEmpty();
-    }
-
 }

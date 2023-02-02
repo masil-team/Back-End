@@ -36,11 +36,10 @@ public class CommentResponse {
         this.replies = replies;
     }
 
-    public static CommentResponse responseCommentDto(Comment comment) {
+    public static CommentResponse of(Comment comment) {
         List<Comment> children = comment.getChildren(); // comment에서 children 을 받아온다.
         List<ChildrenResponse> replies = children.stream()
                 .map(ChildrenResponse::of)
-                .distinct()
                 .collect(Collectors.toList());
 
         return CommentResponse.builder()
