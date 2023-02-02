@@ -35,7 +35,7 @@ public class CommentService {
      */
     public List<CommentResponse> findComments(Long postId, Pageable pageable){
 
-        return commentRepository.findAllByPostIdAndParentIdNullAndStateIsNotNull(postId, pageable).stream()
+        return commentRepository.findAllByPostIdAndParentIdNull(postId, pageable).stream()
                 .map(comment -> CommentResponse.responseCommentDto(comment))
                 .collect(Collectors.toList());
     }

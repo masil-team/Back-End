@@ -9,8 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -79,7 +77,7 @@ public class Comment extends BaseEntity {
     }
 
     public void tempDelete() {
-        this.state = null; // 추후 변경
+        this.state = State.DELETE;
     }
 
     /**

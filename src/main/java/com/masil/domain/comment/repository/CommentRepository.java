@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findAllByPostIdAndParentIdNullAndStateIsNotNull(Long postId, Pageable pageable);
+    List<Comment> findAllByPostIdAndParentIdNull(Long postId, Pageable pageable);
 }
