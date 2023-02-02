@@ -12,6 +12,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Slice<Post> findAllByBoardId(Long boardId, Pageable pageable);
 
-    Slice<Post> findAllByBoardIdAndState(Long boardId, State normal, Pageable pageable);
+    Slice<Post> findAllByBoardIdAndState(Long boardId, State state, Pageable pageable);
 
+    Slice<Post> findAllByBoardIdAndStateAndEmdAddressId(Long boardId, State state, Integer emdAddressId, Pageable pageable);
+
+    Slice<Post> findAllByBoardIdAndStateAndEmdAddressSggAddressId(Long boardId, State state, Integer sggAddressId, Pageable pageable);
 }

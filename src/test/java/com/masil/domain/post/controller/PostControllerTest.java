@@ -47,6 +47,7 @@ public class PostControllerTest extends ControllerMockApiTest {
             .id(1L)
             .member(MEMBER_RESPONSE)
             .boardId(1L)
+            .address("옥천동")
             .content("내용1")
             .viewCount(0)
             .likeCount(0)
@@ -104,6 +105,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("member.id").description("작성자 id"),
                                 fieldWithPath("member.nickname").description("닉네임"),
                                 fieldWithPath("boardId").description("카테고리Id"),
+                                fieldWithPath("address").description("주소"),
                                 fieldWithPath("content").description("내용"),
                                 fieldWithPath("viewCount").description("조회수"),
                                 fieldWithPath("likeCount").description("좋아요 개수"),
@@ -148,6 +150,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .id(1L)
                 .member(MEMBER_RESPONSE)
                 .boardId(1L)
+                .address("옥천동")
                 .content("내용")
                 .viewCount(0)
                 .likeCount(0)
@@ -161,10 +164,10 @@ public class PostControllerTest extends ControllerMockApiTest {
 
         PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
 
-        given(postService.findAllPost(any(), any(), any())).willReturn(postsResponse);
+        given(postService.findPosts(any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = requestFindAllPost("/boards/1/posts?page=0&size=20");
+        ResultActions resultActions = requestFindAllPost("/boards/1/posts?rCode=11680&page=0&size=8");
 
         // then
         resultActions
@@ -177,6 +180,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].member.id").description("작성자 id"),
                                 fieldWithPath("posts.[].member.nickname").description("닉네임"),
                                 fieldWithPath("posts.[].boardId").description("카테고리Id"),
+                                fieldWithPath("posts.[].address").description("주소"),
                                 fieldWithPath("posts.[].content").description("내용"),
                                 fieldWithPath("posts.[].viewCount").description("조회수"),
                                 fieldWithPath("posts.[].likeCount").description("좋아요 개수"),

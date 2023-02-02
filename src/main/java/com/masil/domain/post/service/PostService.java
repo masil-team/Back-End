@@ -6,10 +6,7 @@ import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostDetailResponse;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostsResponse;
+import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
@@ -17,7 +14,6 @@ import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +28,13 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final BoardRepository boardRepository;
 
-    public PostDetailResponse findDetailPost(Long postId, Long memberId) { // memberId 임시값
+    public PostDetailResponse findDetailPost(Long postId, Long memberId) {
         Post post = findPostById(postId);
         checkPostState(post);
 
         // 로그인 상태인 경우
         if (memberId != null) {
-            updatePostBoolean(memberId, post);
+            updatePostPermissionsForMember(memberId, post);
         }
 
         post.plusView();
@@ -46,14 +42,12 @@ public class PostService {
         return PostDetailResponse.of(post);
     }
 
-    public PostsResponse findAllPost(Long boardId, Long memberId, Pageable pageable) {
-        Slice<Post> posts = postRepository.findAllByBoardIdAndState(boardId, State.NORMAL, pageable);
+    public PostsResponse findPosts(PostFilterRequest postFilterRequest, Long memberId) {
+        Slice<Post> posts = findMatchingPosts(postFilterRequest);
 
-        // 로그인 상태인 경우
+        // 회원일 경우
         if (memberId != null) {
-            for (Post post : posts) {
-                updatePostBoolean(memberId, post);
-            }
+            posts.forEach(post -> updatePostPermissionsForMember(memberId, post));
         }
 
         return PostsResponse.ofPosts(posts);
@@ -88,10 +82,26 @@ public class PostService {
         post.tempDelete();
     }
 
-    private void updatePostBoolean(Long memberId, Post post) {
+    private Slice<Post> findMatchingPosts(PostFilterRequest postFilterRequest) {
+        if (postFilterRequest.isEmdAddress()) {
+            return findAllPostByEmdId(postFilterRequest);
+        } else {
+            return findAllPostBySggId(postFilterRequest);
+        }
+    }
+
+    private Slice<Post> findAllPostBySggId(PostFilterRequest request) {
+        return postRepository.findAllByBoardIdAndStateAndEmdAddressSggAddressId(request.getBoardId(), State.NORMAL, request.getRCode(), request.getPageable());
+    }
+
+    private Slice<Post> findAllPostByEmdId(PostFilterRequest request) {
+        return postRepository.findAllByBoardIdAndStateAndEmdAddressId(request.getBoardId(), State.NORMAL, request.getRCode(), request.getPageable());
+    }
+
+    private void updatePostPermissionsForMember(Long memberId, Post post) {
         boolean isOwnPost = post.isOwner(memberId);
         boolean isLiked = postLikeRepository.existsByPostAndMemberId(post, memberId);
-        post.updateBoolean(isOwnPost, isLiked);
+        post.updatePostPermissions(isOwnPost, isLiked);
     }
 
     private void checkPostState(Post post) {
@@ -99,6 +109,7 @@ public class PostService {
             throw new PostNotFoundException();
         }
     }
+
     private void validateOwner(Long memberId, Post post) {
         if (!post.isOwner(memberId)) {
             throw new PostAccessDeniedException();
@@ -114,6 +125,7 @@ public class PostService {
         return memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
     }
+
     private Board findBoardById(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);

@@ -31,6 +31,7 @@ public class PostCreateRequest {
                 .member(member)
                 .content(content)
                 .board(board)
+                .emdAddress(member.getEmdAddress())
                 .build();
     }
 }

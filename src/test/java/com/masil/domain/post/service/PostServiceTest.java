@@ -1,6 +1,8 @@
 package com.masil.domain.post.service;
 
 import com.masil.common.annotation.ServiceTest;
+import com.masil.domain.address.entity.EmdAddress;
+import com.masil.domain.address.repository.EmdAddressRepository;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.member.entity.Member;
@@ -16,13 +18,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 public class PostServiceTest extends ServiceTest {
 
@@ -36,6 +36,8 @@ public class PostServiceTest extends ServiceTest {
     private BoardRepository boardRepository;
     @Autowired
     private PostLikeService postLikeService;
+    @Autowired
+    private EmdAddressRepository emdAddressRepository; // 임시
 
     private static final String POST_CONTENT_1 = "내용1";
     private static final String POST_CONTENT_2 = "내용2";
@@ -46,6 +48,7 @@ public class PostServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
+
         Board board = Board.builder()
                 .id(1L)
                 .name("ALL")
@@ -64,15 +67,19 @@ public class PostServiceTest extends ServiceTest {
         memberRepository.save(member1);
         memberRepository.save(member2);
 
+        EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
+
         Post post1 = Post.builder()
                 .content(POST_CONTENT_1)
                 .member(member1)
                 .board(board)
+                .emdAddress(emdAddress)
                 .build();
         Post post2 = Post.builder()
                 .content(POST_CONTENT_2)
                 .member(member1)
                 .board(board)
+                .emdAddress(emdAddress)
                 .build();
         postRepository.save(post1);
         postRepository.save(post2);
@@ -145,10 +152,13 @@ public class PostServiceTest extends ServiceTest {
 
     @DisplayName("게시글 목록이 성공적으로 조회된다.")
     @Test
-    void findAllPost_success() {
+    void findPosts_success() {
+
+        // given
+        PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
 
         // when
-        PostsResponse allPost = postService.findAllPost(1L, 1L, PageRequest.of(0, 8, DESC, "createDate"));
+        PostsResponse allPost = postService.findPosts(postFilterRequest, 1L);
         List<PostsElementResponse> postList = allPost.getPosts();
         PostsElementResponse postsElementResponse = postList.get(postList.size()-1);
 
@@ -167,18 +177,19 @@ public class PostServiceTest extends ServiceTest {
 
     @DisplayName("게시글 목록에서 상태가 DELETE인 컬럼은 제외하고 조회된다.")
     @Test
-    void findAllPost_State() {
+    void findPosts_State() {
 
         // given
         Post post = postRepository.findById(1L).get();
         post.tempDelete();
+        PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
 
         // when
-        PostsResponse allPost = postService.findAllPost(1L, null, PageRequest.of(0, 8, DESC, "createDate"));
-        List<PostsElementResponse> postList = allPost.getPosts();
+        PostsResponse posts = postService.findPosts(postFilterRequest, 1L);
+        List<PostsElementResponse> postList = posts.getPosts();
 
         // then
-        assertThat(allPost.getPosts().size()).isEqualTo(1);
+        assertThat(posts.getPosts().size()).isEqualTo(1);
         assertThat(postList.get(0).getId()).isEqualTo(2L);
     }
 

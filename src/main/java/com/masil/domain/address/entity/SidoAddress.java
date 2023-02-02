@@ -14,7 +14,7 @@ public class SidoAddress {
 
     @Id
     @Column(name = "sido_id")
-    private Long id;
+    private Integer id;
 
     @Column(length = 20 , nullable = false , unique = true)
     private String sidoName;

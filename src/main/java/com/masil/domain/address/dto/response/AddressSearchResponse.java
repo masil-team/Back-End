@@ -8,15 +8,15 @@ import lombok.Getter;
 @Getter
 public class AddressSearchResponse {
 
-    private Long emdId;
-    private Long sggId;
-    private Long sidoId;
+    private Integer emdId;
+    private Integer sggId;
+    private Integer sidoId;
     private String sidoName;
     private String sggName;
     private String emdName;
 
     @Builder
-    public AddressSearchResponse(Long emdId, Long sggId, Long sidoId, String sidoName, String sggName, String emdName) {
+    public AddressSearchResponse(Integer emdId, Integer sggId, Integer sidoId, String sidoName, String sggName, String emdName) {
         this.emdId = emdId;
         this.sggId = sggId;
         this.sidoId = sidoId;

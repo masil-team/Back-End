@@ -11,7 +11,7 @@ public class EmdAddress {
 
     @Id
     @Column(name = "emd_address_id")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 20)
     private String emdName;
