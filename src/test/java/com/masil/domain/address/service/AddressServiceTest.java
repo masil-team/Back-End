@@ -49,19 +49,4 @@ class AddressServiceTest {
         assertEquals(1, result.size());
         assertEquals("강남구", result.get(0).getSggName());
     }
-
-    @Test
-    @DisplayName("시군구Id 로 여러 읍면동 id 가져오기 테스트")
-    void getEmdIdsBySggId () throws Exception {
-        //given
-        String search = "강남구";
-
-        //when
-        List<AddressSearchResponse> result = addressService.search(search);
-        Long sggId = result.get(0).getSggId();
-        List<EmdAddress> emdAddresses = emdAddressRepository.findAllBySggAddress_Id(sggId);
-
-        System.out.println(emdAddresses);
-        //then
-    }
 }

@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface EmdAddressRepository extends JpaRepository<EmdAddress, Integer> {
     List<EmdAddress> findByEmdNameContains(String search);
-    List<EmdAddress> findAllBySggAddress_Id(Long sggId);
 }
