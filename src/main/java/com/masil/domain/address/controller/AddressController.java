@@ -22,18 +22,7 @@ public class AddressController {
     private final MemberService memberService;
 
     @GetMapping("/search")
-    public List<AddressSearchResponse> search(@NotBlank String keyword) {
+    public List<AddressSearchResponse> search(String keyword) {
         return addressService.search(keyword);
     }
-
-    @GetMapping("/{addressId}")
-    public AddressResponse getAddress(@PathVariable String addressId,
-                                      @LoginUser CurrentMember currentMember) {
-        if (Objects.isNull(currentMember)) {
-            return addressService.getAddress(addressId);
-        } else {
-            return addressService.getAddress(addressId);
-        }
-    }
-
 }

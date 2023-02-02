@@ -8,6 +8,4 @@ import java.util.List;
 public interface AddressService {
 
     List<AddressSearchResponse> search(String keyword);
-
-    AddressResponse getAddress(String addressId);
 }
