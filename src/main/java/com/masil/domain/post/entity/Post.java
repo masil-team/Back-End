@@ -1,5 +1,6 @@
 package com.masil.domain.post.entity;
 
+import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
@@ -48,22 +49,29 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "emdAddress_id")
+    private EmdAddress emdAddress;
+
     @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
     @Transient
     private Boolean isOwner = false;
 
+    @Builder.Default
     @Transient
     private Boolean isLiked = false;
 
     @Builder
-    private Post(String content, Member member, State state, Board board) {
+    private Post(String content, Member member, State state, Board board , EmdAddress emdAddress) {
         this.content = content;
         this.member = member;
         this.state = state;
         this.board = board;
+        this.emdAddress = emdAddress;
     }
     
     public void updateContentAndBoard(String content, Board board){
@@ -71,10 +79,9 @@ public class Post extends BaseEntity {
         this.board = board;
 
     }
-    public void updateBoolean(Boolean isOwner, Boolean isLiked){
+    public void updatePostPermissions(Boolean isOwner, Boolean isLiked){
         this.isOwner = isOwner;
         this.isLiked = isLiked;
-
     }
 
     public void tempDelete() {

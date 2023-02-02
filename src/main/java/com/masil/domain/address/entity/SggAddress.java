@@ -11,7 +11,7 @@ public class SggAddress {
 
     @Id
     @Column(name = "sgg_id")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 20)
     private String sggName;

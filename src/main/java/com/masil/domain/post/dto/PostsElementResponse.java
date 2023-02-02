@@ -13,6 +13,7 @@ public class PostsElementResponse {
     private Long id;
     private MemberResponse member;
     private Long boardId;
+    private String address;
     private String content;
     private int viewCount;
     private int likeCount;
@@ -27,6 +28,7 @@ public class PostsElementResponse {
                 .id(post.getId())
                 .member(MemberResponse.of(post.getMember()))
                 .boardId(post.getBoard().getId())
+                .address(post.getEmdAddress().getEmdName())
                 .content(post.getPostPreview())
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())

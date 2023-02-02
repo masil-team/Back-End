@@ -1,5 +1,6 @@
 package com.masil.domain.member.entity;
 
+import com.masil.domain.address.entity.EmdAddress;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.AccessLevel;
@@ -45,9 +46,10 @@ public class Member extends BaseEntity {
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_address_id")
-    private MemberAddress memberAddress;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emd_address_id")
+    private EmdAddress emdAddress;
+//    private EmdAddress emdAddress;
 
 
     @Builder
@@ -60,5 +62,8 @@ public class Member extends BaseEntity {
         this.authorities = authorities;
     }
 
+    public void updateEmdAddress(EmdAddress emdAddress) {
+        this.emdAddress = emdAddress;
+    }
     // TODO: 2023/01/17 권한 추가 제거
 }

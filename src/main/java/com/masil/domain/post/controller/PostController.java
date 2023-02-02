@@ -1,9 +1,6 @@
 package com.masil.domain.post.controller;
 
-import com.masil.domain.post.dto.PostCreateRequest;
-import com.masil.domain.post.dto.PostDetailResponse;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostsResponse;
+import com.masil.domain.post.dto.*;
 import com.masil.domain.post.service.PostService;
 import com.masil.global.auth.annotaion.LoginUser;
 import com.masil.global.auth.dto.response.CurrentMember;
@@ -41,13 +38,15 @@ public class PostController {
 
     // 목록 조회
     @GetMapping("/boards/{boardId}/posts")
-    public ResponseEntity<PostsResponse> findAllPost(@PathVariable Long boardId,
+    public ResponseEntity<PostsResponse> findPosts(@PathVariable Long boardId,
                                                      @LoginUser CurrentMember currentMember,
+                                                     @RequestParam("rCode") Integer rCode,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
         log.info("게시글 목록 조회 시작");
 
         Long memberId = (currentMember != null) ? currentMember.getId() : null;
-        PostsResponse postsResponse = postService.findAllPost(boardId, memberId, pageable);
+        PostFilterRequest postFilterRequest = new PostFilterRequest(boardId, rCode, pageable);
+        PostsResponse postsResponse = postService.findPosts(postFilterRequest, memberId);
         return ResponseEntity.ok(postsResponse);
     }
 
