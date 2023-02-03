@@ -57,4 +57,19 @@ public class AddressSearchResponse {
                 .isEmdAddress(true)
                 .build();
     }
+
+    @Override
+    public String toString() {
+        return "AddressSearchResponse{" +
+                "rCode=" + rCode +
+                ", rName='" + rName + '\'' +
+                ", emdId=" + emdId +
+                ", sggId=" + sggId +
+                ", sidoId=" + sidoId +
+                ", sidoName='" + sidoName + '\'' +
+                ", sggName='" + sggName + '\'' +
+                ", emdName='" + emdName + '\'' +
+                ", isEmdAddress=" + isEmdAddress +
+                '}';
+    }
 }

@@ -29,12 +29,12 @@ public class AddressServiceImpl implements AddressService {
             searchResult.addAll(searchByEmdAddress(keyword));
             return searchResult;
         } else {
-            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+            throw new BusinessException(ErrorCode.INVALID_ADDRESS_SEARCH_KEYWORD);
         }
     }
 
     private boolean validateKeyword(String keyword) {
-        return keyword.length() > MINUM_SEARCH_KEYWORD_LENGTH;
+        return keyword.length() >= MINUM_SEARCH_KEYWORD_LENGTH;
     }
 
     private List<AddressSearchResponse> searchBySggAddress(String search) {

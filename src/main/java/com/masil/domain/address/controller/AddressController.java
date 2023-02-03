@@ -19,7 +19,6 @@ import java.util.Objects;
 public class AddressController {
 
     private final AddressService addressService;
-    private final MemberService memberService;
 
     @GetMapping("/search")
     public List<AddressSearchResponse> search(String keyword) {
