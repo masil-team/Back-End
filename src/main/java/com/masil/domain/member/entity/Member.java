@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -49,8 +47,6 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emd_address_id")
     private EmdAddress emdAddress;
-//    private EmdAddress emdAddress;
-
 
     @Builder
     public Member(String email, String password, String nickname, String state, String profileImage, Set<Authority> authorities) {

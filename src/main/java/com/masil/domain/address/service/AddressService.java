@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface AddressService {
 
-    List<AddressSearchResponse> search(String search);
-
-    AddressResponse getAddress(String addressId);
+    List<AddressSearchResponse> search(String keyword);
 }

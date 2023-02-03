@@ -31,8 +31,13 @@ public enum ErrorCode {
     COMMENT_ACCESS_DENIED(FORBIDDEN, 3002, "해당 댓글에 대한 권한이 없습니다"),
 
     // board
-    BOARD_NOT_FOUND(NOT_FOUND, 9001, "존재하지 않는 카테고리입니다.");
+    BOARD_NOT_FOUND(NOT_FOUND, 9001, "존재하지 않는 카테고리입니다."),
 
+    // address
+    INVALID_ADDRESS_SEARCH_KEYWORD(BAD_REQUEST, 8001, "잘못된 검색어 입니다."),
+
+
+    ;
     private HttpStatus status;
     private final int code;
     private final String message;

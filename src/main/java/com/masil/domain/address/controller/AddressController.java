@@ -19,21 +19,9 @@ import java.util.Objects;
 public class AddressController {
 
     private final AddressService addressService;
-    private final MemberService memberService;
 
     @GetMapping("/search")
-    public List<AddressSearchResponse> search(@RequestParam @NotBlank(message = "잘못된 검색어입니다") String search) {
-        return addressService.search(search);
+    public List<AddressSearchResponse> search(String keyword) {
+        return addressService.search(keyword);
     }
-
-    @GetMapping("/{addressId}")
-    public AddressResponse getAddress(@PathVariable String addressId,
-                                      @LoginUser CurrentMember currentMember) {
-        if (Objects.isNull(currentMember)) {
-            return addressService.getAddress(addressId);
-        } else {
-            return addressService.getAddress(addressId);
-        }
-    }
-
 }
