@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class AddressSearchResponse {
+    // TODO: 2023/02/03 시군구 리턴값일 때 emd데이터 null으로 리턴하는데 아예 없애고 리턴하기 -> 클래스 분리 필요
 
     private Integer rCode;
     private String rName;
