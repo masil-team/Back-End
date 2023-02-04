@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import static javax.persistence.FetchType.LAZY;
 @Getter
 @SuperBuilder
 @RequiredArgsConstructor
+@Where(clause = "state = 'NORMAL'")
 public class Post extends BaseEntity {
 
     private static final int PREVIEW_LENGTH = 400;
