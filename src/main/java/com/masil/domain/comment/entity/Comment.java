@@ -1,5 +1,6 @@
 package com.masil.domain.comment.entity;
 
+import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.entity.Post;
@@ -9,11 +10,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -21,7 +22,10 @@ import static javax.persistence.FetchType.LAZY;
 @SuperBuilder
 @Entity
 @RequiredArgsConstructor
+@Where(clause = "state = 'NORMAL'")
 public class Comment extends BaseEntity {
+
+    private static final int MAX_LENGTH = 400;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +41,6 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-//    private Integer depth; // 댓글 depth
-
     /**
      * 부모 댓글과 자식 추가
      * 셀프 조인
@@ -47,7 +49,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-//    @Builder.Default
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Comment> children = new ArrayList<>();
 
@@ -76,8 +78,20 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
+    /**
+     * soft delete
+     */
     public void tempDelete() {
         this.state = State.DELETE;
+    }
+
+    /**
+     * 글자 수 초과 exception
+     */
+    public void validateLength(String content) {
+        if (content.length() > MAX_LENGTH) {
+            throw new CommentInputException();
+        }
     }
 
     /**

@@ -49,6 +49,10 @@ public class CommentService {
         Post post  = findPostById(postId);
         Member member = findMemberById(memberId);
         Comment comment = commentCreateRequest.toEntity(post, member);
+        // 댓글 길이가 400이 넘지 않게
+        comment.validateLength(comment.getContent());
+        validateOwner(memberId, comment);
+
 
         return commentRepository.save(comment).getId();
     }
@@ -76,6 +80,7 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
         findMemberById(memberId);
         findPostById(postId);
+        comment.validateLength(comment.getContent());
 
         validateOwner(memberId, comment);
 
@@ -108,7 +113,6 @@ public class CommentService {
     /**
      * 예외 처리
      */
-
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
