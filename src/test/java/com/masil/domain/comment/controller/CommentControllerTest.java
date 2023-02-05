@@ -183,7 +183,7 @@ class CommentControllerTest extends ControllerMockApiTest{
     }
 
     @Test
-    @DisplayName("댓글 길이가 400자를 넘었을 경우 에러가 발생한다.")
+    @DisplayName("댓글 길이가 250자를 넘었을 경우 에러가 발생한다.")
     void CreateComment_length_denied() throws Exception {
         // given
         CommentCreateRequest commentCreateRequest = CommentCreate411RequestBuilder.build();

@@ -29,7 +29,7 @@ public enum ErrorCode {
     // comment
     COMMENT_NOT_FOUND(NOT_FOUND, 5001, "존재하지 않는 댓글입니다."),
     COMMENT_ACCESS_DENIED(FORBIDDEN, 5002, "해당 댓글에 대한 권한이 없습니다"),
-    COMMENT_INPUT_EXCEPTION(LENGTH_REQUIRED, 5003, "댓글은 400자를 넘길 수 없습니다."),
+    COMMENT_INPUT_EXCEPTION(LENGTH_REQUIRED, 5003, "댓글은 250자를 넘길 수 없습니다."),
 
     // board
     BOARD_NOT_FOUND(NOT_FOUND, 9001, "존재하지 않는 카테고리입니다."),

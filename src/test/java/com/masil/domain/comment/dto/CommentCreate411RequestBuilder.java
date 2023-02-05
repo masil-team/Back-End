@@ -7,7 +7,6 @@ public class CommentCreate411RequestBuilder {
     }
 
     public static CommentCreateRequest build() {
-        return new CommentCreateRequest("댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다." +
-                "댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다. 댓글 내용이 400자를 넘었습니다.");
+        return new CommentCreateRequest("댓글 내용이 250자를 넘었습니다. 댓글 내용이 250자를 넘었습니다. 댓글 내용이 250자를 넘었습니다. 댓글 내용이 250자를 넘었습니다. 댓글 내용이 250자를 넘었습니다. 댓글은 250");
     }
 }
