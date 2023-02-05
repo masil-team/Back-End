@@ -1,0 +1,121 @@
+= Spring REST Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels:2
+:sectlinks:
+
+[[resources-post]]
+= 2. 댓글
+
+== 2.1. 댓글 조회
+
+=== 2.1.1 댓글 조회 성공
+
+==== HTTP request
+
+include::{snippets}/comment/find/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/find/http-response.adoc[]
+
+== 2.2. 댓글 생성
+
+=== 2.2.1 댓글 생성 성공
+
+==== HTTP request
+
+include::{snippets}/comment/create/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/create/http-response.adoc[]
+
+=== 2.2.2 대댓글 생성 성공
+
+==== HTTP request
+
+include::{snippets}/comment/ChildrenCreate/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/ChildrenCreate/http-response.adoc[]
+
+=== 2.2.3 댓글 글자 제한
+
+==== HTTP request
+
+include::{snippets}/comment/create/length-denied/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/create/length-denied/http-response.adoc[]
+
+== 2.3. 댓글 수정
+
+=== 2.3.1 댓글 수정 성공
+
+==== HTTP request
+
+include::{snippets}/comment/modify/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/modify/http-response.adoc[]
+
+=== 2.3.2 댓글 수정 권한 없어 실패
+
+==== HTTP request
+
+include::{snippets}/comment/modify/access-denied/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/modify/access-denied/http-response.adoc[]
+
+== 2.4. 댓글 삭제
+
+=== 2.4.1 댓글 삭제 성공
+
+==== HTTP request
+
+include::{snippets}/comment/delete/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/delete/http-response.adoc[]
+
+=== 2.4.2 댓글 삭제 권한 없어 실패
+
+==== HTTP request
+
+include::{snippets}/comment/delete/access-denied/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/delete/access-denied/http-response.adoc[]
+
+== 2.5. 댓글 좋아요
+
+=== 2.4.1 댓글 좋아요 성공
+
+==== HTTP request
+
+include::{snippets}/comment/commentLike/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/commentLike/http-response.adoc[]
+
+=== 2.4.1 본인 댓글에는 좋아요 실패
+
+==== HTTP request
+
+include::{snippets}/comment/commentLike/self-denied/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/comment/commentLike/self-denied/http-response.adoc[]
+

@@ -6,10 +6,15 @@ import com.masil.common.annotation.ServiceTest;
 import com.masil.common.security.WithMockCustomUser;
 import com.masil.domain.comment.dto.*;
 import com.masil.domain.comment.entity.Comment;
+import com.masil.domain.comment.exception.CommentAccessDeniedException;
+import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.PostDetailResponse;
+import com.masil.domain.post.dto.PostModifyRequest;
+import com.masil.domain.post.dto.PostModifyRequestBuilder;
 import com.masil.domain.post.dto.PostsElementResponse;
+import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -35,8 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -101,7 +105,7 @@ class CommentControllerTest extends ControllerMockApiTest{
         given(commentService.findComments(any(), any())).willReturn(commentResponseList);
 
         //when
-        mockMvc.perform(get("/posts/1/comments")
+        mockMvc.perform(get("/posts/1/comments?page=0")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -155,6 +159,55 @@ class CommentControllerTest extends ControllerMockApiTest{
     }
 
     @Test
+    @DisplayName("대댓글을 성공적으로 생성한다.")
+    void createChildrenComment() throws Exception {
+        // given
+        ChildrenCreateRequest childrenCreateRequest = ChildrenCommentCreateRequestBuilder.build();
+
+        given(commentService.createChildrenComment(any(), any(), any(), any())).willReturn(1L);
+
+        // when
+        ResultActions resultActions = requestCreateChildrenComment(childrenCreateRequest);
+
+        // then
+        resultActions
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/posts/1/reply/1"))
+                .andDo(document("Comment/ChildrenCreate",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("content").description("대댓글 내용")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("댓글 길이가 250자를 넘었을 경우 에러가 발생한다.")
+    void CreateComment_length_denied() throws Exception {
+        // given
+        CommentCreateRequest commentCreateRequest = CommentCreate411RequestBuilder.build();
+
+        willThrow(new CommentInputException()).given(commentService).createComment(any(),any(),any());
+
+        // when
+        ResultActions resultActions = requestCreateComment(commentCreateRequest);
+
+        // then
+        resultActions
+                .andExpect(status().isLengthRequired())
+                .andDo(document("comment/create/length-denied",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
+    }
+
+    @Test
     @DisplayName("댓글을 성공적으로 수정한다.")
     void modifyComment() throws Exception {
         // given
@@ -178,6 +231,31 @@ class CommentControllerTest extends ControllerMockApiTest{
     }
 
     @Test
+    @DisplayName("댓글 수정 권한이 없을 경우 예외가 발생한다.")
+    void modifyComment_access_denied() throws Exception {
+        // given
+        CommentModifyRequest commentModifyRequest = CommentModifyRequestBuilder.build();
+
+        willThrow(new CommentAccessDeniedException()).given(commentService).modifyComment(any(),any(),any(), any());
+
+        // when
+        ResultActions resultActions = requestModifyComment(commentModifyRequest);
+
+        // then
+        resultActions
+                .andExpect(status().isForbidden())
+                .andDo(document("comment/modify/access-denied",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
+    }
+
+    @Test
     @DisplayName("댓글을 성공적으로 삭제한다.")
     void deleteComment() throws Exception {
         // given
@@ -194,8 +272,40 @@ class CommentControllerTest extends ControllerMockApiTest{
                 ));
     }
 
+    @Test
+    @DisplayName("댓글 삭제 권한이 없을 경우 예외가 발생한다.")
+    void deleteComment_access_denied() throws Exception {
+        // given
+        willThrow(new CommentAccessDeniedException()).given(commentService).deleteComment(any(),any(),any());
+
+        // when
+        ResultActions resultActions = requestDeleteComment("/posts/1/comments/1");
+
+        // then
+        resultActions
+                .andExpect(status().isForbidden())
+                .andDo(document("comment/delete/access-denied",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메세지"),
+                                fieldWithPath("errors").description("에러 종류"),
+                                fieldWithPath("code").description("코드")
+                        )
+                ));
+    }
+
     private ResultActions requestCreateComment(CommentCreateRequest dto) throws Exception {
         return mockMvc.perform(post("/posts/1/comments")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andDo(print());
+    }
+
+    private ResultActions requestCreateChildrenComment(ChildrenCreateRequest dto) throws Exception {
+        return mockMvc.perform(post("/posts/1/reply/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
