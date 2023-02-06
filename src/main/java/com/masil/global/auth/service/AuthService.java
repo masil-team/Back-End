@@ -47,10 +47,19 @@ public class AuthService {
         authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
 
+
+        validateSignRequest(createRequest);
+        memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
+    }
+
+    private void validateSignRequest(SignupRequest createRequest) {
         if (checkDuplicateEmail(createRequest)) {
             throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
         }
-        memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
+
+        if (!createRequest.getPassword().equals(createRequest.getPasswordConfirm())) {
+            throw new BusinessException(ErrorCode.NOT_SAME_PASSWORD_CONFIRM);
+        }
     }
 
     private boolean checkDuplicateEmail(SignupRequest createRequest) {

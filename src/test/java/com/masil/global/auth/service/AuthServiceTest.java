@@ -9,6 +9,8 @@ import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.model.MemberAuthType;
 import com.masil.global.auth.repository.AuthorityRepository;
+import com.masil.global.error.exception.BusinessException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,11 +52,13 @@ class AuthServiceTest extends ServiceTest{
         //given
         String testEmail = "test@gmail.com";
         String testPassword = "test@1234";
+        String testPasswordConfirm = "test@1234";
         String testNickName = "테스트닉네임";
 
         SignupRequest createRequest = SignupRequest.builder()
                 .email(testEmail)
                 .password(testPassword)
+                .passwordConfirm(testPasswordConfirm)
                 .nickname(testNickName)
                 .build();
 
@@ -75,13 +79,50 @@ class AuthServiceTest extends ServiceTest{
     }
     
     @Test
-    @DisplayName("이메일이나 비밀번호가 유효하지 않을 경우 실패")
-    void loginFailBecauseBadRequest () throws Exception {
+    @DisplayName("이메일 중복오류 테스트")
+    void loginFailBecauseDuplicateEmail () throws Exception {
         //given
-        
-        //when
-        
+
+        String testEmail = "test@gmail.com";
+        String testPassword = "test@1234";
+        String testPasswordConfirm = "test@1234";
+        String testNickName = "테스트닉네임";
+
+        SignupRequest createRequest = SignupRequest.builder()
+                .email(testEmail)
+                .password(testPassword)
+                .passwordConfirm(testPasswordConfirm)
+                .nickname(testNickName)
+                .build();
+
+        authService.signUp(createRequest);
+
         //then
+        Assertions.assertThatThrownBy(() -> authService.signUp(SignupRequest.builder()
+                .email(testEmail)
+                .password("234wetwer23")
+                .passwordConfirm("234wetwer23")
+                .nickname("닉네임")
+                .build())).isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    @DisplayName("회원가입시 비밀번호 , 비밀번호 확인이 다를 경우")
+    void signupFailBecauseNotEqualPasswordAndPasswordConfirm () throws Exception {
+        //given
+        String testEmail = "test@gmail.com";
+        String testPassword = "test@1234";
+        String testPasswordConfirm = "test@12345";
+        String testNickName = "테스트닉네임";
+
+        //when
+        Assertions.assertThatThrownBy(() -> authService.signUp(SignupRequest.builder()
+                .email(testEmail)
+                .password(testPassword)
+                .passwordConfirm(testPasswordConfirm)
+                .nickname(testNickName)
+                .build())).isInstanceOf(BusinessException.class);
+
     }
 
     @Test
