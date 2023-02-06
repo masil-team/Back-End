@@ -25,8 +25,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public void signUp(@Valid @RequestBody SignupRequest createRequest) {
-        authService.signUp(createRequest);
+    public void signUp(@Valid @RequestBody SignupRequest signupRequest) {
+        authService.signUp(signupRequest);
     }
     @PostMapping("/login")
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {

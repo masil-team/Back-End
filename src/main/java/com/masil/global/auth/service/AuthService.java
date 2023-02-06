@@ -41,15 +41,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signUp(SignupRequest createRequest) {
+    public void signUp(SignupRequest signupRequest) {
         Set<Authority> authorites = new HashSet<>();
 
         authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
 
-
-        validateSignRequest(createRequest);
-        memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
+        validateSignRequest(signupRequest);
+        memberRepository.save(signupRequest.convertMember(passwordEncoder, authorites));
     }
 
     private void validateSignRequest(SignupRequest createRequest) {
@@ -60,6 +59,14 @@ public class AuthService {
         if (!createRequest.getPassword().equals(createRequest.getPasswordConfirm())) {
             throw new BusinessException(ErrorCode.NOT_SAME_PASSWORD_CONFIRM);
         }
+
+        if (checkDuplicateNickName(createRequest)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+    }
+
+    private boolean checkDuplicateNickName(SignupRequest createRequest) {
+        return memberRepository.findByNickname(createRequest.getNickname()).isPresent();
     }
 
     private boolean checkDuplicateEmail(SignupRequest createRequest) {

@@ -16,6 +16,7 @@ public enum ErrorCode {
     // member
     MEMBER_NOT_FOUND(NOT_FOUND, 2001, "존재하지 않는 사용자입니다."),
     DUPLICATE_EMAIL(BAD_REQUEST, 2002, "중복된 이메일 입니다."),
+    DUPLICATE_NICKNAME(BAD_REQUEST, 2003, "중복된 닉네임입니다."),
     NOT_SAME_PASSWORD_CONFIRM(BAD_REQUEST, 2003, "비밀번호와 비밀번호 확인 값이 다릅니다."),
     // post
     POST_NOT_FOUND(NOT_FOUND, 3001, "존재하지 않는 게시글입니다."),
@@ -38,7 +39,7 @@ public enum ErrorCode {
     // address
     INVALID_ADDRESS_SEARCH_KEYWORD(BAD_REQUEST, 8001, "잘못된 검색어 입니다."),
 
-    // auth
+    // auth;
 
     ;
     private HttpStatus status;

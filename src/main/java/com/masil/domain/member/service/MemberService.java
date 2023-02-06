@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -33,11 +32,12 @@ public class MemberService {
 
     }
 
+    @Transactional
     public void modifyMemberAddress(Long memberId, MemberAddressRequest request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ENTITY_NOT_FOUND));
 
-        EmdAddress emdAddress = emdAddressRepository.findById(request.getRCode())
+        EmdAddress emdAddress = emdAddressRepository.findById(request.getEmdId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ENTITY_NOT_FOUND));
 
         member.updateEmdAddress(emdAddress);
