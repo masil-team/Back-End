@@ -1,5 +1,6 @@
 package com.masil.domain.member.controller;
 
+import com.masil.domain.member.dto.request.MemberAddressRequest;
 import com.masil.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,4 +26,9 @@ public class MemberController {
         memberService.modifyUserToDeleteState();
     }
 
+    @PutMapping("/{memberId}/address")
+    public void modifyMemberAddress(@PathVariable Long memberId,
+                                    @RequestBody MemberAddressRequest request) {
+        memberService.modifyMemberAddress(memberId, request);
+    }
 }
