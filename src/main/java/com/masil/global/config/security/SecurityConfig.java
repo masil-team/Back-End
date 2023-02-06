@@ -45,20 +45,21 @@ public class SecurityConfig {
                 .configurationSource(corsConfigurationSource())
                 .and()
 
-                .httpBasic().disable()
+                .formLogin().disable()
+                .httpBasic().disable() // httpBasic 방식 : Authorization header 값에 id , pw 값 전달하는 방식
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
+                // TODO: 2023/02/06 추후 authenticate url 패턴 이야기 나누기
                 .authorizeRequests()
                 .antMatchers(
                         "/auth/login",
-                        "/",
-                        "/boards/*/posts/*",
-                        "/boards/*/posts",
-                        "/posts/*/comments"
-                ).permitAll()
+                        "/boards/**/posts/**",
+                        "/boards/**/posts",
+                        "/posts/**/comments"
+                ).authenticated()
                 .anyRequest().permitAll()
                 .and()
 

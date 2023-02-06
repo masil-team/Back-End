@@ -6,6 +6,7 @@ import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
+import com.masil.global.auth.dto.response.CurrentMember;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.entity.RefreshToken;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
@@ -46,13 +47,21 @@ public class AuthService {
         authorites.add(authorityRepository.findByAuthorityName(MemberAuthType.ROLE_USER)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)));
 
+        if (checkDuplicateEmail(createRequest)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
+        }
         memberRepository.save(createRequest.convertMember(passwordEncoder, authorites));
+    }
+
+    private boolean checkDuplicateEmail(SignupRequest createRequest) {
+        return memberRepository.findByEmail(createRequest.getEmail()).isPresent();
     }
 
     @Transactional
     public AuthTokenResponse login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
+        // TODO: 2023/02/06 메서드 크기가 커서 분리 필요  
         // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
@@ -64,17 +73,27 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(email, member.getAuthorities());
         String refreshToken = jwtTokenProvider.createRefreshToken(email, member.getAuthorities());
 
-//        // 리프레쉬 토큰 DB 저장
-//        RefreshToken save = refreshTokenRepository.save(
-//                RefreshToken.builder()
-//                        .key(email)
-//                        .value(refreshToken)
-//                        .build()
-//        );
+        // 리프레쉬 토큰 DB 저장
+        RefreshToken savedToken;
 
-//        log.debug("refreshToken = key : {} , value : {} ", save.getKey(), save.getValue());
+        if (isSavedRefreshToken(email)) {
+            savedToken = refreshTokenRepository.findByKey(email)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+            savedToken.updateValue(refreshToken);
+        } else {
+            savedToken = refreshTokenRepository.save(RefreshToken.builder()
+                    .key(email)
+                    .value(refreshToken)
+                    .build());
+        }
+
+        log.debug("refreshToken = key : {} , value : {} ", savedToken.getKey(), savedToken.getValue());
 
         return jwtTokenProvider.createTokenResponse(accessToken,refreshToken);
+    }
+
+    private boolean isSavedRefreshToken(String email) {
+        return refreshTokenRepository.findByKey(email).isPresent();
     }
 
     @Transactional
@@ -82,6 +101,7 @@ public class AuthService {
         String orgAccessToken = tokenRequest.getAccessToken();
         String orgRefreshToken = tokenRequest.getRefreshToken();
 
+        // TODO: 2023/02/06 메서드 크기가 큼 리팩토링 필요 
         // refreshToken 검증
         if (jwtTokenProvider.validateToken(orgRefreshToken)) {
             // 2. Access Token 에서 Member Email 가져오기
@@ -124,7 +144,11 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
     }
 
-    public void logout() {
+    public void logout(CurrentMember member) {
+        // 로그 아웃 시 DB에 있는 리프레쉬  토큰 삭제
+        RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+        refreshTokenRepository.delete(refreshToken);
     }
 
 }
