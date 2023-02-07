@@ -106,7 +106,7 @@ public class AuthService {
 
         log.debug("refreshToken = key : {} , value : {} ", savedToken.getKey(), savedToken.getValue());
 
-        return jwtTokenProvider.createTokenResponse(accessToken,refreshToken);
+        return jwtTokenProvider.createTokenResponse(accessToken, refreshToken);
     }
 
     private boolean isSavedRefreshToken(String email) {
@@ -168,7 +168,6 @@ public class AuthService {
     }
 
     public LoginMemberInfoResponse getMemberInfo(CurrentMember member) {
-
         if (member == null) {
             throw new BusinessException(ErrorCode.UNAUTHENTICATED_LOGIN_USER);
         }
