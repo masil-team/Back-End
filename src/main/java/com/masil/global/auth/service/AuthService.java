@@ -7,6 +7,7 @@ import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.dto.response.CurrentMember;
+import com.masil.global.auth.dto.response.LoginMemberInfoResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.entity.RefreshToken;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
@@ -166,4 +167,11 @@ public class AuthService {
         refreshTokenRepository.delete(refreshToken);
     }
 
+    public LoginMemberInfoResponse getMemberInfo(CurrentMember member) {
+
+        if (member == null) {
+            throw new BusinessException(ErrorCode.UNAUTHENTICATED_LOGIN_USER);
+        }
+        return LoginMemberInfoResponse.of(member);
+    }
 }
