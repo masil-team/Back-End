@@ -36,11 +36,12 @@ public class CommentController {
      */
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> findComments(@PathVariable Long postId,
-                                                              @PageableDefault(page = 0, size = 5, direction = DESC) Pageable pageable){
+                                                              @PageableDefault(page = 0, size = 8, direction = DESC) Pageable pageable,
+                                                              @LoginUser CurrentMember currentMember){
 
         log.info("댓글 조회 시작");
-
-        List<CommentResponse> comments = commentService.findComments(postId, pageable);
+        Long memberId = (currentMember != null) ? currentMember.getId() : null;
+        List<CommentResponse> comments = commentService.findComments(postId, pageable, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 

@@ -20,9 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CommentLikeService {
 
-    private final static String SUCCESS_LIKE_BOARD = "좋아요 처리 완료";
-    private final static String SUCCESS_UNLIKE_BOARD = "좋아요 취소 완료";
-
     private final CommentLikeRepository commentLikeRepository;
 
     private final CommentRepository commentRepository;
@@ -36,7 +33,7 @@ public class CommentLikeService {
         Member member = findMemberById(memberId);
 
         if (comment.isOwner(memberId)) {
-            throw new SelfCommentLikeException(); // 추후 변경
+            throw new SelfCommentLikeException();
         }
 
         if (!hasLikeComment(comment, member)) {
