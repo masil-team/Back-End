@@ -4,6 +4,8 @@ import com.masil.global.auth.jwt.properties.JwtProperties;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -20,6 +22,7 @@ import java.io.PrintWriter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
@@ -27,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // TODO: 2023/02/06 추후 변경하기  
         String header = request.getHeader(AUTHORIZATION_HEADER);
-        if (header == null || !header.startsWith(BEARER_PREFIX)) {
+        if (header == null || !header.startsWith(BEARER_PREFIX) && HttpMethod.GET.equals(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }
