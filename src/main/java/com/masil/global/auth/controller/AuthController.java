@@ -30,7 +30,6 @@ public class AuthController {
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
-
     @PostMapping("/logout")
     public void logout(@LoginUser CurrentMember member) {
         authService.logout(member);
