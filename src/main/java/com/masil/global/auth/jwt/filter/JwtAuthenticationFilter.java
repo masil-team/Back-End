@@ -1,5 +1,6 @@
 package com.masil.global.auth.jwt.filter;
 
+import com.masil.global.auth.jwt.properties.JwtProperties;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,14 +24,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        // TODO: 2023/02/06 추후 변경하기  
+        String header = request.getHeader(AUTHORIZATION_HEADER);
+        if (header == null || !header.startsWith(BEARER_PREFIX)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String token = resolveToken(request);
         log.debug("token = {}", token);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token)) {
+            jwtTokenProvider.validateTokenOnFilter(token);
             // 토큰 유효함
             this.setAuthentication(token);
+        } else {
+
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return request.getServletPath().startsWith("/auth");
+        /*
+
+         */
     }
 
     /**

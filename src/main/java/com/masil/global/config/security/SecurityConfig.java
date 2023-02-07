@@ -45,23 +45,27 @@ public class SecurityConfig {
                 .configurationSource(corsConfigurationSource())
                 .and()
 
-                .httpBasic().disable()
+                .formLogin().disable()
+                .httpBasic().disable() // httpBasic 방식 : Authorization header 값에 id , pw 값 전달하는 방식
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
+                // TODO: 2023/02/06 추후 authenticate url 패턴 이야기 나누기
                 .authorizeRequests()
                 .antMatchers(
-                        "/auth/login",
-                        "/",
-                        "/boards/*/posts/*",
-                        "/boards/*/posts",
-                        "/posts/*/comments"
+                        "/auth/**",
+                        "/boards/**/posts/**",
+                        // 비회원 포스트 컨트롤러가 있고
+                        // 토큰이 필요 없는 서비스 uri 패턴만 넣어놓기
+                        "/boards/**/posts",
+                        "/posts/**/comments",
+                        "/posts/**"
+                        //
                 ).permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
                 .and()
-
                 .apply(new JwtSecurityConfig(jwtTokenProvider));
 
         return http.build();

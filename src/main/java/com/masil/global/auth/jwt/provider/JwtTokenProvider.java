@@ -111,19 +111,16 @@ public class JwtTokenProvider {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SignatureException ex){
-            throw new BusinessException("Invalid JWT signature", ErrorCode.INVALID_INPUT_VALUE);
-        } catch (MalformedJwtException ex) {
-            throw new BusinessException("Invalid JWT token", ErrorCode.INVALID_INPUT_VALUE);
         } catch (ExpiredJwtException ex) {
-            throw new BusinessException("Expired JWT token", ErrorCode.INVALID_INPUT_VALUE);
-        } catch (UnsupportedJwtException ex) {
-            throw new BusinessException("Unsupported JWT token", ErrorCode.INVALID_INPUT_VALUE);
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException("JWT claims string is empty.", ErrorCode.INVALID_INPUT_VALUE);
+            throw new BusinessException(ErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException ex) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
     }
 
+    public void validateTokenOnFilter(String token) {
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    }
 
     /**
      *

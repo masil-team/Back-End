@@ -13,6 +13,8 @@ import java.util.Set;
 @Getter
 public class SignupRequest {
 
+    private final String NORMAL_STATE = "NORMAL";
+
     @NotBlank(message = "잘못된 이메일 값입니다.")
     private String email;
     @NotBlank(message = "잘못된 패스워드 값입니다.")
@@ -37,6 +39,7 @@ public class SignupRequest {
         return Member.builder()
                 .email(email)
                 .password(encoder.encode(password))
+                .state(NORMAL_STATE)
                 .nickname(nickname)
                 .authorities(authorities)
                 .build();

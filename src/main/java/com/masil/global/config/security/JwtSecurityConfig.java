@@ -1,6 +1,7 @@
 package com.masil.global.config.security;
 
 import com.masil.global.auth.jwt.filter.JwtAuthenticationFilter;
+import com.masil.global.auth.jwt.filter.JwtExceptionHandlerFilter;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
@@ -17,5 +18,6 @@ public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurity
     public void configure(HttpSecurity http) throws Exception {
         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(tokenProvider);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
     }
 }
