@@ -30,12 +30,6 @@ public class AuthController {
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
-
-    @GetMapping("/login-user")
-    public LoginMemberInfoResponse getMemberInfo(@LoginUser CurrentMember member) {
-        return authService.getMemberInfo(member);
-    }
-
     @PostMapping("/logout")
     public void logout(@LoginUser CurrentMember member) {
         authService.logout(member);
