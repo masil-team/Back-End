@@ -37,13 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             // 토큰 유효함
             this.setAuthentication(token);
+        } else {
+
         }
         filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().equals("/addresses/test");
+        return request.getServletPath().startsWith("/auth");
+        /*
+
+         */
     }
 
     /**

@@ -55,14 +55,17 @@ public class SecurityConfig {
                 // TODO: 2023/02/06 추후 authenticate url 패턴 이야기 나누기
                 .authorizeRequests()
                 .antMatchers(
-                        "/auth/login",
+                        "/auth/**",
                         "/boards/**/posts/**",
+                        // 비회원 포스트 컨트롤러가 있고
+                        // 토큰이 필요 없는 서비스 uri 패턴만 넣어놓기
                         "/boards/**/posts",
-                        "/posts/**/comments"
-                ).authenticated()
-                .anyRequest().permitAll()
+                        "/posts/**/comments",
+                        "/posts/**"
+                        //
+                ).permitAll()
+                .anyRequest().authenticated()
                 .and()
-
                 .apply(new JwtSecurityConfig(jwtTokenProvider));
 
         return http.build();
