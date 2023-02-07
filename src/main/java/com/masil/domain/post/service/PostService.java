@@ -91,11 +91,11 @@ public class PostService {
     }
 
     private Slice<Post> findAllPostBySggId(PostFilterRequest request) {
-        return postRepository.findAllByBoardIdAndStateAndEmdAddressSggAddressId(request.getBoardId(), State.NORMAL, request.getRCode(), request.getPageable());
+        return postRepository.findAllByBoardIdAndEmdAddressSggAddressId(request.getBoardId(), request.getRCode(), request.getPageable());
     }
 
     private Slice<Post> findAllPostByEmdId(PostFilterRequest request) {
-        return postRepository.findAllByBoardIdAndStateAndEmdAddressId(request.getBoardId(), State.NORMAL, request.getRCode(), request.getPageable());
+        return postRepository.findAllByBoardIdAndEmdAddressId(request.getBoardId(), request.getRCode(), request.getPageable());
     }
 
     private void updatePostPermissionsForMember(Long memberId, Post post) {
