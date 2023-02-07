@@ -127,12 +127,12 @@ public class AuthService {
 
             // 3. 저장소에서 Member Email 를 기반으로 Refresh Token 값 가져옴
             RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE)); // 로그 아웃된 사용자
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN)); // 로그 아웃된 사용자
 
 
             // 4. Refresh Token 일치하는지 검사
             if (!refreshToken.getValue().equals(orgRefreshToken)) {
-                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE); // 토큰이 일치하지 않습니다.
+                throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN); // 토큰이 일치하지 않습니다.
             }
 
             // 5. 새로운 토큰 생성
@@ -148,10 +148,9 @@ public class AuthService {
 
             // 6. 저장소 정보 업데이트 (dirtyChecking으로 업데이트)
             refreshToken.updateValue(newRefreshToken);
-
             return tokenResponse;
         } else {
-            throw new BusinessException("Invalid JWT token", ErrorCode.INVALID_INPUT_VALUE);
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 

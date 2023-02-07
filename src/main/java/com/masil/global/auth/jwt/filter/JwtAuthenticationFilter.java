@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.debug("token = {}", token);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token)) {
+            jwtTokenProvider.validateTokenOnFilter(token);
             // 토큰 유효함
             this.setAuthentication(token);
         } else {
