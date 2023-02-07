@@ -19,18 +19,22 @@ public class CommentResponse {
     private String content;
     private Long postId;
     private MemberResponse member;
+    private boolean isOwner;
     private int likeCount;
+    private boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     private List<ChildrenResponse> replies;
 
     @Builder
-    public CommentResponse(Long id, Long postId, String content, MemberResponse member, int likeCount, LocalDateTime createDate, LocalDateTime modifyDate, List<ChildrenResponse> replies) {
+    public CommentResponse(Long id, Long postId, String content, MemberResponse member, boolean isOwner, int likeCount, boolean isLiked, LocalDateTime createDate, LocalDateTime modifyDate, List<ChildrenResponse> replies) {
         this.id = id;
         this.postId = postId;
         this.content = content;
         this.member = member;
+        this.isOwner = isOwner;
         this.likeCount = likeCount;
+        this.isLiked = isLiked;
         this.createDate = createDate;
         this.modifyDate = modifyDate;
         this.replies = replies;
@@ -47,7 +51,9 @@ public class CommentResponse {
                 .postId(comment.getPost().getId())
                 .content(comment.getContent())
                 .member(MemberResponse.of(comment.getMember()))
+                .isOwner(comment.getIsOwner())
                 .likeCount(comment.getLikeCount())
+                .isLiked(comment.getIsLiked())
                 .createDate(comment.getCreateDate())
                 .modifyDate(comment.getModifyDate())
                 .replies(replies)

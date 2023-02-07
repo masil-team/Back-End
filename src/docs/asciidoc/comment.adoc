@@ -99,7 +99,7 @@ include::{snippets}/comment/delete/access-denied/http-response.adoc[]
 
 == 2.5. 댓글 좋아요
 
-=== 2.4.1 댓글 좋아요 성공
+=== 2.5.1 댓글 좋아요 성공
 
 ==== HTTP request
 
@@ -109,7 +109,7 @@ include::{snippets}/comment/commentLike/http-request.adoc[]
 
 include::{snippets}/comment/commentLike/http-response.adoc[]
 
-=== 2.4.1 본인 댓글에는 좋아요 실패
+=== 2.5.2 본인 댓글에는 좋아요 실패
 
 ==== HTTP request
 

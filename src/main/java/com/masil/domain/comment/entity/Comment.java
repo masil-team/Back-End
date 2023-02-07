@@ -65,6 +65,17 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int likeCount;
 
+    /**
+     * 좋아요 여부, 오너
+     */
+    @Builder.Default
+    @Transient
+    private Boolean isOwner = false;
+
+    @Builder.Default
+    @Transient
+    private Boolean isLiked = false;
+
     @Builder
     private Comment(String content, Member member, Post post, State state, Comment parent) {
         this.content = content;
@@ -101,6 +112,11 @@ public class Comment extends BaseEntity {
         return this.member.getId() == memberId;
     }
 
+    public boolean isCommentWriter(Long memberId){
+        return this.member.getId() == (memberId);
+    }
+
+
     /**
      * 댓글 좋아요 기능
      */
@@ -110,5 +126,17 @@ public class Comment extends BaseEntity {
 
     public void decreaseLikeCount() {
         this.likeCount -= 1;
+    }
+
+    /**
+     * isOwner와 isLiked를 true로 만들어주는 로직
+     */
+
+    public void updateIsCommentWriter(Boolean isOwner) {
+        this.isOwner = isOwner;
+    }
+
+    public void updateCommentLiked(Boolean isLiked){
+        this.isLiked = isLiked;
     }
 }

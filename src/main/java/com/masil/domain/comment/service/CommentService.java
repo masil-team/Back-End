@@ -1,13 +1,12 @@
 package com.masil.domain.comment.service;
 
-import com.masil.domain.comment.dto.ChildrenCreateRequest;
-import com.masil.domain.comment.dto.CommentCreateRequest;
-import com.masil.domain.comment.dto.CommentModifyRequest;
-import com.masil.domain.comment.dto.CommentResponse;
+import com.masil.domain.comment.dto.*;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
+import com.masil.domain.commentlike.dto.CommentLikeResponse;
+import com.masil.domain.commentlike.repository.CommentLikeRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
@@ -30,14 +29,24 @@ public class CommentService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
+    private final CommentLikeRepository commentLikeRepository;
+
     /**
      * 댓글 조회
      */
-    public List<CommentResponse> findComments(Long postId, Pageable pageable){
+    public List<CommentResponse> findComments(Long postId, Pageable pageable, Long memberId){
 
-        return commentRepository.findAllByPostIdAndParentIdNull(postId, pageable).stream()
-                .map(comment -> CommentResponse.of(comment))
-                .collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findAllByPostIdAndParentIdNull(postId, pageable);
+
+        for (Comment comment : comments) {
+            updateCommentPermissionsForMember(memberId, comment);
+            for (Comment child : comment.getChildren()) {
+                updateCommentPermissionsForMember(memberId, child);
+            }
+        }
+
+        return comments.stream()
+                .map(m -> CommentResponse.of(m)).collect(Collectors.toList());
     }
 
     /**
@@ -49,7 +58,7 @@ public class CommentService {
         Post post  = findPostById(postId);
         Member member = findMemberById(memberId);
         Comment comment = commentCreateRequest.toEntity(post, member);
-        // 댓글 길이가 400이 넘지 않게
+        // 댓글 길이가 250이 넘지 않게
         comment.validateLength(comment.getContent());
         validateOwner(memberId, comment);
 
@@ -110,6 +119,12 @@ public class CommentService {
         }
     }
 
+    private void updateCommentPermissionsForMember(Long memberId, Comment comment) {
+        boolean isOwner = comment.isCommentWriter(memberId);
+        boolean isLiked = commentLikeRepository.existsByCommentAndMemberId(comment, memberId);
+        comment.updateIsCommentWriter(isOwner);
+        comment.updateCommentLiked(isLiked);
+    }
     /**
      * 예외 처리
      */

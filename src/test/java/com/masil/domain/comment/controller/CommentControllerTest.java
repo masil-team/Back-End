@@ -1,38 +1,19 @@
 package com.masil.domain.comment.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.common.annotation.ControllerMockApiTest;
-import com.masil.common.annotation.ServiceTest;
-import com.masil.common.security.WithMockCustomUser;
 import com.masil.domain.comment.dto.*;
-import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.post.dto.PostDetailResponse;
-import com.masil.domain.post.dto.PostModifyRequest;
-import com.masil.domain.post.dto.PostModifyRequestBuilder;
-import com.masil.domain.post.dto.PostsElementResponse;
-import com.masil.domain.post.exception.PostAccessDeniedException;
-import com.masil.global.auth.jwt.provider.JwtTokenProvider;
-import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -102,7 +83,7 @@ class CommentControllerTest extends ControllerMockApiTest{
                     .build());
         }
 
-        given(commentService.findComments(any(), any())).willReturn(commentResponseList);
+        given(commentService.findComments(any(), any(), any())).willReturn(commentResponseList);
 
         //when
         mockMvc.perform(get("/posts/1/comments?page=0")
@@ -122,6 +103,8 @@ class CommentControllerTest extends ControllerMockApiTest{
                                 fieldWithPath("[].createDate").description("생성 날짜"),
                                 fieldWithPath("[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("[].replies").description("대댓글"),
+                                fieldWithPath("[].liked").description("좋아여 여부"),
+                                fieldWithPath("[].owner").description("본인 댓글 여부"),
                                 fieldWithPath("[].replies.[].id").description("댓글 id"),
                                 fieldWithPath("[].replies.[].postId").description("게시글 id"),
                                 fieldWithPath("[].replies.[].content").description("댓글 내용"),
@@ -129,7 +112,9 @@ class CommentControllerTest extends ControllerMockApiTest{
                                 fieldWithPath("[].replies.[].member.nickname").description("닉네임"),
                                 fieldWithPath("[].replies.[].likeCount").description("좋아요 갯수"),
                                 fieldWithPath("[].replies.[].createDate").description("생성 날짜"),
-                                fieldWithPath("[].replies.[].modifyDate").description("수정 날짜")
+                                fieldWithPath("[].replies.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("[].replies.[].liked").description("좋아여 여부"),
+                                fieldWithPath("[].replies.[].owner").description("본인 댓글 여부")
                         )
                 ));
     }

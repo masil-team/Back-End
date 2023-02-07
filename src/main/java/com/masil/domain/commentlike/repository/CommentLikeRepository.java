@@ -11,4 +11,5 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
 
     Optional<CommentLike> findByMemberAndComment(Member member, Comment comment);
 
+    boolean existsByCommentAndMemberId(Comment comment, Long memberId);
 }

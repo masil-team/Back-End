@@ -19,7 +19,9 @@ public class ChildrenResponse {
     private String content;
     private Long postId;
     private MemberResponse member;
+    private boolean isOwner;
     private int likeCount;
+    private boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -29,7 +31,9 @@ public class ChildrenResponse {
                 .content(comment.getContent())
                 .postId(comment.getPost().getId())
                 .member(MemberResponse.of(comment.getMember()))
+                .isOwner(comment.getIsOwner())
                 .likeCount(comment.getLikeCount())
+                .isLiked(comment.getIsLiked())
                 .createDate(comment.getCreateDate())
                 .modifyDate(comment.getModifyDate())
                 .build();
