@@ -46,6 +46,8 @@ public enum ErrorCode {
 
     INVALID_REFRESH_TOKEN(BAD_REQUEST,6003,"잘못된 리프레쉬 토큰입니다"),
 
+    UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다."),
+
     ;
     private HttpStatus status;
     private final int code;
