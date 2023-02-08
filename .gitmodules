@@ -1,3 +1,4 @@
 [submodule "src/main/resources/backend-security"]
 	path = src/main/resources/backend-security
 	url = https://github.com/masil-team/backend-security.git
+	branch = main
