@@ -38,6 +38,6 @@ out/
 
 ### yml
 application-local.yml
-
+/src/main/resources/application-test.yml
 ### api docs
 /src/main/resources/static/docs
