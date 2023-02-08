@@ -1,3 +1,5 @@
 spring:
+  config:
+    import: classpath:/backend-security/application-prod.yml
   profiles:
     active: local
