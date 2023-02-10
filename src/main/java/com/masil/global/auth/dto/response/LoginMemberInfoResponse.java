@@ -1,6 +1,6 @@
 package com.masil.global.auth.dto.response;
 
-import com.masil.domain.address.entity.EmdAddress;
+import com.masil.domain.address.dto.response.AddressResponse;
 import com.masil.global.auth.entity.Authority;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,10 +15,10 @@ public class LoginMemberInfoResponse {
     private final String nickname;
     private final String profileImage;
     private final Set<Authority> authorities;
-    private final EmdAddress address;
+    private final AddressResponse address;
 
     @Builder
-    public LoginMemberInfoResponse(Long id, String email, String nickname, String profileImage, Set<Authority> authorities, EmdAddress address) {
+    public LoginMemberInfoResponse(Long id, String email, String nickname, String profileImage, Set<Authority> authorities, AddressResponse address) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -41,7 +41,7 @@ public class LoginMemberInfoResponse {
                     .email(currentMember.getEmail())
                     .nickname(currentMember.getNickname())
                     .authorities(currentMember.getAuthorities())
-                    .address(currentMember.getAddress())
+                    .address(AddressResponse.of(currentMember.getAddress()))
                     .build();
         }
     }
