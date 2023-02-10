@@ -51,7 +51,7 @@ public class Comment extends BaseEntity {
     private Comment parent;
 
     @Builder.Default
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Comment> children = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -142,7 +142,7 @@ public class Comment extends BaseEntity {
     }
 
     /**
-     * 부모 댓글이 삭제되면 자식 댓글도 삭제됨
+     * 추후 수정
      */
     public void deleteChild(Comment reply) {
         reply.tempDelete();

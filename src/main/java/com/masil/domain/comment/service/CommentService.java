@@ -135,6 +135,11 @@ public class CommentService {
     }
 
 
+    /**
+     * 댓글 삭제 로직
+     * 부모 댓글 삭제시 자식 댓글만 나오게 하기
+     * TODO: 02/11
+     */
     private void deleteCommentOrReply(Comment comment) {
         if (comment.isParent()) {
             deleteParent(comment);
