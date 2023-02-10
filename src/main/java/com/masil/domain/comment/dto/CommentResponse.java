@@ -4,6 +4,7 @@ package com.masil.domain.comment.dto;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.dto.response.MemberResponse;
 import lombok.*;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,8 @@ public class CommentResponse {
     private boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+
+//    private boolean isDeleted; // 자식이 있을경우 삭제되면 true, 삭제 안됐을 경우 false
     private List<ChildrenResponse> replies;
 
     @Builder

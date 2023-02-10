@@ -5,7 +5,6 @@ import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
-import com.masil.domain.commentlike.dto.CommentLikeResponse;
 import com.masil.domain.commentlike.repository.CommentLikeRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
@@ -13,15 +12,16 @@ import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class CommentService {
 
@@ -34,9 +34,17 @@ public class CommentService {
     /**
      * 댓글 조회
      */
-    public List<CommentResponse> findComments(Long postId, Pageable pageable, Long memberId){
+    public CommentsResponse findComments(Long postId, Pageable pageable, Long memberId){
 
-        List<Comment> comments = commentRepository.findAllByPostIdAndParentIdNull(postId, pageable);
+        Page<Comment> comments = commentRepository.findAllByPostIdAndParentIdNull(postId, pageable);
+        log.info("getTotalElements={}", comments.getTotalElements());
+        log.info("Size={}", comments.getSize());
+
+        Long totalCommentCount = commentRepository.countByPostId(postId);
+        log.info("count = {}", totalCommentCount);
+
+        int totalPage = pageable.getPageSize();
+        log.info("totalPage = {}", totalPage);
 
         for (Comment comment : comments) {
             updateCommentPermissionsForMember(memberId, comment);
@@ -44,9 +52,7 @@ public class CommentService {
                 updateCommentPermissionsForMember(memberId, child);
             }
         }
-
-        return comments.stream()
-                .map(m -> CommentResponse.of(m)).collect(Collectors.toList());
+        return CommentsResponse.ofComment(comments, totalCommentCount);
     }
 
     /**
@@ -108,6 +114,8 @@ public class CommentService {
         validateOwner(memberId, comment);
 
         comment.tempDelete();
+
+//        deleteCommentOrReply(comment);
     }
 
     /**
@@ -125,6 +133,35 @@ public class CommentService {
         comment.updateIsCommentWriter(isOwner);
         comment.updateCommentLiked(isLiked);
     }
+
+
+    /**
+     * 댓글 삭제 로직
+     * 부모 댓글 삭제시 자식 댓글만 나오게 하기
+     * TODO: 02/11
+     */
+    private void deleteCommentOrReply(Comment comment) {
+        if (comment.isParent()) {
+            deleteParent(comment);
+            return;
+        }
+
+        deleteChild(comment);
+    }
+
+    private void deleteParent(Comment comment) {
+        if (comment.hasNoReply()) {
+            comment.tempDelete();
+        }
+    }
+
+    private void deleteChild(Comment comment) {
+        Comment parent = comment.getParent();
+        parent.deleteChild(comment);
+//        commentRepository.delete(comment);
+
+    }
+
     /**
      * 예외 처리
      */
