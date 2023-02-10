@@ -6,6 +6,7 @@ import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.domain.member.dto.response.MemberResponse;
+import com.masil.domain.post.dto.PostsResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,7 +50,6 @@ class CommentControllerTest extends ControllerMockApiTest{
             .id(1L)
             .nickname("닉네임2")
             .build();
-
     private static final ChildrenResponse REPLIES_RESPONSE_1 = ChildrenResponse.builder()
             .id(1L)
             .content("대댓글")
@@ -60,18 +60,19 @@ class CommentControllerTest extends ControllerMockApiTest{
             .modifyDate(LocalDateTime.now())
             .build();
 
+
     private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
 
     @Test
     @DisplayName("댓글을 성공적으로 조회한다.")
     void findComments() throws Exception {
-        //given
+//        given
         List<ChildrenResponse> childrenResponseList = new ArrayList<>();
         childrenResponseList.add(REPLIES_RESPONSE_1);
-        List<CommentResponse> commentResponseList = new ArrayList<>();
+        List<CommentResponse> commentResponses = new ArrayList<>();
 
         for (int i = 0; i < 1; i++) {
-            commentResponseList.add(CommentResponse.builder()
+            commentResponses.add(CommentResponse.builder()
                     .id((long) i)
                     .postId(1L)
                     .content("댓글")
@@ -83,7 +84,10 @@ class CommentControllerTest extends ControllerMockApiTest{
                     .build());
         }
 
+        CommentsResponse commentResponseList = new CommentsResponse(commentResponses, 2L ,1);
+
         given(commentService.findComments(any(), any(), any())).willReturn(commentResponseList);
+
 
         //when
         mockMvc.perform(get("/posts/1/comments?page=0")
@@ -94,27 +98,30 @@ class CommentControllerTest extends ControllerMockApiTest{
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
-                                fieldWithPath("[].id").description("댓글 id"),
-                                fieldWithPath("[].postId").description("게시글 id"),
-                                fieldWithPath("[].content").description("댓글 내용"),
-                                fieldWithPath("[].member.id").description("멤버 id"),
-                                fieldWithPath("[].member.nickname").description("닉네임"),
-                                fieldWithPath("[].likeCount").description("좋아요 갯수"),
-                                fieldWithPath("[].createDate").description("생성 날짜"),
-                                fieldWithPath("[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("[].replies").description("대댓글"),
-                                fieldWithPath("[].liked").description("좋아여 여부"),
-                                fieldWithPath("[].owner").description("본인 댓글 여부"),
-                                fieldWithPath("[].replies.[].id").description("댓글 id"),
-                                fieldWithPath("[].replies.[].postId").description("게시글 id"),
-                                fieldWithPath("[].replies.[].content").description("댓글 내용"),
-                                fieldWithPath("[].replies.[].member.id").description("멤버 id"),
-                                fieldWithPath("[].replies.[].member.nickname").description("닉네임"),
-                                fieldWithPath("[].replies.[].likeCount").description("좋아요 갯수"),
-                                fieldWithPath("[].replies.[].createDate").description("생성 날짜"),
-                                fieldWithPath("[].replies.[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("[].replies.[].liked").description("좋아여 여부"),
-                                fieldWithPath("[].replies.[].owner").description("본인 댓글 여부")
+                                fieldWithPath("comments").description("댓글"),
+                                fieldWithPath("comments.[].id").description("댓글 id"),
+                                fieldWithPath("comments.[].content").description("댓글 내용"),
+                                fieldWithPath("comments.[].postId").description("게시글 id"),
+                                fieldWithPath("comments.[].member.id").description("멤버 id"),
+                                fieldWithPath("comments.[].member.nickname").description("닉네임"),
+                                fieldWithPath("comments.[].likeCount").description("좋아요 갯수"),
+                                fieldWithPath("comments.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("comments.[].replies").description("대댓글"),
+                                fieldWithPath("comments.[].replies.[].id").description("댓글 id"),
+                                fieldWithPath("comments.[].replies.[].postId").description("게시글 id"),
+                                fieldWithPath("comments.[].replies.[].content").description("댓글 내용"),
+                                fieldWithPath("comments.[].replies.[].member.id").description("멤버 id"),
+                                fieldWithPath("comments.[].replies.[].member.nickname").description("닉네임"),
+                                fieldWithPath("comments.[].replies.[].likeCount").description("좋아요 갯수"),
+                                fieldWithPath("comments.[].replies.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].replies.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("comments.[].replies.[].liked").description("좋아여 여부"),
+                                fieldWithPath("comments.[].replies.[].owner").description("본인 댓글 여부"),
+                                fieldWithPath("comments.[].liked").description("좋아여 여부"),
+                                fieldWithPath("comments.[].owner").description("본인 댓글 여부"),
+                                fieldWithPath("totalCommentCount").description("댓글 갯수"),
+                                fieldWithPath("totalPage").description("게시글 총 페이지")
                         )
                 ));
     }

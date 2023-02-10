@@ -15,6 +15,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -25,7 +26,7 @@ import static javax.persistence.FetchType.LAZY;
 @Where(clause = "state = 'NORMAL'")
 public class Comment extends BaseEntity {
 
-    private static final int MAX_LENGTH = 400;
+    private static final int MAX_LENGTH = 250;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +51,7 @@ public class Comment extends BaseEntity {
     private Comment parent;
 
     @Builder.Default
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -138,5 +139,20 @@ public class Comment extends BaseEntity {
 
     public void updateCommentLiked(Boolean isLiked){
         this.isLiked = isLiked;
+    }
+
+    /**
+     * 부모 댓글이 삭제되면 자식 댓글도 삭제됨
+     */
+    public void deleteChild(Comment reply) {
+        reply.tempDelete();
+    }
+
+    public boolean isParent() {
+        return Objects.isNull(parent);
+    }
+
+    public boolean hasNoReply() {
+        return children.isEmpty();
     }
 }

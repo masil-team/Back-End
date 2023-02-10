@@ -1,15 +1,13 @@
 package com.masil.domain.comment.controller;
 
-import com.masil.domain.comment.dto.ChildrenCreateRequest;
-import com.masil.domain.comment.dto.CommentCreateRequest;
-import com.masil.domain.comment.dto.CommentModifyRequest;
-import com.masil.domain.comment.dto.CommentResponse;
+import com.masil.domain.comment.dto.*;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.global.auth.annotaion.LoginUser;
 import com.masil.global.auth.dto.response.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +33,13 @@ public class CommentController {
      * 페이징 처리
      */
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> findComments(@PathVariable Long postId,
-                                                              @PageableDefault(page = 0, size = 8, direction = DESC) Pageable pageable,
-                                                              @LoginUser CurrentMember currentMember){
+    public ResponseEntity<CommentsResponse> findComments(@PathVariable Long postId,
+                                                                @PageableDefault(page = 0, size = 10, direction = DESC) Pageable pageable,
+                                                                @LoginUser CurrentMember currentMember){
 
         log.info("댓글 조회 시작");
         Long memberId = (currentMember != null) ? currentMember.getId() : null;
-        List<CommentResponse> comments = commentService.findComments(postId, pageable, memberId);
+        CommentsResponse comments = commentService.findComments(postId, pageable, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
