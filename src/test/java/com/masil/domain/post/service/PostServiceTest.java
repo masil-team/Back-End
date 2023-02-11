@@ -19,6 +19,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,9 @@ public class PostServiceTest extends ServiceTest {
     private PostLikeService postLikeService;
     @Autowired
     private EmdAddressRepository emdAddressRepository; // 임시
+
+    @PersistenceContext
+    private EntityManager em;
 
     private static final String POST_CONTENT_1 = "내용1";
     private static final String POST_CONTENT_2 = "내용2";
@@ -91,17 +96,32 @@ public class PostServiceTest extends ServiceTest {
 
         // when
         PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
+        Post post = postRepository.findById(postDetailResponse.getId()).get();
 
         // then
-        assertThat(postDetailResponse.getId()).isEqualTo(1L);
-        assertThat(postDetailResponse.getMember().getId()).isEqualTo(1L);
-        assertThat(postDetailResponse.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
-        assertThat(postDetailResponse.getBoardId()).isEqualTo(1L);
-        assertThat(postDetailResponse.getContent()).isEqualTo(POST_CONTENT_1);
-        assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
-        assertThat(postDetailResponse.getLikeCount()).isEqualTo(0);
-        assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
-        assertThat(postDetailResponse.getIsLiked()).isEqualTo(false);
+        assertThat(post.getId()).isEqualTo(1L);
+        assertThat(post.getMember().getId()).isEqualTo(1L);
+        assertThat(post.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
+        assertThat(post.getBoard().getId()).isEqualTo(1L);
+        assertThat(post.getViewCount()).isEqualTo(1L);
+        assertThat(post.getContent()).isEqualTo(POST_CONTENT_1);
+        assertThat(post.getLikeCount()).isEqualTo(0);
+        assertThat(post.getIsOwner()).isEqualTo(false);
+        assertThat(post.getIsLiked()).isEqualTo(false);
+    }
+
+    @DisplayName("게시글 조회시 조회수 1 증가.")
+    @Test
+    void findPost_increase_viewCount() {
+
+        // when
+        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
+
+        em.clear();
+        Post post = postRepository.findById(postDetailResponse.getId()).get();
+
+        // then
+        assertThat(post.getViewCount()).isEqualTo(1);
     }
 
     @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다")
