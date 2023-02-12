@@ -22,8 +22,7 @@ public class Board extends BaseEntity {
     private String name;
 
     @Builder
-    private Board(Long id, String name) {
-        this.id = id;
+    private Board(String name) {
         this.name = name;
     }
 }
