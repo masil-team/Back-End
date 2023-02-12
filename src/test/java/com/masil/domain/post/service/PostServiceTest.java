@@ -16,6 +16,7 @@ import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.postlike.service.PostLikeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,8 +24,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+import static com.masil.domain.fixture.BoardFixture.*;
+import static com.masil.domain.fixture.MemberFixture.*;
+import static com.masil.domain.fixture.PostFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class PostServiceTest extends ServiceTest {
 
@@ -44,256 +49,290 @@ public class PostServiceTest extends ServiceTest {
     @PersistenceContext
     private EntityManager em;
 
-    private static final String POST_CONTENT_1 = "내용1";
-    private static final String POST_CONTENT_2 = "내용2";
-    private static final String USER_EMAIL_1 = "email1@naver.com";
-    private static final String USER_EMAIL_2 = "email2@naver.com";
-    private static final String USER_NICKNAME_1 = "test1";
-    private static final String USER_NICKNAME_2 = "test2";
+    private static final Long NOT_FOUND_POST_ID = 9999L;
 
-    @BeforeEach
-    void setUp() {
+    @Nested
+    @DisplayName("게시글 상세 조회를 할 때")
+    class FindDetailPost {
 
-        Board board = Board.builder()
-                .id(1L)
-                .name("ALL")
-                .build();
-        boardRepository.save(board);
-        Member member1 = Member.builder()
-                .email(USER_EMAIL_1)
-                .nickname(USER_NICKNAME_1)
-                .password("123")
-                .build();
-        Member member2 = Member.builder()
-                .email(USER_EMAIL_2)
-                .nickname(USER_NICKNAME_2)
-                .password("123")
-                .build();
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        private Post post;
 
-        EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
+        @BeforeEach
+        void setUp() {
+            // TODO : emd 추후 제거
+            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
 
-        Post post1 = Post.builder()
-                .content(POST_CONTENT_1)
-                .member(member1)
-                .board(board)
-                .emdAddress(emdAddress)
-                .build();
-        Post post2 = Post.builder()
-                .content(POST_CONTENT_2)
-                .member(member1)
-                .board(board)
-                .emdAddress(emdAddress)
-                .build();
-        postRepository.save(post1);
-        postRepository.save(post2);
+            post = 일반_게시글_JJ.엔티티_생성(emdAddress);
+            memberRepository.save(post.getMember());
+            boardRepository.save(post.getBoard());
+            postRepository.save(post);
+        }
+
+        @Test
+        @DisplayName("성공적으로 조회한다.")
+        void success() {
+
+            // when
+            PostDetailResponse postDetailResponse = postService.findDetailPost(post.getId(), post.getMember().getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(postDetailResponse.getId()).isEqualTo(1L),
+                    () -> assertThat(postDetailResponse.getMember().getId()).isEqualTo(post.getMember().getId()),
+                    () -> assertThat(postDetailResponse.getBoardId()).isEqualTo(post.getBoard().getId()),
+                    () -> assertThat(postDetailResponse.getContent()).isEqualTo(post.getContent()),
+                    () -> assertThat(postDetailResponse.getAddress()).isEqualTo(post.getEmdAddress().getEmdName()), // 추후 수정,
+                    () -> assertThat(postDetailResponse.getIsOwner()).isEqualTo(true)
+            );
+        }
+
+        @Test
+        @DisplayName("다른 사람의 글을 조회한다.")
+        void not_isOwner() {
+
+            // given
+            Member KK = memberRepository.save(일반_회원_KK.엔티티_생성());
+
+            // when
+            PostDetailResponse postDetailResponse = postService.findDetailPost(post.getId(), KK.getId());
+
+            // then
+            assertThat(postDetailResponse.getIsOwner()).isEqualTo(false);
+        }
+
+        @Test
+        @DisplayName("조회수가 1 증가한다.")
+        void view_count() {
+
+            //given
+            em.clear();
+
+            // when
+            PostDetailResponse postDetailResponse = postService.findDetailPost(post.getId(), post.getMember().getId());
+
+            // then
+            assertThat(postDetailResponse.getViewCount()).isEqualTo(1);
+        }
+
+        @DisplayName("좋아요한 게시글을 조회한다.")
+        @Test
+        void findPost_isLike() {
+            // given
+            Member KK = memberRepository.save(일반_회원_KK.엔티티_생성());
+            postLikeService.toggleLikePost(post.getId(), KK.getId());
+
+            // when
+            PostDetailResponse postDetailResponse = postService.findDetailPost(post.getId(), KK.getId());
+
+            // then
+            assertThat(postDetailResponse.getIsLiked()).isEqualTo(true);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다")
+        void not_found() {
+
+            // when, then
+            assertThatThrownBy(() -> postService.findDetailPost(NOT_FOUND_POST_ID, post.getMember().getId()))
+                    .isInstanceOf(PostNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("삭제 상태인 게시글인 경우 예외가 발생한다")
+        void findPost_isDeleted() {
+
+            // given
+            post.tempDelete();
+
+            // when, then
+            assertThatThrownBy(() -> postService.findDetailPost(post.getId(), post.getMember().getId()))
+                    .isInstanceOf(PostNotFoundException.class);
+        }
     }
 
-    @DisplayName("상세 게시글이 성공적으로 조회된다.")
-    @Test
-    void findPost_success() {
+    @Nested
+    @DisplayName("게시글 목록 조회를 할 때")
+    class FindPosts {
 
-        // when
-        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
-        Post post = postRepository.findById(postDetailResponse.getId()).get();
+        private List<Post> posts;
+        private Post post;
 
-        // then
-        assertThat(post.getId()).isEqualTo(1L);
-        assertThat(post.getMember().getId()).isEqualTo(1L);
-        assertThat(post.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
-        assertThat(post.getBoard().getId()).isEqualTo(1L);
-        assertThat(post.getViewCount()).isEqualTo(1L);
-        assertThat(post.getContent()).isEqualTo(POST_CONTENT_1);
-        assertThat(post.getLikeCount()).isEqualTo(0);
-        assertThat(post.getIsOwner()).isEqualTo(false);
-        assertThat(post.getIsLiked()).isEqualTo(false);
+        @BeforeEach
+        void setUp() {
+            // TODO : emd 추후 제거
+            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
+            posts = 일반_게시글_JJ.엔티티_여러개_생성(emdAddress);
+            post = posts.get(0);
+
+            memberRepository.save(post.getMember());
+            boardRepository.save(post.getBoard());
+            postRepository.saveAll(posts);
+        }
+        @Test
+        @DisplayName("성공적으로 조회한다.")
+        void success() {
+            // given
+            PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
+
+            // when
+            PostsResponse postsResponse = postService.findPosts(postFilterRequest, post.getMember().getId());
+            List<PostsElementResponse> postsElementResponseList = postsResponse.getPosts();
+            PostsElementResponse postsElementResponse = postsElementResponseList.get(0);
+
+            // then
+            assertAll(
+                    () -> assertThat(postsElementResponseList.size()).isEqualTo(posts.size()),
+                    () -> assertThat(postsElementResponse.getId()).isEqualTo(2L),
+                    () -> assertThat(postsResponse.getIsLast()).isTrue()
+            );
+        }
+
+        @DisplayName("상태가 DELETE 인 게시글은 제외하고 조회한다.")
+        @Test
+        void findPosts_isDeleted() {
+
+            // given
+            Post foundPost = postRepository.findById(1L).get();
+            foundPost.tempDelete();
+            PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
+
+            // when
+            PostsResponse foundPosts = postService.findPosts(postFilterRequest, post.getMember().getId());
+            List<PostsElementResponse> postList = foundPosts.getPosts();
+
+            // then
+            assertThat(postList.get(0).getId()).isEqualTo(2L);
+        }
+
     }
 
-    @DisplayName("게시글 조회시 조회수 1 증가.")
-    @Test
-    void findPost_increase_viewCount() {
+    @Nested
+    @DisplayName("게시글 생성할 때")
+    class CreatePost {
 
-        // when
-        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
+        private Member JJ;
+        private Board board;
 
-        em.clear();
-        Post post = postRepository.findById(postDetailResponse.getId()).get();
+        @BeforeEach
+        void setUp() {
+            JJ = memberRepository.save(일반_회원_JJ.엔티티_생성());
+            board = boardRepository.save(전체_카테고리.엔티티_생성());
+        }
 
-        // then
-        assertThat(post.getViewCount()).isEqualTo(1);
+        @Test
+        @DisplayName("성공적으로 생성된다.")
+        void success() {
+
+            // given
+            String content = "새로운 내용";
+            PostCreateRequest postCreateRequest = PostCreateRequestBuilder.build(content, board.getId());
+
+            // when
+            Long postId = postService.createPost(postCreateRequest, JJ.getId());
+            Post foundPost = postRepository.findById(postId).get();
+
+            // then
+            assertAll(
+                    () -> assertThat(foundPost.getId()).isEqualTo(postId),
+                    () -> assertThat(foundPost.getContent()).isEqualTo(content),
+                    () -> assertThat(foundPost.getMember().getId()).isEqualTo(JJ.getId()),
+                    () -> assertThat(foundPost.getViewCount()).isEqualTo(0),
+                    () -> assertThat(foundPost.getBoard().getId()).isEqualTo(board.getId()),
+                    () -> assertThat(foundPost.getState()).isEqualTo(State.NORMAL)
+            );
+
+        }
     }
 
-    @DisplayName("존재하지 않는 게시글일 경우 예외가 발생한다")
-    @Test
-    void findPost_notFound() {
+    @Nested
+    @DisplayName("게시글 수정할 때")
+    class ModifyPost {
 
-        // when, then
-        assertThatThrownBy(() -> postService.findDetailPost(100L, 2L))
-                .isInstanceOf(PostNotFoundException.class);
+        private Post post;
+        private Member JJ;
+
+        @BeforeEach
+        void setUp() {
+            // TODO : emd 추후 제거
+            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
+
+            post = 일반_게시글_JJ.엔티티_생성(emdAddress);
+            JJ = memberRepository.save(post.getMember());
+            boardRepository.save(post.getBoard());
+            postRepository.save(post);
+        }
+
+        @Test
+        @DisplayName("성공적으로 수정된다.")
+        void modifyPost_success() {
+
+            // given
+            String content = "수정 후 내용";
+            PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
+
+            // when
+            postService.modifyPost(post.getId(), postModifyRequest, JJ.getId());
+
+            // then
+            Post modifiedPost = postRepository.findById(post.getId()).get();
+            assertThat(modifiedPost.getContent()).isEqualTo(content);
+        }
+
+        @DisplayName("게시글에 권한이 없는 유저가 수정할 경우 예외가 발생한다.")
+        @Test
+        void modifyPost_fail() {
+
+            // given
+            Member KK = memberRepository.save(일반_회원_KK.엔티티_생성());
+            String content = "수정 후 내용";
+            PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
+
+            // when, then
+            assertThatThrownBy(() -> postService.modifyPost(post.getId(), postModifyRequest, KK.getId()))
+                    .isInstanceOf(PostAccessDeniedException.class);
+        }
     }
 
-    @DisplayName("삭제 상태인 게시글인 경우 예외가 발생한다")
-    @Test
-    void findPost_isDeleted() {
+    @Nested
+    @DisplayName("게시글 삭제할 때")
+    class DeletePost {
 
-        // given
-        Post post = postRepository.findById(1L).get();
-        post.tempDelete();
+        private Post post;
+        private Member JJ;
 
-        // when, then
-        assertThatThrownBy(() -> postService.findDetailPost(1L, 2L))
-                .isInstanceOf(PostNotFoundException.class);
-    }
+        @BeforeEach
+        void setUp() {
+            // TODO : emd 추후 제거
+            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
 
-    @DisplayName("본인의 상세 게시글인 경우")
-    @Test
-    void findPost_isOwner() {
+            post = 일반_게시글_JJ.엔티티_생성(emdAddress);
+            JJ = memberRepository.save(post.getMember());
+            boardRepository.save(post.getBoard());
+            postRepository.save(post);
+        }
 
-        // when
-        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 1L);
+        @DisplayName("성공적으로 삭제된다.")
+        @Test
+        void deletePost_success() {
 
-        // then
-        assertThat(postDetailResponse.getIsOwner()).isEqualTo(true);
-    }
+            // when
+            postService.deletePost(post.getId(), JJ.getId());
 
-    @DisplayName("좋아요한 상세 게시글인 경우")
-    @Test
-    void findPost_isLike() {
-        // given
-        postLikeService.toggleLikePost(1L, 2L);
+            // then
+            Post deletedPost = postRepository.findById(post.getId()).get(); // status : DELETE
+            assertThat(deletedPost.getState()).isEqualTo(State.DELETE);
+        }
 
-        // when
-        PostDetailResponse postDetailResponse = postService.findDetailPost(1L, 2L);
+        @DisplayName("게시글에 권한이 없는 유저가 삭제할 경우 예외가 발생한다")
+        @Test
+        void deletePost_fail() {
 
-        // then
-        assertThat(postDetailResponse.getIsLiked()).isEqualTo(true);
-    }
+            // given
+            Member KK = memberRepository.save(일반_회원_KK.엔티티_생성());
 
-    @DisplayName("게시글 목록이 성공적으로 조회된다.")
-    @Test
-    void findPosts_success() {
-
-        // given
-        PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
-
-        // when
-        PostsResponse allPost = postService.findPosts(postFilterRequest, 1L);
-        List<PostsElementResponse> postList = allPost.getPosts();
-        PostsElementResponse postsElementResponse = postList.get(postList.size()-1);
-
-        // then
-        assertThat(allPost.getPosts().size()).isEqualTo(2);
-        assertThat(postsElementResponse.getId()).isEqualTo(1L);
-        assertThat(postsElementResponse.getMember().getId()).isEqualTo(1L);
-        assertThat(postsElementResponse.getMember().getNickname()).isEqualTo(USER_NICKNAME_1);
-        assertThat(postsElementResponse.getContent()).isEqualTo(POST_CONTENT_1);
-        assertThat(postsElementResponse.getViewCount()).isEqualTo(0);
-        assertThat(postsElementResponse.getLikeCount()).isEqualTo(0);
-        assertThat(postsElementResponse.getCommentCount()).isEqualTo(0);
-        assertThat(postsElementResponse.getIsOwner()).isEqualTo(true);
-        assertThat(postsElementResponse.getIsLiked()).isEqualTo(false);
-    }
-
-    @DisplayName("게시글 목록에서 상태가 DELETE인 컬럼은 제외하고 조회된다.")
-    @Test
-    void findPosts_State() {
-
-        // given
-        Post post = postRepository.findById(1L).get();
-        post.tempDelete();
-        PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build();
-
-        // when
-        PostsResponse posts = postService.findPosts(postFilterRequest, 1L);
-        List<PostsElementResponse> postList = posts.getPosts();
-
-        // then
-        assertThat(posts.getPosts().size()).isEqualTo(1);
-        assertThat(postList.get(0).getId()).isEqualTo(2L);
-    }
-
-    @DisplayName("게시글이 성공적으로 생성된다.")
-    @Test
-    void createPost_test() {
-        // given
-        Member member = memberRepository.findById(1L).get();
-
-        String content = "새로운 내용";
-        PostCreateRequest postCreateRequest = PostCreateRequestBuilder.build(content);
-        // when
-        Long postId = postService.createPost(postCreateRequest, 1L);
-        Post post = postRepository.findById(postId).get();
-
-
-        // then
-        assertThat(post.getId()).isEqualTo(postId);
-        assertThat(post.getContent()).isEqualTo(content);
-        assertThat(post.getMember().getId()).isEqualTo(member.getId());
-        assertThat(post.getViewCount()).isEqualTo(0);
-        assertThat(post.getBoard().getId()).isEqualTo(1L);
-        assertThat(post.getState()).isEqualTo(State.NORMAL);
-    }
-
-    @DisplayName("게시글 수정이 성공적으로 수행된다.")
-    @Test
-    void modifyPost_success() {
-
-        // given
-        Member member = memberRepository.findById(1L).get();
-
-        String content = "수정 후 내용";
-        Post beforePost = postRepository.findById(1L).get();
-
-        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
-
-        // when
-        postService.modifyPost(beforePost.getId(), postModifyRequest, member.getId());
-
-        // then
-        Post afterPost = postRepository.findById(1L).get();
-        assertThat(afterPost.getContent()).isEqualTo(content);
-    }
-    @DisplayName("게시글에 권한이 없는 유저가 게시글을 수정할 경우 예외가 발생한다.")
-    @Test
-    void modifyPost_fail() {
-
-        // given
-        String content = "수정 후 내용";
-        Post post = postRepository.findById(1L).get();
-
-        PostModifyRequest postModifyRequest = PostModifyRequestBuilder.build(content);
-
-        // when, then
-        assertThatThrownBy(() -> postService.modifyPost(post.getId(), postModifyRequest, 2L))
-                .isInstanceOf(PostAccessDeniedException.class);
-    }
-
-    @DisplayName("게시글 삭제 성공")
-    @Test
-    void deletePost_success() {
-
-        // given
-        Post beforePost = postRepository.findById(1L).get();  // status : NORMAL
-        Member member = memberRepository.findById(1L).get();
-
-        // when
-        postService.deletePost(beforePost.getId(), member.getId());
-
-        // then
-        Post afterPost = postRepository.findById(1L).get(); // status : DELETE
-        assertThat(afterPost.getState()).isEqualTo(State.DELETE);
-    }
-
-    @DisplayName("게시글에 권한이 없는 유저가 게시글을 삭제할 경우 예외가 발생한다")
-    @Test
-    void deletePost_fail() {
-
-        // given
-        Post post = postRepository.findById(1L).get();  // status : NORMAL
-
-        // when, then
-        assertThatThrownBy(() -> postService.deletePost(post.getId(), 2L))
-                .isInstanceOf(PostAccessDeniedException.class);
+            // when, then
+            assertThatThrownBy(() -> postService.deletePost(post.getId(), KK.getId()))
+                    .isInstanceOf(PostAccessDeniedException.class);
+        }
     }
 }
