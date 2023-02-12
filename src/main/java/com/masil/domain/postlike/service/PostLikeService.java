@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,20 +30,15 @@ public class PostLikeService {
         Post post = findPostById(postId);
         Member member = findMemberById(memberId);
 
-        if (post.isOwner(memberId)) {
-            throw new SelfPostLikeException(); // 추후 변경
-        }
+        checkSelfPostLike(memberId, post);
 
-        PostLike postLike = postLikeRepository.findByPostAndMember(post, member).orElse(null);
+        Optional<PostLike> postLikeOp = postLikeRepository.findByPostAndMember(post, member);
+        return postLikeOp
+                .map(postLike -> deletePostLike(post, postLike))    // 이미 좋아요 한 경우 삭제
+                .orElseGet(() -> addPostLike(post, member));        // 처음 좋아요 한 경우 추가
+    }
 
-        // 이미 좋아요 한 경우 삭제
-        if (postLike != null) {
-            postLikeRepository.delete(postLike);
-            post.minusLike();
-            return PostLikeResponse.of(post.getLikeCount(), false);
-        }
-
-        // 처음 좋아요 한 경우 추가
+    private PostLikeResponse addPostLike(Post post, Member member) {
         PostLike newPostLike = PostLike.builder()
                 .post(post)
                 .member(member)
@@ -50,10 +47,24 @@ public class PostLikeService {
         post.plusLike();
         return PostLikeResponse.of(post.getLikeCount(), true);
     }
+
+    private PostLikeResponse deletePostLike(Post post, PostLike postLike) {
+        postLikeRepository.delete(postLike);
+        post.minusLike();
+        return PostLikeResponse.of(post.getLikeCount(), false);
+    }
+
+    private void checkSelfPostLike(Long memberId, Post post) {
+        if (post.isOwner(memberId)) {
+            throw new SelfPostLikeException();
+        }
+    }
+
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
     }
+
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
