@@ -94,9 +94,6 @@ public class Post extends BaseEntity {
         return this.member.getId() == memberId;
     }
 
-    public void plusView() {
-        this.viewCount++;
-    }
     public void plusLike() {
         this.likeCount++;
     }

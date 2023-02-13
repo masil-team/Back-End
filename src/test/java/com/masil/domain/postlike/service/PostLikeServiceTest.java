@@ -14,6 +14,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.masil.domain.fixture.PostFixture.일반_게시글_JJ;
+import static com.masil.domain.fixture.PostFixture.일반_게시글_KK;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -28,85 +31,69 @@ class PostLikeServiceTest extends ServiceTest {
     @Autowired
     public PostRepository postRepository;
 
-    private static final String POST_CONTENT_1 = "내용1";
-    private static final String POST_CONTENT_2 = "내용2";
-    private static final String USER_EMAIL_1 = "email1@naver.com";
-    private static final String USER_EMAIL_2 = "email2@naver.com";
-    private static final String USER_NICKNAME_1 = "test1";
-    private static final String USER_NICKNAME_2 = "test2";
+    private Post post1;
+    private Post post2;
+    private Member JJ;
+    private Member KK;
+
     @BeforeEach
     void setUp() {
-        Member member1 = Member.builder()
-                .email(USER_EMAIL_1)
-                .nickname(USER_NICKNAME_1)
-                .password("123")
-                .build();
-        Member member2 = Member.builder()
-                .email(USER_EMAIL_2)
-                .nickname(USER_NICKNAME_2)
-                .password("123")
-                .build();
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-
-        Post post1 = Post.builder()
-                .content(POST_CONTENT_1)
-                .member(member1)
-                .build();
-        Post post2 = Post.builder()
-                .content(POST_CONTENT_2)
-                .member(member1)
-                .build();
+        post1 = 일반_게시글_JJ.엔티티_생성();
+        JJ = memberRepository.save(post1.getMember());
         postRepository.save(post1);
+
+        post2 = 일반_게시글_KK.엔티티_생성();
+        KK = memberRepository.save(post2.getMember());
         postRepository.save(post2);
     }
-    @DisplayName("유저2가 게시글1에 좋아요를 누른다.")
+
+    @DisplayName("KK가 게시글1에 좋아요를 누른다.")
     @Test
     void toggleLikePost_plusLike() {
-        // then
-        Post post = postRepository.findById(1L).get();
-        Member member = memberRepository.findById(2L).get();
-        int likeCount = post.getLikeCount();
 
         // when
-        PostLikeResponse postLikeResponse = postLikeService.toggleLikePost(post.getId(), member.getId());
+        PostLikeResponse postLikeResponse = postLikeService.toggleLikePost(post1.getId(), KK.getId());
 
         // then
-        PostLike postLike = postLikeRepository.findByPostAndMember(post, member).get();
+        PostLike postLike = postLikeRepository.findByPostAndMember(post1, KK).get();
+        Post likedPost = postRepository.findById(post1.getId()).get();
 
-        assertThat(postLikeResponse.getLikeCount()).isEqualTo(likeCount+1);
-        assertThat(postLikeResponse.getIsLike()).isTrue();
-        assertThat(postLike.getPost()).isEqualTo(post);
-        assertThat(postLike.getMember()).isEqualTo(member);
+        assertAll(
+                () -> assertThat(postLikeResponse.getLikeCount()).isEqualTo(1),
+                () -> assertThat(postLikeResponse.getIsLike()).isTrue(),
+                () -> assertThat(postLike.getPost()).isEqualTo(post1),
+                () -> assertThat(postLike.getMember()).isEqualTo(KK),
+                () -> assertThat(likedPost.getLikeCount()).isEqualTo(1)
+        );
     }
 
-    @DisplayName("유저2가 게시글1에 좋아요를 취소한다.")
+    @DisplayName("KK가 게시글1에 좋아요를 취소한다.")
     @Test
     void toggleLikePost_minusLike() {
         // then
-        Post post = postRepository.findById(1L).get();
-        Member member = memberRepository.findById(2L).get();
-        PostLikeResponse postLikeResponse = postLikeService.toggleLikePost(post.getId(), member.getId());
+        PostLikeResponse postLikeResponse = postLikeService.toggleLikePost(post1.getId(), KK.getId());
 
         // when
-        PostLikeResponse afterPostLikeResponse = postLikeService.toggleLikePost(post.getId(), member.getId());
+        PostLikeResponse canceledPostLikeResponse = postLikeService.toggleLikePost(post1.getId(), KK.getId());
 
         // then
-        PostLike postLike = postLikeRepository.findByPostAndMember(post, member).orElse(null);
+        PostLike postLike = postLikeRepository.findByPostAndMember(post1, KK).orElse(null);
+        Post canceledPost = postRepository.findById(post1.getId()).get();
 
-        assertThat(postLike).isNull();
-        assertThat(afterPostLikeResponse.getLikeCount()).isEqualTo(postLikeResponse.getLikeCount()-1);
-        assertThat(afterPostLikeResponse.getIsLike()).isFalse();
+        assertAll(
+                () -> assertThat(postLike).isNull(),
+                () -> assertThat(canceledPostLikeResponse.getLikeCount()).isEqualTo(postLikeResponse.getLikeCount()-1),
+                () -> assertThat(canceledPostLikeResponse.getIsLike()).isFalse(),
+                () -> assertThat(canceledPost.getLikeCount()).isEqualTo(0)
+        );
     }
+
     @DisplayName("본인 글에 좋아요를 누를 경우 예외가 발생한다.")
     @Test
     void toggleLikePost_isOwner() {
-        // then
-        Post post = postRepository.findById(1L).get();
-        Member member = memberRepository.findById(1L).get();
 
         // then, when
-        assertThatThrownBy(() -> postLikeService.toggleLikePost(post.getId(), member.getId()))
+        assertThatThrownBy(() -> postLikeService.toggleLikePost(post1.getId(), JJ.getId()))
                 .isInstanceOf(SelfPostLikeException.class);
     }
 

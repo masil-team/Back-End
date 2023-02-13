@@ -8,7 +8,6 @@ import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
-import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -28,7 +27,10 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final BoardRepository boardRepository;
 
+    @Transactional
     public PostDetailResponse findDetailPost(Long postId, Long memberId) {
+        postRepository.increaseViewCount(postId);
+
         Post post = findPostById(postId);
         checkPostState(post);
 
@@ -36,8 +38,6 @@ public class PostService {
         if (memberId != null) {
             updatePostPermissionsForMember(memberId, post);
         }
-
-        post.plusView();
 
         return PostDetailResponse.of(post);
     }
