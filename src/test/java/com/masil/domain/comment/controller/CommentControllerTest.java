@@ -118,8 +118,8 @@ class CommentControllerTest extends ControllerMockApiTest{
                                 fieldWithPath("comments.[].replies.[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("comments.[].replies.[].liked").description("좋아여 여부"),
                                 fieldWithPath("comments.[].replies.[].owner").description("본인 댓글 여부"),
-                                fieldWithPath("comments.[].deleted").description("본인 댓글 여부"),
-                                fieldWithPath("comments.[].liked").description("부모 댓글 삭제 여부"),
+                                fieldWithPath("comments.[].deleted").description("본인 댓글 삭제 여부"),
+                                fieldWithPath("comments.[].liked").description("좋아요 여부"),
                                 fieldWithPath("comments.[].owner").description("본인 댓글 여부"),
                                 fieldWithPath("totalCommentCount").description("댓글 갯수"),
                                 fieldWithPath("totalPage").description("게시글 총 페이지")
