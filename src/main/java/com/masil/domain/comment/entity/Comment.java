@@ -1,5 +1,6 @@
 package com.masil.domain.comment.entity;
 
+import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.member.entity.Member;
@@ -15,7 +16,6 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -60,6 +60,7 @@ public class Comment extends BaseEntity {
     /**
      * commentLikes 추가
      */
+    @Builder.Default
     @OneToMany(mappedBy = "comment", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<CommentLike> commentLikes = new ArrayList<>();
 
@@ -142,17 +143,15 @@ public class Comment extends BaseEntity {
     }
 
     /**
-     * 추후 수정
+     * TODO:02/12
+     * 부모 댓글과 자식 댓글 삭제 로직
      */
-    public void deleteChild(Comment reply) {
-        reply.tempDelete();
+    public boolean isAvailable() {
+        return this.state.isAvailable();
     }
 
-    public boolean isParent() {
-        return Objects.isNull(parent);
+    public boolean isNotAvailable() {
+        return !this.state.isAvailable();
     }
 
-    public boolean hasNoReply() {
-        return children.isEmpty();
-    }
 }
