@@ -18,6 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -36,22 +40,18 @@ public class CommentService {
      */
     public CommentsResponse findComments(Long postId, Pageable pageable, Long memberId){
 
-        Page<Comment> comments = commentRepository.findAllByPostIdAndParentIdNull(postId, pageable);
-        log.info("getTotalElements={}", comments.getTotalElements());
-        log.info("Size={}", comments.getSize());
-
+        Page<Comment> comments = commentRepository.findAllByPostId(postId, pageable);
+        
         Long totalCommentCount = commentRepository.countByPostId(postId);
-        log.info("count = {}", totalCommentCount);
-
-        int totalPage = pageable.getPageSize();
-        log.info("totalPage = {}", totalPage);
 
         for (Comment comment : comments) {
+            log.info("comment id = {}", comment.getId());
             updateCommentPermissionsForMember(memberId, comment);
             for (Comment child : comment.getChildren()) {
                 updateCommentPermissionsForMember(memberId, child);
             }
         }
+
         return CommentsResponse.ofComment(comments, totalCommentCount);
     }
 
@@ -115,7 +115,6 @@ public class CommentService {
 
         comment.tempDelete();
 
-//        deleteCommentOrReply(comment);
     }
 
     /**
@@ -132,34 +131,6 @@ public class CommentService {
         boolean isLiked = commentLikeRepository.existsByCommentAndMemberId(comment, memberId);
         comment.updateIsCommentWriter(isOwner);
         comment.updateCommentLiked(isLiked);
-    }
-
-
-    /**
-     * 댓글 삭제 로직
-     * 부모 댓글 삭제시 자식 댓글만 나오게 하기
-     * TODO: 02/11
-     */
-    private void deleteCommentOrReply(Comment comment) {
-        if (comment.isParent()) {
-            deleteParent(comment);
-            return;
-        }
-
-        deleteChild(comment);
-    }
-
-    private void deleteParent(Comment comment) {
-        if (comment.hasNoReply()) {
-            comment.tempDelete();
-        }
-    }
-
-    private void deleteChild(Comment comment) {
-        Comment parent = comment.getParent();
-        parent.deleteChild(comment);
-//        commentRepository.delete(comment);
-
     }
 
     /**
