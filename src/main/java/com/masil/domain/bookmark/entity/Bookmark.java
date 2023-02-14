@@ -1,9 +1,12 @@
-package com.masil.domain.postlike.entity;
+package com.masil.domain.bookmark.entity;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.entity.Post;
 import com.masil.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -12,8 +15,7 @@ import javax.persistence.*;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostLike extends BaseEntity {
-
+public class Bookmark extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,9 +29,8 @@ public class PostLike extends BaseEntity {
     private Post post;
 
     @Builder
-    public PostLike(Post post, Member member) {
+    public Bookmark(Post post, Member member) {
         this.post = post;
         this.member = member;
     }
-
 }
