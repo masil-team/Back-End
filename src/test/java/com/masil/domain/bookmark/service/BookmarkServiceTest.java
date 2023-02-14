@@ -15,17 +15,13 @@ import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.repository.PostRepository;
-import com.masil.domain.postlike.exception.SelfPostLikeException;
-import org.checkerframework.checker.units.qual.A;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.support.PageableExecutionUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import java.util.List;
 
@@ -112,8 +108,6 @@ class BookmarkServiceTest extends ServiceTest {
                 .isInstanceOf(BookmarkNotFoundException.class);
     }
 
-    @PersistenceContext
-    private EntityManager em;
     @Test
     @DisplayName("유저의 전체 북마크 목록을 성공적으로 조회한다.")
     void findBookmark() {
