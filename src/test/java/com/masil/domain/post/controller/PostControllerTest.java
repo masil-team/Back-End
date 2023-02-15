@@ -292,7 +292,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
@@ -300,8 +300,8 @@ public class PostControllerTest extends ControllerMockApiTest {
     private ResultActions requestFindPost(String url) throws Exception {
         return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
+                        .contentType(MediaType.APPLICATION_JSON))
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 
@@ -315,15 +315,15 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(patch(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
     private ResultActions requestDeletePost(String url) throws Exception {
         return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
+                        .contentType(MediaType.APPLICATION_JSON))
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 
