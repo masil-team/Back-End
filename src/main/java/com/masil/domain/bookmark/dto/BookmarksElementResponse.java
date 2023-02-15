@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class BookmarksElementResponse {
-    private Long id;
+    private Long postId;
     private MemberResponse member;
     private Long boardId;
     private String address;
@@ -22,7 +22,7 @@ public class BookmarksElementResponse {
     public static BookmarksElementResponse of(Bookmark bookmark) {
         Post post = bookmark.getPost();
         return BookmarksElementResponse.builder()
-                .id(post.getId())
+                .postId(post.getId())
                 .member(MemberResponse.of(post.getMember()))
                 .boardId(post.getBoard().getId())
                 .address(post.getEmdAddress().getEmdName())
