@@ -59,10 +59,6 @@ public class BookmarkService {
     public BookmarksResponse findBookmarks(Long memberId, Pageable pageable) {
         Member member = findMemberById(memberId);
         Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member, pageable);
-        for (Bookmark bookmark : bookmarks) {
-            System.out.println("asdasd"+bookmark);
-        }
-        System.out.println("ASDSAD"+bookmarks.getSize());
         return BookmarksResponse.ofBookmarks(bookmarks);
     }
     
