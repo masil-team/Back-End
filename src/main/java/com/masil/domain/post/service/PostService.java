@@ -3,6 +3,7 @@ package com.masil.domain.post.service;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
+import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
@@ -26,6 +27,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
     private final BoardRepository boardRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     @Transactional
     public PostDetailResponse findDetailPost(Long postId, Long memberId) {
@@ -101,7 +103,8 @@ public class PostService {
     private void updatePostPermissionsForMember(Long memberId, Post post) {
         boolean isOwnPost = post.isOwner(memberId);
         boolean isLiked = postLikeRepository.existsByPostAndMemberId(post, memberId);
-        post.updatePostPermissions(isOwnPost, isLiked);
+        boolean isScrap = bookmarkRepository.existsByPostAndMemberId(post, memberId);
+        post.updatePostPermissions(isOwnPost, isLiked, isScrap);
     }
 
     private void checkPostState(Post post) {

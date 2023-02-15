@@ -5,6 +5,7 @@ import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.address.repository.EmdAddressRepository;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.repository.BoardRepository;
+import com.masil.domain.bookmark.service.BookmarkService;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
@@ -45,6 +46,8 @@ public class PostServiceTest extends ServiceTest {
     private PostLikeService postLikeService;
     @Autowired
     private EmdAddressRepository emdAddressRepository; // 임시
+    @Autowired
+    private BookmarkService bookmarkService;
 
     @PersistenceContext
     private EntityManager em;
@@ -82,7 +85,9 @@ public class PostServiceTest extends ServiceTest {
                     () -> assertThat(postDetailResponse.getBoardId()).isEqualTo(post.getBoard().getId()),
                     () -> assertThat(postDetailResponse.getContent()).isEqualTo(post.getContent()),
                     () -> assertThat(postDetailResponse.getAddress()).isEqualTo(post.getEmdAddress().getEmdName()), // 추후 수정,
-                    () -> assertThat(postDetailResponse.getIsOwner()).isEqualTo(true)
+                    () -> assertThat(postDetailResponse.getIsOwner()).isEqualTo(true),
+                    () -> assertThat(postDetailResponse.getIsLiked()).isEqualTo(false),
+                    () -> assertThat(postDetailResponse.getIsScrap()).isEqualTo(false)
             );
         }
 
@@ -126,6 +131,19 @@ public class PostServiceTest extends ServiceTest {
 
             // then
             assertThat(postDetailResponse.getIsLiked()).isEqualTo(true);
+        }
+
+        @DisplayName("즐겨찾기한 게시글을 조회한다.")
+        @Test
+        void findPost_isScrap() {
+            // given
+            bookmarkService.addBookmark(post.getId(), post.getMember().getId());
+
+            // when
+            PostDetailResponse postDetailResponse = postService.findDetailPost(post.getId(),  post.getMember().getId());
+
+            // then
+            assertThat(postDetailResponse.getIsScrap()).isEqualTo(true);
         }
 
         @Test

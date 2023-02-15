@@ -65,6 +65,10 @@ public class Post extends BaseEntity {
     @Transient
     private Boolean isLiked = false;
 
+    @Builder.Default
+    @Transient
+    private Boolean isScrap = false;
+
     @Builder
     private Post(String content, Member member, State state, Board board , EmdAddress emdAddress) {
         this.content = content;
@@ -79,9 +83,10 @@ public class Post extends BaseEntity {
         this.board = board;
 
     }
-    public void updatePostPermissions(Boolean isOwner, Boolean isLiked){
+    public void updatePostPermissions(Boolean isOwner, Boolean isLiked, Boolean isScrap){
         this.isOwner = isOwner;
         this.isLiked = isLiked;
+        this.isScrap = isScrap;
     }
 
     public void tempDelete() {

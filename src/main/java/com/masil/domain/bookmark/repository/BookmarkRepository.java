@@ -14,8 +14,11 @@ import java.util.Optional;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     boolean existsByPostAndMember(Post post, Member member);
 
+    boolean existsByPostAndMemberId(Post post, Long memberId);
+
     Optional<Bookmark> findByPostAndMember(Post post, Member member);
 
     @EntityGraph(attributePaths = {"post"}) // fetch 조인 후 조회
     Slice<Bookmark> findAllByMember(Member member, Pageable pageable);
+
 }

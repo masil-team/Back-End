@@ -20,6 +20,7 @@ public class PostDetailResponse {
     private int likeCount;
     private Boolean isOwner;
     private Boolean isLiked;
+    private Boolean isScrap;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -34,6 +35,7 @@ public class PostDetailResponse {
                 .likeCount(post.getLikeCount())
                 .isOwner(post.getIsOwner())
                 .isLiked(post.getIsLiked())
+                .isScrap(post.getIsScrap())
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
                 .build();

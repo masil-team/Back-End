@@ -53,6 +53,7 @@ public class PostControllerTest extends ControllerMockApiTest {
             .likeCount(0)
             .isOwner(false)
             .isLiked(false)
+            .isScrap(false)
             .createDate(LocalDateTime.now())
             .modifyDate(LocalDateTime.now())
             .build();
@@ -111,6 +112,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("likeCount").description("좋아요 개수"),
                                 fieldWithPath("isOwner").description("본인 게시글 여부"),
                                 fieldWithPath("isLiked").description("게시글 좋아요 여부"),
+                                fieldWithPath("isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("createDate").description("생성 날짜"),
                                 fieldWithPath("modifyDate").description("수정 날짜")
                         )
@@ -157,6 +159,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .commentCount(0)
                 .isOwner(false)
                 .isLiked(false)
+                .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
                 .build());
@@ -187,6 +190,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].commentCount").description("댓글 개수"),
                                 fieldWithPath("posts.[].isOwner").description("본인 글 여부"),
                                 fieldWithPath("posts.[].isLiked").description("좋아요 여부"),
+                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")

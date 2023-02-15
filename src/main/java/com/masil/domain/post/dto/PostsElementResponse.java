@@ -20,6 +20,7 @@ public class PostsElementResponse {
     private int commentCount;
     private Boolean isOwner;
     private Boolean isLiked;
+    private Boolean isScrap;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -35,6 +36,7 @@ public class PostsElementResponse {
                 .commentCount(post.getCommentCount())
                 .isOwner(post.getIsOwner())
                 .isLiked(post.getIsLiked())
+                .isScrap(post.getIsScrap())
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
                 .build();
