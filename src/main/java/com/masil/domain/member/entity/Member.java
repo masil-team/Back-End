@@ -46,7 +46,7 @@ public class Member extends BaseEntity {
     @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "emd_address_id")
     private EmdAddress emdAddress;
 

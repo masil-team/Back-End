@@ -167,6 +167,7 @@ public class AuthService {
         refreshTokenRepository.delete(refreshToken);
     }
 
+    @Transactional
     public LoginMemberInfoResponse getMemberInfo(CurrentMember member) {
         if (member == null) {
             throw new BusinessException(ErrorCode.UNAUTHENTICATED_LOGIN_USER);

@@ -16,7 +16,7 @@ public class EmdAddress {
     @Column(nullable = false, length = 20)
     private String emdName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sgg_id")
     private SggAddress sggAddress;
 

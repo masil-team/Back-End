@@ -1,11 +1,16 @@
 package com.masil.global.auth.service;
 
 import com.masil.common.annotation.ServiceTest;
+import com.masil.domain.member.dto.request.MemberAddressRequest;
+import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.member.service.MemberService;
 import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.request.SignupRequest;
+import com.masil.global.auth.dto.response.AuthMemberAdaptor;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
+import com.masil.global.auth.dto.response.CurrentMember;
+import com.masil.global.auth.dto.response.LoginMemberInfoResponse;
 import com.masil.global.auth.entity.Authority;
 import com.masil.global.auth.model.MemberAuthType;
 import com.masil.global.auth.repository.AuthorityRepository;
@@ -16,10 +21,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureHttpGraphQlTester;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AuthServiceTest extends ServiceTest{
+@ActiveProfiles("test")
+@SpringBootTest
+@Transactional
+class AuthServiceTest {
 
     @Autowired
     private AuthService authService;
@@ -32,6 +51,9 @@ class AuthServiceTest extends ServiceTest{
 
     @Autowired
     private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @BeforeEach
     void saveAuthority() {
@@ -153,6 +175,41 @@ class AuthServiceTest extends ServiceTest{
         //when
         
         //then
+    }
+
+    @Test
+    @DisplayName("로그인한 유저정보 조회 성공")
+    void getLoginUserSuccess () throws Exception {
+
+        //given
+        SignupRequest testUser = SignupRequest.builder()
+                .email("test1234567@naver.com")
+                .nickname("테스트 닉네임")
+                .password("1234")
+                .passwordConfirm("1234")
+                .build();
+
+        authService.signUp(testUser);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername("test1234567@naver.com");
+        AuthMemberAdaptor adaptor = (AuthMemberAdaptor) userDetails;
+
+        CurrentMember member = adaptor.getMember();
+        member.getId();
+        MemberAddressRequest addressRequest = MemberAddressRequest.builder()
+                .emdId(11110103)
+                .build();
+
+        memberService.modifyMemberAddress(member.getId(),addressRequest);
+
+        AuthMemberAdaptor afterAdaptor = (AuthMemberAdaptor) userDetailsService.loadUserByUsername("test1234567@naver.com");
+
+        //when
+        LoginMemberInfoResponse memberInfo = authService.getMemberInfo(afterAdaptor.getMember());
+        //then
+        assertEquals("테스트 닉네임",memberInfo.getNickname());
+        assertEquals("test1234567@naver.com",memberInfo.getEmail());
+        assertEquals(11110103,memberInfo.getAddress().getEmdId());
     }
 
 }
