@@ -35,14 +35,13 @@ public class LoginMemberInfoResponse {
                     .nickname(currentMember.getNickname())
                     .authorities(currentMember.getAuthorities())
                     .build();
-        } else {
-            return LoginMemberInfoResponse.builder()
-                    .id(currentMember.getId())
-                    .email(currentMember.getEmail())
-                    .nickname(currentMember.getNickname())
-                    .authorities(currentMember.getAuthorities())
-                    .address(AddressResponse.of(currentMember.getAddress()))
-                    .build();
         }
+        return LoginMemberInfoResponse.builder()
+                .id(currentMember.getId())
+                .email(currentMember.getEmail())
+                .nickname(currentMember.getNickname())
+                .authorities(currentMember.getAuthorities())
+                .address(AddressResponse.of(currentMember.getAddress()))
+                .build();
     }
 }
