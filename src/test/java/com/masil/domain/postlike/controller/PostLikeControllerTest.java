@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({
         PostLikeController.class,
 })
-@AutoConfigureMockMvc(addFilters = false)
+//@AutoConfigureMockMvc(addFilters = false)
 class PostLikeControllerTest extends ControllerMockApiTest {
 
     @MockBean

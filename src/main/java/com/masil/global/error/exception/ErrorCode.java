@@ -25,6 +25,10 @@ public enum ErrorCode {
     // post like
     POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다."),
 
+    // bookmark
+    BOOKMARK_ALREADY_EXISTS(BAD_REQUEST, 3301, "잘못된 요청입니다."),
+    BOOKMARK_NOT_FOUND(NOT_FOUND, 3302, "등록되지 않은 즐겨찾기입니다."),
+
     // commentLike
     COMMENT_NOT_SELF_LIKE(FORBIDDEN, 6001, "본인 댓글에는 좋아요를 누를 수 없습니다."),
 
@@ -46,9 +50,9 @@ public enum ErrorCode {
 
     INVALID_REFRESH_TOKEN(BAD_REQUEST,6003,"잘못된 리프레쉬 토큰입니다"),
 
-    UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다."),
+    UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다.");
 
-    ;
+
     private HttpStatus status;
     private final int code;
     private final String message;

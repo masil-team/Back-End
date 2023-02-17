@@ -53,6 +53,7 @@ public class PostControllerTest extends ControllerMockApiTest {
             .likeCount(0)
             .isOwner(false)
             .isLiked(false)
+            .isScrap(false)
             .createDate(LocalDateTime.now())
             .modifyDate(LocalDateTime.now())
             .build();
@@ -111,6 +112,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("likeCount").description("좋아요 개수"),
                                 fieldWithPath("isOwner").description("본인 게시글 여부"),
                                 fieldWithPath("isLiked").description("게시글 좋아요 여부"),
+                                fieldWithPath("isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("createDate").description("생성 날짜"),
                                 fieldWithPath("modifyDate").description("수정 날짜")
                         )
@@ -157,6 +159,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .commentCount(0)
                 .isOwner(false)
                 .isLiked(false)
+                .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
                 .build());
@@ -187,6 +190,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].commentCount").description("댓글 개수"),
                                 fieldWithPath("posts.[].isOwner").description("본인 글 여부"),
                                 fieldWithPath("posts.[].isLiked").description("좋아요 여부"),
+                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
@@ -288,7 +292,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
@@ -296,8 +300,8 @@ public class PostControllerTest extends ControllerMockApiTest {
     private ResultActions requestFindPost(String url) throws Exception {
         return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
+                        .contentType(MediaType.APPLICATION_JSON))
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 
@@ -311,15 +315,15 @@ public class PostControllerTest extends ControllerMockApiTest {
         return mockMvc.perform(patch(url)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print());
     }
     private ResultActions requestDeletePost(String url) throws Exception {
         return mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
+                        .contentType(MediaType.APPLICATION_JSON))
+//                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
 

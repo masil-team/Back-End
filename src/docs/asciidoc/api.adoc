@@ -121,3 +121,41 @@ include::{snippets}/post/like/selfLike/http-request.adoc[]
 ==== HTTP response
 
 include::{snippets}/post/like/selfLike/http-response.adoc[]
+
+= 2. 즐겨찾기
+
+== 2.1. 즐겨찾기 추가하기
+
+=== 2.1.1 즐겨찾기 추가하기 성공
+
+==== HTTP request
+
+include::{snippets}/bookmark/add/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/bookmark/add/http-response.adoc[]
+
+== 2.2. 즐겨찾기 삭제하기
+
+=== 2.2.1 즐겨찾기 삭제하기 성공
+
+==== HTTP request
+
+include::{snippets}/bookmark/delete/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/bookmark/delete/http-response.adoc[]
+
+== 2.3. 즐겨찾기 조회하기
+
+=== 2.3.1 즐겨찾기 조회하기 성공
+
+==== HTTP request
+
+include::{snippets}/bookmark/find/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/bookmark/find/http-response.adoc[]
