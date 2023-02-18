@@ -14,8 +14,8 @@ public class EmitterRepositoryImpl implements EmitterRepository{
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
     @Override
-    public SseEmitter save(String emitterId, SseEmitter sseEmitter) {
-        emitters.put(emitterId, sseEmitter);
+    public SseEmitter save(String id, SseEmitter sseEmitter) {
+        emitters.put(id, sseEmitter);
         return sseEmitter;
     }
 
@@ -25,9 +25,9 @@ public class EmitterRepositoryImpl implements EmitterRepository{
     }
 
     @Override
-    public Map<String, Object> findAllEventCacheStartWithByEmitterId(String emitterId) {
+    public Map<String, Object> findAllEventCacheStartWithById(String id) {
         return eventCache.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(emitterId))
+                .filter(entry -> entry.getKey().startsWith(id))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

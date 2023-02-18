@@ -47,7 +47,7 @@ public class NotificationService {
      * lastEventId 이전에 발생한 알람리스트 전송
      */
     private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
-        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByEmitterId(String.valueOf(memberId));
+        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithById(String.valueOf(memberId));
         eventCaches.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendNotification(emitter, emitterId, entry.getValue()));
