@@ -8,11 +8,11 @@ import java.util.Map;
 public interface EmitterRepository {
     SseEmitter save(String id, SseEmitter sseEmitter);
     
-    void saveEventCache(String id, Object data);
+    void saveEventCache(String id, Notification data);
     
     void deleteById(String id);
     
-    Map<String, Object> findAllEventCacheStartWithById(String id);
+    Map<String, Notification> findAllEventCacheStartWithById(String id);
 
     Map<String, SseEmitter> findAllStartWithById(String id);
 }

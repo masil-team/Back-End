@@ -2,11 +2,10 @@ package com.masil.domain.notification.service;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.notification.dto.NotificationDto;
+import com.masil.domain.notification.dto.NotificationResponse;
 import com.masil.domain.notification.entity.Notification;
-import com.masil.domain.notification.entity.NotificationType;
 import com.masil.domain.notification.repository.EmitterRepository;
 import com.masil.domain.notification.repository.NotificationRepository;
-import com.masil.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +19,14 @@ import java.util.Map;
 @Service
 public class NotificationService {
 
-    private static final Long DEFAULT_TIMEOUT = 3000L;
+    private static final Long DEFAULT_TIMEOUT = 3000L; // sse 연결 시간
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
+    /**
+     * 클라이언트와 sse 연결
+     */
     public SseEmitter createConnection(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
@@ -45,19 +47,23 @@ public class NotificationService {
         return emitter;
     }
 
+    /**
+     * 클라이언트에 알람 전송
+     */
     @Transactional
     public void send(Member sender, Member receiver, NotificationDto notificationDto) {
 
         Notification notification = addNotification(sender, receiver, notificationDto);
 
         String receiverId = String.valueOf(receiver.getId());
+        String eventId = receiverId + "_" + System.currentTimeMillis();
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(receiverId);
 
         // 연결된 클라이언트가 없는 경우 EventCache 에 저장하고 연결된 클라이언트가 있는 경우 데이터 전송
         if (sseEmitters.isEmpty()) {
-            sseEmitters.forEach((id, emitter) -> emitterRepository.saveEventCache(id, notification));
+            emitterRepository.saveEventCache(eventId, notification);
         } else {
-            sseEmitters.forEach((id, emitter) -> sendNotification(emitter, id, notification));
+            sseEmitters.forEach((id, emitter) -> sendNotification(emitter, id, NotificationResponse.of(notification)));
         }
     }
 
@@ -69,10 +75,11 @@ public class NotificationService {
      * lastEventId 이전에 발생한 알람리스트 전송
      */
     private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
-        Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithById(String.valueOf(memberId));
+        Map<String, Notification> eventCaches = emitterRepository.findAllEventCacheStartWithById(String.valueOf(memberId));
+
         eventCaches.entrySet().stream()
-                .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                .forEach(entry -> sendNotification(emitter, emitterId, entry.getValue()));
+                .filter(entry -> lastEventId.compareTo(entry.getKey()) <= 0)
+                .forEach(entry -> sendNotification(emitter, emitterId, NotificationResponse.of(entry.getValue())));
     }
 
     // TODO : send 할 때 id값 나중에 체크
@@ -97,4 +104,5 @@ public class NotificationService {
         notificationRepository.save(notification);
         return notification;
     }
+
 }

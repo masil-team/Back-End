@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class EmitterRepositoryImpl implements EmitterRepository{
 
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
+    private final Map<String, Notification> eventCache = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter save(String id, SseEmitter sseEmitter) {
@@ -20,7 +20,7 @@ public class EmitterRepositoryImpl implements EmitterRepository{
         return sseEmitter;
     }
     @Override
-    public void saveEventCache(String id, Object event) {
+    public void saveEventCache(String id, Notification event) {
         eventCache.put(id, event);
     }
 
@@ -30,7 +30,7 @@ public class EmitterRepositoryImpl implements EmitterRepository{
     }
 
     @Override
-    public Map<String, Object> findAllEventCacheStartWithById(String id) {
+    public Map<String, Notification> findAllEventCacheStartWithById(String id) {
         return eventCache.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(id))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
