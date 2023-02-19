@@ -8,13 +8,11 @@ import com.masil.global.error.exception.BusinessException;
 import com.masil.global.error.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -112,9 +110,20 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException ex) {
-            throw new BusinessException(ErrorCode.TOKEN_EXPIRED);
+            throw new BusinessException(ErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (JwtException ex) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException ex) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+        } catch (JwtException ex) {
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 

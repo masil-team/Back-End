@@ -44,11 +44,10 @@ public enum ErrorCode {
     INVALID_ADDRESS_SEARCH_KEYWORD(BAD_REQUEST, 8001, "잘못된 검색어 입니다."),
 
     // auth
-    TOKEN_EXPIRED(BAD_REQUEST,6001,"토큰 유효기간이 지났습니다."),
-
+    ACCESS_TOKEN_EXPIRED(BAD_REQUEST,6001,"액세스 토큰 유효기간이 지났습니다."),
     INVALID_TOKEN(BAD_REQUEST, 6002, "잘못된 토큰입니다."),
-
     INVALID_REFRESH_TOKEN(BAD_REQUEST,6003,"잘못된 리프레쉬 토큰입니다"),
+    REFRESH_TOKEN_EXPIRED(BAD_REQUEST, 6005, "리프레쉬 토큰 유효기간이 지났습니다."),
 
     UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다.");
 

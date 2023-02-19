@@ -16,7 +16,7 @@ public class SggAddress {
     @Column(nullable = false, length = 20)
     private String sggName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sido_id")
     private SidoAddress sidoAddress;
 }

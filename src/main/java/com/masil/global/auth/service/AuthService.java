@@ -120,7 +120,7 @@ public class AuthService {
 
         // TODO: 2023/02/06 메서드 크기가 큼 리팩토링 필요 
         // refreshToken 검증
-        if (jwtTokenProvider.validateToken(orgRefreshToken)) {
+        if (jwtTokenProvider.validateRefreshToken(orgRefreshToken)) {
             // 2. Access Token 에서 Member Email 가져오기
             Authentication authentication = jwtTokenProvider.getAuthentication(orgAccessToken);
 
@@ -148,7 +148,7 @@ public class AuthService {
             log.debug("refresh New = {} ", newRefreshToken);
 
             // 6. 저장소 정보 업데이트 (dirtyChecking으로 업데이트)
-            refreshToken.updateValue(newRefreshToken);
+//            refreshToken.updateValue(newRefreshToken);
             return tokenResponse;
         } else {
             throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
@@ -167,6 +167,7 @@ public class AuthService {
         refreshTokenRepository.delete(refreshToken);
     }
 
+    @Transactional
     public LoginMemberInfoResponse getMemberInfo(CurrentMember member) {
         if (member == null) {
             throw new BusinessException(ErrorCode.UNAUTHENTICATED_LOGIN_USER);

@@ -41,15 +41,15 @@ public class CurrentMember {
                     .nickname(member.getNickname())
                     .authorities(member.getAuthorities())
                     .build();
-        } else {
-            return CurrentMember.builder()
-                    .id(member.getId())
-                    .email(member.getEmail())
-                    .password(member.getPassword())
-                    .nickname(member.getNickname())
-                    .authorities(member.getAuthorities())
-                    .address(member.getEmdAddress())
-                    .build();
         }
+
+        return CurrentMember.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .nickname(member.getNickname())
+                .authorities(member.getAuthorities())
+                .address(member.getEmdAddress())
+                .build();
     }
 }
