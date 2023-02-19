@@ -1,9 +1,15 @@
 package com.masil.domain.notification.service;
 
+import com.masil.domain.member.entity.Member;
+import com.masil.domain.notification.dto.NotificationDto;
+import com.masil.domain.notification.entity.Notification;
+import com.masil.domain.notification.entity.NotificationType;
 import com.masil.domain.notification.repository.EmitterRepository;
 import com.masil.domain.notification.repository.NotificationRepository;
+import com.masil.domain.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -39,6 +45,22 @@ public class NotificationService {
         return emitter;
     }
 
+    @Transactional
+    public void send(Member sender, Member receiver, NotificationDto notificationDto) {
+
+        Notification notification = addNotification(sender, receiver, notificationDto);
+
+        String receiverId = String.valueOf(receiver.getId());
+        Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(receiverId);
+
+        // 연결된 클라이언트가 없는 경우 EventCache 에 저장하고 연결된 클라이언트가 있는 경우 데이터 전송
+        if (sseEmitters.isEmpty()) {
+            sseEmitters.forEach((id, emitter) -> emitterRepository.saveEventCache(id, notification));
+        } else {
+            sseEmitters.forEach((id, emitter) -> sendNotification(emitter, id, notification));
+        }
+    }
+
     private boolean hasLostData(String lastEventId) {
         return !lastEventId.isEmpty();
     }
@@ -62,5 +84,17 @@ public class NotificationService {
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
         }
+    }
+
+    private Notification addNotification(Member sender, Member receiver, NotificationDto notificationDto) {
+        Notification notification = Notification.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .content(notificationDto.getContent())
+                .url(notificationDto.getUrl())
+                .notificationType(notificationDto.getNotificationType())
+                .build();
+        notificationRepository.save(notification);
+        return notification;
     }
 }

@@ -1,5 +1,6 @@
 package com.masil.domain.notification.repository;
 
+import com.masil.domain.notification.entity.Notification;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -18,6 +19,10 @@ public class EmitterRepositoryImpl implements EmitterRepository{
         emitters.put(id, sseEmitter);
         return sseEmitter;
     }
+    @Override
+    public void saveEventCache(String id, Object event) {
+        eventCache.put(id, event);
+    }
 
     @Override
     public void deleteById(String id) {
@@ -30,4 +35,12 @@ public class EmitterRepositoryImpl implements EmitterRepository{
                 .filter(entry -> entry.getKey().startsWith(id))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
+    @Override
+    public Map<String, SseEmitter> findAllStartWithById(String id) {
+        return emitters.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(id))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
 }

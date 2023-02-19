@@ -37,8 +37,9 @@ public class Notification extends BaseEntity {
     @Column(nullable = false)
     private String url;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean isRead;
+    private Boolean isRead = false;
 
     @Column(nullable = false)
     private String content;

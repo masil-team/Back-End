@@ -3,6 +3,9 @@ package com.masil.domain.postlike.service;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
+import com.masil.domain.notification.dto.NotificationDto;
+import com.masil.domain.notification.entity.NotificationType;
+import com.masil.domain.notification.service.NotificationService;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -25,6 +28,8 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
+    private final NotificationService notificationService;
+
     @Transactional
     public PostLikeResponse toggleLikePost(Long postId, Long memberId) {
         Post post = findPostById(postId);
@@ -45,6 +50,7 @@ public class PostLikeService {
                 .build();
         postLikeRepository.save(newPostLike);
         post.plusLike();
+        notificationService.send(member, post.getMember(), NotificationDto.of(NotificationType.POST_LIKE, post));
         return PostLikeResponse.of(post.getLikeCount(), true);
     }
 
