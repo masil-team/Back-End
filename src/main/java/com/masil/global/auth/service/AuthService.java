@@ -93,7 +93,7 @@ public class AuthService {
         // 리프레쉬 토큰 DB 저장
         RefreshToken savedToken;
 
-        if (isSavedRefreshToken(email)) {
+        if (isExistingRefreshToken(email)) {
             savedToken = refreshTokenRepository.findByKey(email)
                     .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
             savedToken.updateValue(refreshToken);
@@ -109,12 +109,12 @@ public class AuthService {
         return jwtTokenProvider.createTokenResponse(accessToken, refreshToken);
     }
 
-    private boolean isSavedRefreshToken(String email) {
+    private boolean isExistingRefreshToken(String email) {
         return refreshTokenRepository.findByKey(email).isPresent();
     }
 
     @Transactional
-    public AuthTokenResponse reissue(AuthTokenRequest tokenRequest) {
+    public AuthTokenResponse reissueAccessToken(AuthTokenRequest tokenRequest) {
         String orgAccessToken = tokenRequest.getAccessToken();
         String orgRefreshToken = tokenRequest.getRefreshToken();
 
@@ -178,7 +178,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginMemberInfoResponse getMemberInfo(CurrentMember member) {
+    public LoginMemberInfoResponse getLoginMemberInfo(CurrentMember member) {
         if (member == null) {
             throw new BusinessException(ErrorCode.UNAUTHENTICATED_LOGIN_USER);
         }
