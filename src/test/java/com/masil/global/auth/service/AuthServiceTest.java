@@ -12,8 +12,10 @@ import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.dto.response.CurrentMember;
 import com.masil.global.auth.dto.response.LoginMemberInfoResponse;
 import com.masil.global.auth.entity.Authority;
+import com.masil.global.auth.entity.RefreshToken;
 import com.masil.global.auth.model.MemberAuthType;
 import com.masil.global.auth.repository.AuthorityRepository;
+import com.masil.global.auth.repository.RefreshTokenRepository;
 import com.masil.global.error.exception.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -54,6 +56,12 @@ class AuthServiceTest {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void saveAuthority() {
@@ -212,4 +220,38 @@ class AuthServiceTest {
         assertEquals(11110103,memberInfo.getAddress().getEmdId());
     }
 
+    @Test
+    @DisplayName("로그아웃 - 성공")
+    void userLogoutTestSuccess () throws Exception {
+        //given
+        String testEmail = "test@gmail.com";
+        String testPassword = "test@1234";
+        String testPasswordConfirm = "test@1234";
+        String testNickName = "테스트닉네임";
+
+        SignupRequest createRequest = SignupRequest.builder()
+                .email(testEmail)
+                .password(testPassword)
+                .passwordConfirm(testPasswordConfirm)
+                .nickname(testNickName)
+                .build();
+
+        authService.signUp(createRequest);
+
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email(testEmail)
+                .password(testPassword)
+                .build();
+
+        //when
+        AuthTokenResponse token = authService.login(loginRequest);
+        RefreshToken refreshToken = refreshTokenRepository.findByKey(testEmail).orElseThrow();
+        AuthMemberAdaptor userDetails = (AuthMemberAdaptor) userDetailsService.loadUserByUsername(testEmail);
+
+        //then
+        assertEquals(token.getRefreshToken(), refreshToken.getValue());
+        authService.logout(userDetails.getMember());
+        refreshToken = refreshTokenRepository.findByKey(testEmail).orElse(null);
+        assertEquals(null, refreshToken);
+    }
 }

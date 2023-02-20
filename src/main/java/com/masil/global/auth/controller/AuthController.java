@@ -16,26 +16,25 @@ import javax.validation.Valid;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/auth")
 @RestController
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public void signUp(@Valid @RequestBody SignupRequest signupRequest) {
         authService.signUp(signupRequest);
     }
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
-    @PostMapping("/logout")
+    @PostMapping("users/logout")
     public void logout(@LoginUser CurrentMember member) {
         authService.logout(member);
     }
 
-    @PostMapping("/reissue")
+    @PostMapping("/auth/reissue")
     public AuthTokenResponse reissue(@RequestBody AuthTokenRequest tokenRequest) {
         return authService.reissue(tokenRequest);
     }
