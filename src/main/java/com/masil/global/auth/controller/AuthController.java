@@ -40,5 +40,4 @@ public class AuthController {
     public AuthTokenResponse reissue(@RequestBody AuthTokenRequest tokenRequest) {
         return authService.reissue(tokenRequest);
     }
-
 }

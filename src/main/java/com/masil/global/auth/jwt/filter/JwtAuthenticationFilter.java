@@ -1,21 +1,19 @@
 package com.masil.global.auth.jwt.filter;
 
-import com.masil.global.auth.jwt.properties.JwtProperties;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
+import com.masil.global.config.properties.AccessRequestMatcherAdaptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,16 +22,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final AccessRequestMatcherAdaptor requestMatcherAdaptor;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
         // TODO: 2023/02/06 추후 변경하기  
-        String header = request.getHeader(AUTHORIZATION_HEADER);
-        if (header == null || !header.startsWith(BEARER_PREFIX) && HttpMethod.GET.equals(request.getMethod())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        String header = request.getHeader(AUTHORIZATION_HEADER);
+//        if (header == null || !header.startsWith(BEARER_PREFIX) && HttpMethod.GET.equals(request.getMethod())) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
         String token = resolveToken(request);
         log.debug("token = {}", token);
 
@@ -49,10 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().startsWith("/auth");
-        /*
 
-         */
+        if (requestMatcherAdaptor.getRequestMatcher().matches(request) &&
+                request.getServletPath().startsWith("/auth") || request.getMethod().equals("GET")) {
+            return true;
+        }
+        return false;
     }
 
     /**
