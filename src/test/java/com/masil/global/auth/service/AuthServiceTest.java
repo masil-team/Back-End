@@ -1,8 +1,6 @@
 package com.masil.global.auth.service;
 
-import com.masil.common.annotation.ServiceTest;
 import com.masil.domain.member.dto.request.MemberAddressRequest;
-import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.member.service.MemberService;
 import com.masil.global.auth.dto.request.LoginRequest;
@@ -23,17 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureHttpGraphQlTester;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -213,7 +205,7 @@ class AuthServiceTest {
         AuthMemberAdaptor afterAdaptor = (AuthMemberAdaptor) userDetailsService.loadUserByUsername("test1234567@naver.com");
 
         //when
-        LoginMemberInfoResponse memberInfo = authService.getMemberInfo(afterAdaptor.getMember());
+        LoginMemberInfoResponse memberInfo = authService.getLoginMemberInfo(afterAdaptor.getMember());
         //then
         assertEquals("테스트 닉네임",memberInfo.getNickname());
         assertEquals("test1234567@naver.com",memberInfo.getEmail());
