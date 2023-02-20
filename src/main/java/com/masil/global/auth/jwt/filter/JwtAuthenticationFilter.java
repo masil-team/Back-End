@@ -1,7 +1,7 @@
 package com.masil.global.auth.jwt.filter;
 
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
-import com.masil.global.config.properties.AccessRequestMatcherAdaptor;
+import com.masil.global.config.properties.AccessRequestMatcherAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final AccessRequestMatcherAdaptor requestMatcherAdaptor;
+    private final AccessRequestMatcherAdapter requestMatcherAdaptor;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,23 +34,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            filterChain.doFilter(request, response);
 //            return;
 //        }
-        String token = resolveToken(request);
+        String token = request.getHeader(AUTHORIZATION_HEADER).replace(BEARER_PREFIX, "");
         log.debug("token = {}", token);
-
-        if (StringUtils.hasText(token)) {
-            jwtTokenProvider.validateTokenOnFilter(token);
-            // 토큰 유효함
-            this.setAuthentication(token);
-        } else {
-
-        }
+        jwtTokenProvider.validateTokenOnFilter(token);
+        this.setAuthentication(token);
         filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
-        if (requestMatcherAdaptor.getRequestMatcher().matches(request) &&
+        if (requestMatcherAdaptor.matches(request) &&
                 request.getServletPath().startsWith("/auth") || request.getMethod().equals("GET")) {
             return true;
         }
@@ -68,6 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Request Header 에서 토큰 정보를 꺼내오기
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }

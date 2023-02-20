@@ -4,29 +4,35 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class AccessRequestMatcherAdaptor {
+public class AccessRequestMatcherAdapter implements RequestMatcher {
 
-    public RequestMatcher getRequestMatcher() {
-        AntPathMatcher pathMatcher = new AntPathMatcher();
-        pathMatcher.setCaseSensitive(false); // 대소문자 구분 안함
+    private final RequestMatcher guestAccessUri;
 
-        List<String> patterns = Arrays.asList(
+    public AccessRequestMatcherAdapter() {
+
+        List<String> accessUriPattern = Arrays.asList(
                 "/auth/**",
                 "/board/**/posts",
                 "/posts/**",
                 "/addresses/search",
                 "/posts/**/comments"
         );
-
-        return new OrRequestMatcher(patterns.stream()
+        List<RequestMatcher> requestMatchers = accessUriPattern.stream()
                 .map(pattern -> new AntPathRequestMatcher(pattern))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+
+        this.guestAccessUri = new OrRequestMatcher(requestMatchers);
+    }
+
+    @Override
+    public boolean matches(HttpServletRequest request) {
+        return guestAccessUri.matches(request);
     }
 }

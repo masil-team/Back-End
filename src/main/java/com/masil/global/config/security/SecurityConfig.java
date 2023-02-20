@@ -1,7 +1,7 @@
 package com.masil.global.config.security;
 
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
-import com.masil.global.config.properties.AccessRequestMatcherAdaptor;
+import com.masil.global.config.properties.AccessRequestMatcherAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
-    private final AccessRequestMatcherAdaptor accessRequestMatcher;
+    private final AccessRequestMatcherAdapter accessRequestMatcher;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
@@ -51,7 +51,6 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
-                // TODO: 2023/02/06 추후 authenticate url 패턴 이야기 나누기
                 .authorizeRequests()
                 .antMatchers(
                         "/auth/**"
