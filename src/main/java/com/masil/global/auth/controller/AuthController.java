@@ -6,11 +6,13 @@ import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.request.SignupRequest;
 import com.masil.global.auth.dto.response.AuthTokenResponse;
 import com.masil.global.auth.dto.response.CurrentMember;
-import com.masil.global.auth.dto.response.LoginMemberInfoResponse;
 import com.masil.global.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -29,9 +31,9 @@ public class AuthController {
     public AuthTokenResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
-    @PostMapping("users/logout")
-    public void logout(@LoginUser CurrentMember member) {
-        authService.logout(member);
+    @PostMapping("/members/{memberId}/logout")
+    public void logout(@PathVariable("memberId") Long memberId,@LoginUser CurrentMember member) {
+        authService.logout(memberId,member);
     }
 
     @PostMapping("/auth/reissue")

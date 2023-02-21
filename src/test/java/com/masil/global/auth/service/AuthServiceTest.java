@@ -250,7 +250,7 @@ class AuthServiceTest {
 
         //then
         assertEquals(token.getRefreshToken(), refreshToken.getValue());
-        authService.logout(userDetails.getMember());
+        authService.logout(userDetails.getMember().getId(),userDetails.getMember());
         refreshToken = refreshTokenRepository.findByKey(testEmail).orElse(null);
         assertEquals(null, refreshToken);
     }

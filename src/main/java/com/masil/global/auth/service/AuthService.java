@@ -161,11 +161,20 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(CurrentMember member) {
-        // 로그 아웃 시 DB에 있는 리프레쉬  토큰 삭제
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
-        refreshTokenRepository.delete(refreshToken);
+    public void logout(Long memberId,CurrentMember member) {
+
+        if (validateLogInUser(memberId, member)) {
+            // 로그 아웃 시 DB에 있는 리프레쉬  토큰 삭제
+            RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+            refreshTokenRepository.delete(refreshToken);
+        } else {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private boolean validateLogInUser(Long memberId, CurrentMember member) {
+        return memberId == member.getId();
     }
 
     @Transactional
