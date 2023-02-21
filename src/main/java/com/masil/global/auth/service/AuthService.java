@@ -78,7 +78,7 @@ public class AuthService {
     public AuthTokenResponse login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-        // TODO: 2023/02/06 메서드 크기가 커서 분리 필요  
+        // TODO: 2023/02/06 메서드 크기가 커서 분리 필요  , 비밀번호 틀렸을 경우 Exception 처리
         // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
@@ -160,11 +160,21 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
     }
 
-    public void logout(CurrentMember member) {
-        // 로그 아웃 시 DB에 있는 리프레쉬  토큰 삭제
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
-        refreshTokenRepository.delete(refreshToken);
+    @Transactional
+    public void logout(Long memberId,CurrentMember member) {
+
+        if (validateLogInUser(memberId, member)) {
+            // 로그 아웃 시 DB에 있는 리프레쉬  토큰 삭제
+            RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+            refreshTokenRepository.delete(refreshToken);
+        } else {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private boolean validateLogInUser(Long memberId, CurrentMember member) {
+        return memberId == member.getId();
     }
 
     @Transactional
