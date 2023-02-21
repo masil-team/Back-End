@@ -32,8 +32,8 @@ public class CommentController {
      */
     @GetMapping("/{postId}/comments")
     public ResponseEntity<CommentsResponse> findComments(@PathVariable Long postId,
-                                                                @PageableDefault(page = 0, size = 20, direction = DESC) Pageable pageable,
-                                                                @LoginUser CurrentMember currentMember){
+                                                         @PageableDefault(page = 0, size = 20) Pageable pageable,
+                                                         @LoginUser CurrentMember currentMember){
 
         log.info("댓글 조회 시작");
         Long memberId = (currentMember != null) ? currentMember.getId() : null;

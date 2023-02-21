@@ -1,6 +1,5 @@
 package com.masil.domain.commentlike.dto;
 
-import com.masil.domain.postlike.dto.PostLikeResponse;
 import lombok.Builder;
 import lombok.Getter;
 

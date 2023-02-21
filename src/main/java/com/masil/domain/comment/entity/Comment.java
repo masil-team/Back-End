@@ -1,6 +1,5 @@
 package com.masil.domain.comment.entity;
 
-import com.masil.domain.comment.dto.CommentResponse;
 import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.member.entity.Member;
