@@ -3,7 +3,10 @@ package com.masil.domain.postlike.entity;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.post.entity.Post;
 import com.masil.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;

@@ -5,7 +5,10 @@ import com.masil.domain.board.entity.Board;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
 import com.masil.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 

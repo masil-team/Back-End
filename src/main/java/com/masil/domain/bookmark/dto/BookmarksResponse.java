@@ -1,8 +1,6 @@
 package com.masil.domain.bookmark.dto;
 
 import com.masil.domain.bookmark.entity.Bookmark;
-import com.masil.domain.post.dto.PostsElementResponse;
-import com.masil.domain.post.entity.Post;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 

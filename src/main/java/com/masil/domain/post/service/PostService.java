@@ -3,7 +3,6 @@ package com.masil.domain.post.service;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
-import com.masil.domain.bookmark.dto.BookmarksResponse;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.entity.Member;
@@ -21,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
