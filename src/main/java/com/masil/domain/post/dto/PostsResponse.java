@@ -18,6 +18,7 @@ public class PostsResponse {
         this.posts = posts;
         this.isLast = isLast;
     }
+
     public static PostsResponse ofPosts(Slice<Post> posts) {
         List<PostsElementResponse> postsResponse = posts
                 .stream()
@@ -25,6 +26,15 @@ public class PostsResponse {
                 .collect(Collectors.toList());
 
         return new PostsResponse(postsResponse, posts.isLast());
+    }
+
+    public static PostsResponse ofBookmarks(Slice<Bookmark> bookmarks) {
+        List<PostsElementResponse> postsResponse = bookmarks
+                .stream()
+                .map(bookmark -> PostsElementResponse.of(bookmark.getPost()))
+                .collect(Collectors.toList());
+
+        return new PostsResponse(postsResponse, bookmarks.isLast());
     }
 
 }

@@ -5,6 +5,8 @@ import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.address.repository.EmdAddressRepository;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.repository.BoardRepository;
+import com.masil.domain.bookmark.dto.BookmarksElementResponse;
+import com.masil.domain.bookmark.dto.BookmarksResponse;
 import com.masil.domain.bookmark.service.BookmarkService;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -31,6 +34,7 @@ import static com.masil.domain.fixture.PostFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 public class PostServiceTest extends ServiceTest {
 
@@ -353,4 +357,58 @@ public class PostServiceTest extends ServiceTest {
                     .isInstanceOf(PostAccessDeniedException.class);
         }
     }
+    @Nested
+    @DisplayName("유저가 북마크한 게시글 목록 조회를 할 때")
+    class FindBookmarks {
+
+        private List<Post> posts;
+        private Post post;
+        private Member JJ;
+
+        @BeforeEach
+        void setUp() {
+            // TODO : emd 추후 제거
+            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
+            posts = 일반_게시글_JJ.엔티티_여러개_생성(emdAddress);
+            post = posts.get(0);
+
+            JJ = memberRepository.save(post.getMember());
+            boardRepository.save(post.getBoard());
+            postRepository.saveAll(posts);
+        }
+        @Test
+        @DisplayName("성공적으로 조회한다.")
+        void findBookmarks_success() {
+
+            // given
+            bookmarkService.addBookmark(post.getId(), JJ.getId());
+
+            // when
+            PostsResponse postsResponse = postService.findBookmarks(JJ.getId(), PageRequest.of(0, 8, DESC, "createDate"));
+            PostsElementResponse postsElementResponse = postsResponse.getPosts().get(0);
+
+            // then
+            assertAll(
+                    () -> assertThat(postsResponse.getPosts().size()).isEqualTo(1),
+                    () -> assertThat(postsElementResponse.getId()).isEqualTo(post.getId()),
+                    () -> assertThat(postsResponse.getIsLast()).isTrue()
+            );
+        }
+
+        @Test
+        @DisplayName("상태가 DELETE 인 게시글은 제외하고 조회한다.")
+        void findBookmarks_isDeleted() {
+            // given
+            bookmarkService.addBookmark(post.getId(), JJ.getId());
+            postService.deletePost(post.getId(), JJ.getId());
+
+            // when
+            PostsResponse postsResponse = postService.findBookmarks(JJ.getId(), PageRequest.of(0, 8, DESC, "createDate"));
+
+            // then
+            assertThat(postsResponse.getPosts().size()).isEqualTo(0);
+        }
+
+    }
+
 }

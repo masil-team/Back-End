@@ -84,4 +84,14 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/bookmarks")
+    public ResponseEntity<PostsResponse> findBookmarks(@LoginUser CurrentMember currentMember,
+                                                       @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        log.info("즐겨찾기 목록 조회 시작");
+
+        PostsResponse postsResponse = postService.findBookmarks(currentMember.getId(), pageable);
+        return ResponseEntity.ok(postsResponse);
+    }
+
 }

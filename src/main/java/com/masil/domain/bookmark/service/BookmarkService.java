@@ -55,12 +55,6 @@ public class BookmarkService {
         bookmarkRepository.delete(bookmark);
         return BookmarkResponse.of(false);
     }
-
-    public BookmarksResponse findBookmarks(Long memberId, Pageable pageable) {
-        Member member = findMemberById(memberId);
-        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member, pageable);
-        return BookmarksResponse.ofBookmarks(bookmarks);
-    }
     
     private void validateBookmarkNotExist(Post post, Member member) {
         if (bookmarkRepository.existsByPostAndMember(post, member))

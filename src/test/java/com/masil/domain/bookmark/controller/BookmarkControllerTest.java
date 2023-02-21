@@ -43,11 +43,6 @@ class BookmarkControllerTest extends ControllerMockApiTest {
     @MockBean
     private BookmarkService bookmarkService;
 
-    private static final MemberResponse MEMBER_RESPONSE = MemberResponse.builder()
-            .id(1L)
-            .nickname("닉네임1")
-            .build();
-
     private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
 
     @Test
@@ -94,49 +89,6 @@ class BookmarkControllerTest extends ControllerMockApiTest {
                 ));
     }
 
-    @Test
-    @DisplayName("즐겨찾기를 성공적으로 조회한다")
-    void findBookmarks() throws Exception {
-
-        // given
-        List<BookmarksElementResponse> bookmarksElementResponseList = new ArrayList<>();
-
-        bookmarksElementResponseList.add(BookmarksElementResponse.builder()
-                .postId(1L)
-                .member(MEMBER_RESPONSE)
-                .boardId(1L)
-                .address("옥천동")
-                .content("내용")
-                .createDate(LocalDateTime.now())
-                .modifyDate(LocalDateTime.now())
-                .build());
-
-
-        BookmarksResponse bookmarksResponse = new BookmarksResponse(bookmarksElementResponseList, true);
-        given(bookmarkService.findBookmarks(any(), any())).willReturn(bookmarksResponse);
-
-        // when
-        ResultActions resultActions = requestFindBookmarks("/bookmarks");
-
-        // then
-        resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("bookmark/find",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        responseFields(
-                                fieldWithPath("bookmarks.[].postId").description("게시글 id"),
-                                fieldWithPath("bookmarks.[].member.id").description("작성자 id"),
-                                fieldWithPath("bookmarks.[].member.nickname").description("닉네임"),
-                                fieldWithPath("bookmarks.[].boardId").description("카테고리Id"),
-                                fieldWithPath("bookmarks.[].address").description("주소"),
-                                fieldWithPath("bookmarks.[].content").description("내용"),
-                                fieldWithPath("bookmarks.[].createDate").description("생성 날짜"),
-                                fieldWithPath("bookmarks.[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("isLast").description("마지막 페이지 여부")
-                        )
-                ));
-    }
     private ResultActions requestAddBookmark(String url) throws Exception {
         return mockMvc.perform(post(url)
                         .accept(MediaType.APPLICATION_JSON)
@@ -151,10 +103,5 @@ class BookmarkControllerTest extends ControllerMockApiTest {
                 .andDo(print());
     }
 
-    private ResultActions requestFindBookmarks(String url) throws Exception {
-        return mockMvc.perform(get(url)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
-    }
+
 }
