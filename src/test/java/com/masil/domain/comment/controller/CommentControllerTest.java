@@ -6,7 +6,6 @@ import com.masil.domain.comment.exception.CommentAccessDeniedException;
 import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.comment.service.CommentService;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.post.dto.PostsResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -116,11 +115,11 @@ class CommentControllerTest extends ControllerMockApiTest{
                                 fieldWithPath("comments.[].replies.[].likeCount").description("좋아요 갯수"),
                                 fieldWithPath("comments.[].replies.[].createDate").description("생성 날짜"),
                                 fieldWithPath("comments.[].replies.[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("comments.[].replies.[].liked").description("좋아여 여부"),
-                                fieldWithPath("comments.[].replies.[].owner").description("본인 댓글 여부"),
-                                fieldWithPath("comments.[].deleted").description("본인 댓글 삭제 여부"),
-                                fieldWithPath("comments.[].liked").description("좋아요 여부"),
-                                fieldWithPath("comments.[].owner").description("본인 댓글 여부"),
+                                fieldWithPath("comments.[].replies.[].isLiked").description("좋아여 여부"),
+                                fieldWithPath("comments.[].replies.[].isOwner").description("본인 댓글 여부"),
+                                fieldWithPath("comments.[].isDeleted").description("본인 댓글 삭제 여부"),
+                                fieldWithPath("comments.[].isLiked").description("좋아요 여부"),
+                                fieldWithPath("comments.[].isOwner").description("본인 댓글 여부"),
                                 fieldWithPath("totalCommentCount").description("댓글 갯수"),
                                 fieldWithPath("totalPage").description("게시글 총 페이지")
                         )

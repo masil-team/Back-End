@@ -5,7 +5,6 @@ import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.dto.response.MemberResponse;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,17 +21,17 @@ public class CommentResponse {
     private String content;
     private Long postId;
     private MemberResponse member;
-    private boolean isOwner;
+    private Boolean isOwner;
     private int likeCount;
-    private boolean isLiked;
+    private Boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
-    private boolean isDeleted; // 자식이 있을경우 삭제되면 true, 삭제 안됐을 경우 false
+    private Boolean isDeleted; // 자식이 있을경우 삭제되면 true, 삭제 안됐을 경우 false
     private List<ChildrenResponse> replies;
 
     @Builder
-    public CommentResponse(Long id, Long postId, String content, MemberResponse member, boolean isOwner, int likeCount, boolean isLiked, LocalDateTime createDate, LocalDateTime modifyDate, boolean isDeleted, List<ChildrenResponse> replies) {
+    public CommentResponse(Long id, Long postId, String content, MemberResponse member, Boolean isOwner, int likeCount, Boolean isLiked, LocalDateTime createDate, LocalDateTime modifyDate, Boolean isDeleted, List<ChildrenResponse> replies) {
         this.id = id;
         this.postId = postId;
         this.content = content;

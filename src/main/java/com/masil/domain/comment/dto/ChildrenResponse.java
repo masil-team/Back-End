@@ -2,16 +2,10 @@ package com.masil.domain.comment.dto;
 
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.member.entity.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@ToString
 @Getter
 @Builder
 public class ChildrenResponse {
@@ -19,9 +13,9 @@ public class ChildrenResponse {
     private String content;
     private Long postId;
     private MemberResponse member;
-    private boolean isOwner;
+    private Boolean isOwner;
     private int likeCount;
-    private boolean isLiked;
+    private Boolean isLiked;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
