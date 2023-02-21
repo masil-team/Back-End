@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.masil.domain.fixture.PostFixture.일반_게시글_JJ;
 import static com.masil.domain.fixture.PostFixture.일반_게시글_KK;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostLikeServiceTest extends ServiceTest {
 

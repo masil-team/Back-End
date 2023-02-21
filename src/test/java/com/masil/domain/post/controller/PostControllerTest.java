@@ -2,8 +2,6 @@ package com.masil.domain.post.controller;
 
 
 import com.masil.common.annotation.ControllerMockApiTest;
-import com.masil.domain.bookmark.dto.BookmarksElementResponse;
-import com.masil.domain.bookmark.dto.BookmarksResponse;
 import com.masil.domain.member.dto.response.MemberResponse;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.exception.PostAccessDeniedException;
