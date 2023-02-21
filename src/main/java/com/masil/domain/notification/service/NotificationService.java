@@ -3,15 +3,18 @@ package com.masil.domain.notification.service;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.notification.dto.NotificationDto;
 import com.masil.domain.notification.dto.NotificationResponse;
+import com.masil.domain.notification.dto.NotificationsResponse;
 import com.masil.domain.notification.entity.Notification;
 import com.masil.domain.notification.repository.EmitterRepository;
 import com.masil.domain.notification.repository.NotificationRepository;
+import com.masil.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -19,7 +22,7 @@ import java.util.Map;
 @Service
 public class NotificationService {
 
-    private static final Long DEFAULT_TIMEOUT = 3000L; // sse 연결 시간
+    private static final Long DEFAULT_TIMEOUT = 60 * 1000L * 5; // sse 연결 시간, 임시로 5분
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
@@ -37,7 +40,7 @@ public class NotificationService {
 
         // SseEmitter 의 유효 시간동안 어느 데이터도 전송되지 않는다면 503 에러 발생
         // 이를 방지하기 위한 더미 이벤트 전송
-        sendNotification(emitter, emitterId, "EventStream Created. [memberId=" + memberId + "]");
+        sendToClient(emitter, emitterId, "EventStream Created. [memberId=" + memberId + "]");
 
         // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
         if (hasLostData(lastEventId)) {
@@ -63,8 +66,21 @@ public class NotificationService {
         if (sseEmitters.isEmpty()) {
             emitterRepository.saveEventCache(eventId, notification);
         } else {
-            sseEmitters.forEach((id, emitter) -> sendNotification(emitter, id, NotificationResponse.of(notification)));
+            sseEmitters.forEach((id, emitter) -> sendToClient(emitter, id, NotificationResponse.of(notification)));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public NotificationsResponse findNotifications(Long receiverId) {
+        List<Notification> notifications = notificationRepository.findAllByReceiverId(receiverId);
+        return NotificationsResponse.ofNotifications(notifications);
+    }
+
+    @Transactional(readOnly = true)
+    public void readNotification(Long id) {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 알람은 존재하지 않습니다."));
+        notification.read();
     }
 
     private boolean hasLostData(String lastEventId) {
@@ -79,11 +95,11 @@ public class NotificationService {
 
         eventCaches.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) <= 0)
-                .forEach(entry -> sendNotification(emitter, emitterId, NotificationResponse.of(entry.getValue())));
+                .forEach(entry -> sendToClient(emitter, emitterId, NotificationResponse.of(entry.getValue())));
     }
 
     // TODO : send 할 때 id값 나중에 체크
-    private void sendNotification(SseEmitter emitter, String emitterId, Object data) {
+    private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
                     .id(emitterId)
@@ -104,5 +120,4 @@ public class NotificationService {
         notificationRepository.save(notification);
         return notification;
     }
-
 }

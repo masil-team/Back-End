@@ -1,8 +1,5 @@
 package com.masil.domain.notification.entity;
 
-import com.masil.domain.member.entity.Member;
-import com.masil.domain.post.entity.Post;
-
 public enum NotificationType {
     POST_COMMENT_REPLY("님이 *에 댓글을 달았습니다."),
     POST_LIKE("님이 *에 좋아요를 하였습니다."),

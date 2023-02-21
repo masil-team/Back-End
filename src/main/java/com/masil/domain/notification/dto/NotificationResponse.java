@@ -1,18 +1,12 @@
 package com.masil.domain.notification.dto;
 
 import com.masil.domain.member.dto.response.MemberResponse;
-import com.masil.domain.member.entity.Member;
 import com.masil.domain.notification.entity.Notification;
-import com.masil.domain.notification.entity.NotificationType;
-import com.masil.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.*;
 
 import java.time.LocalDateTime;
-
-import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Builder
