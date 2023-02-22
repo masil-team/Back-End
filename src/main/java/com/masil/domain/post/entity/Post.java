@@ -22,7 +22,8 @@ import static javax.persistence.FetchType.LAZY;
 @Where(clause = "state = 'NORMAL'")
 public class Post extends BaseEntity {
 
-    private static final int PREVIEW_LENGTH = 400;
+    private static final int POST_PREVIEW_LENGTH = 400;
+    private static final int NOTIFICATION_PREVIEW_LENGTH = 20;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -114,6 +115,10 @@ public class Post extends BaseEntity {
         return this.state == State.DELETE;
     }
     public String getPostPreview() {
-        return this.content.substring(0, Math.min(PREVIEW_LENGTH, content.length()));
+        return this.content.substring(0, Math.min(POST_PREVIEW_LENGTH, content.length()));
+    }
+
+    public String getNotificationPreview() {
+        return this.content.substring(0, Math.min(NOTIFICATION_PREVIEW_LENGTH, content.length())) + "...";
     }
 }
