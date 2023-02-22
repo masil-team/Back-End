@@ -5,6 +5,7 @@ import com.masil.domain.address.dto.response.AddressSearchResponse;
 import com.masil.domain.address.service.AddressService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({
         AddressController.class,
 })
+@AutoConfigureMockMvc(addFilters = false)
 class AddressControllerTest extends ControllerMockApiTest {
 
     @MockBean

@@ -4,6 +4,7 @@ package com.masil.common.annotation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masil.common.security.WithMockCustomUser;
 import com.masil.global.auth.jwt.provider.JwtTokenProvider;
+import com.masil.global.config.properties.AccessRequestMatcherAdapter;
 import com.masil.global.config.security.SecurityConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,4 +32,6 @@ public class ControllerMockApiTest {
     protected JwtTokenProvider jwtTokenProvider;
     @MockBean
     protected UserDetailsService userDetailsService;
+    @MockBean
+    protected AccessRequestMatcherAdapter accessRequestMatcher;
 }

@@ -4,6 +4,7 @@ import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.address.repository.EmdAddressRepository;
 import com.masil.domain.member.dto.request.MemberAddressRequest;
 import com.masil.domain.member.entity.Member;
+import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.global.auth.repository.AuthorityRepository;
 import com.masil.global.error.exception.EntityNotFoundException;
@@ -35,7 +36,7 @@ public class MemberService {
     @Transactional
     public void modifyMemberAddress(Long memberId, MemberAddressRequest request) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ENTITY_NOT_FOUND));
+                .orElseThrow(MemberNotFoundException::new);
 
         EmdAddress emdAddress = emdAddressRepository.findById(request.getEmdId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ENTITY_NOT_FOUND));

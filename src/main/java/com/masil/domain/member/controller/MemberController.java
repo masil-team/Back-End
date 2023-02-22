@@ -40,7 +40,7 @@ public class MemberController {
 
     @GetMapping("/login-user")
     public LoginMemberInfoResponse getMemberInfo(@LoginUser CurrentMember member) {
-        return authService.getMemberInfo(member);
+        return authService.getLoginMemberInfo(member);
     }
 
 }

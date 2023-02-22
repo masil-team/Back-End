@@ -5,6 +5,7 @@ import com.masil.domain.bookmark.dto.BookmarkResponse;
 import com.masil.domain.bookmark.service.BookmarkService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({
         BookmarkController.class,
 })
+@AutoConfigureMockMvc(addFilters = false)
 class BookmarkControllerTest extends ControllerMockApiTest {
 
     @MockBean
