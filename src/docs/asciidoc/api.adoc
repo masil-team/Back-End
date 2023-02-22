@@ -154,8 +154,8 @@ include::{snippets}/bookmark/delete/http-response.adoc[]
 
 ==== HTTP request
 
-include::{snippets}/bookmark/find/http-request.adoc[]
+include::{snippets}/post/findBookmarks/http-request.adoc[]
 
 ==== HTTP response
 
-include::{snippets}/bookmark/find/http-response.adoc[]
+include::{snippets}/post/findBookmarks/http-response.adoc[]

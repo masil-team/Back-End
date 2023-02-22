@@ -1,7 +1,6 @@
 package com.masil.domain.bookmark.service;
 
 import com.masil.domain.bookmark.dto.BookmarkResponse;
-import com.masil.domain.bookmark.dto.BookmarksResponse;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.exception.BookmarkAlreadyExistsException;
 import com.masil.domain.bookmark.exception.BookmarkNotFoundException;
@@ -14,8 +13,6 @@ import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,12 +51,6 @@ public class BookmarkService {
 
         bookmarkRepository.delete(bookmark);
         return BookmarkResponse.of(false);
-    }
-
-    public BookmarksResponse findBookmarks(Long memberId, Pageable pageable) {
-        Member member = findMemberById(memberId);
-        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member, pageable);
-        return BookmarksResponse.ofBookmarks(bookmarks);
     }
     
     private void validateBookmarkNotExist(Post post, Member member) {

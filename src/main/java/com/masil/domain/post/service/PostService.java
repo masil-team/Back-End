@@ -3,17 +3,20 @@ package com.masil.domain.post.service;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
+import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +85,17 @@ public class PostService {
         validateOwner(memberId, post);
 
         post.tempDelete();
+    }
+
+    public PostsResponse findBookmarks(Long memberId, Pageable pageable) {
+        Member member = findMemberById(memberId);
+        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberAndPostState(member, State.NORMAL, pageable);
+
+        for (Bookmark bookmark : bookmarks) {
+            updatePostPermissionsForMember(memberId, bookmark.getPost());
+        }
+
+        return PostsResponse.ofBookmarks(bookmarks);
     }
 
     private Slice<Post> findMatchingPosts(PostFilterRequest postFilterRequest) {

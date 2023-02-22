@@ -1,12 +1,7 @@
 package com.masil.domain.bookmark.service;
 
 import com.masil.common.annotation.ServiceTest;
-import com.masil.domain.address.entity.EmdAddress;
-import com.masil.domain.address.repository.EmdAddressRepository;
-import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.bookmark.dto.BookmarkResponse;
-import com.masil.domain.bookmark.dto.BookmarksElementResponse;
-import com.masil.domain.bookmark.dto.BookmarksResponse;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.exception.BookmarkAlreadyExistsException;
 import com.masil.domain.bookmark.exception.BookmarkNotFoundException;
@@ -15,21 +10,15 @@ import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.repository.PostRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-
-
-import java.util.List;
 
 import static com.masil.domain.fixture.PostFixture.일반_게시글_JJ;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 
 class BookmarkServiceTest extends ServiceTest {
@@ -42,10 +31,6 @@ class BookmarkServiceTest extends ServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private EmdAddressRepository emdAddressRepository;
-    @Autowired
-    private BoardRepository boardRepository;
 
     private Member JJ;
     private Post post1;
@@ -106,32 +91,6 @@ class BookmarkServiceTest extends ServiceTest {
         // when then
         assertThatThrownBy(() -> bookmarkService.deleteBookmark(post1.getId(), JJ.getId()))
                 .isInstanceOf(BookmarkNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("유저의 전체 북마크 목록을 성공적으로 조회한다.")
-    void findBookmark() {
-
-        // given TODO : emd 추후 제거
-        EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
-        List<Post> posts = 일반_게시글_JJ.엔티티_여러개_생성(emdAddress);
-        Post post = posts.get(0);
-        memberRepository.save(post.getMember());
-        boardRepository.save(post.getBoard());
-        postRepository.saveAll(posts);
-        for (Post post1 : posts) {
-            bookmarkService.addBookmark(post1.getId(), JJ.getId());
-        }
-
-        // when
-        BookmarksResponse bookmarksResponse = bookmarkService.findBookmarks(JJ.getId(), PageRequest.of(0, 8, DESC, "createDate"));
-        List<BookmarksElementResponse> bookmarks = bookmarksResponse.getBookmarks();
-
-        // then
-        assertAll(
-                () -> assertThat(bookmarksResponse.getIsLast()).isTrue(),
-                () -> assertThat(bookmarks.size()).isEqualTo(2)
-        );
     }
 
 }
