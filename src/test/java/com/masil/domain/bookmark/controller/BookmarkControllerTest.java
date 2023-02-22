@@ -89,5 +89,4 @@ class BookmarkControllerTest extends ControllerMockApiTest {
                 .andDo(print());
     }
 
-
 }
