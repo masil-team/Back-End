@@ -19,7 +19,7 @@ public class AccessRequestMatcherAdapter implements RequestMatcher {
 
         List<String> accessUriPattern = Arrays.asList(
                 "/auth/**",
-                "/board/**/posts",
+                "/boards/**/posts",
                 "/posts/**",
                 "/addresses/search",
                 "/posts/**/comments"

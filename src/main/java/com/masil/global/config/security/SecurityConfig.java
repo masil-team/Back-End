@@ -56,7 +56,7 @@ public class SecurityConfig {
                         "/auth/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.GET,
-                        "/board/**/posts",
+                        "/boards/**/posts",
                         "/posts/**",
                         "/addresses/search",
                         "/posts/**/comments"
