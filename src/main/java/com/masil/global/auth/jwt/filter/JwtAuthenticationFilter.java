@@ -4,6 +4,7 @@ import com.masil.global.auth.jwt.provider.JwtTokenProvider;
 import com.masil.global.config.properties.AccessRequestMatcherAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -29,11 +30,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         // TODO: 2023/02/06 추후 변경하기  
-//        String header = request.getHeader(AUTHORIZATION_HEADER);
-//        if (header == null || !header.startsWith(BEARER_PREFIX) && HttpMethod.GET.equals(request.getMethod())) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+        String header = request.getHeader(AUTHORIZATION_HEADER);
+        if (header == null || !header.startsWith(BEARER_PREFIX) && HttpMethod.GET.equals(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String token = request.getHeader(AUTHORIZATION_HEADER).replace(BEARER_PREFIX, "");
         log.debug("token = {}", token);
         jwtTokenProvider.validateTokenOnFilter(token);
@@ -41,14 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        if (requestMatcherAdaptor.matches(request) &&
-                request.getServletPath().startsWith("/auth") || request.getMethod().equals("GET")) {
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+//        if (requestMatcherAdaptor.matches(request) &&
+//                request.getServletPath().startsWith("/auth") || request.getMethod().equals("GET")) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     /**
      * @param token 토큰이 유효한 경우 SecurityContext에 저장
