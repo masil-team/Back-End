@@ -52,17 +52,17 @@ public class SecurityConfig {
                 .and()
 
                 .authorizeRequests()
-                .antMatchers(
-                        "/auth/**"
-                ).permitAll()
-                .antMatchers(HttpMethod.GET,
-                        "/board/**/posts",
-                        "/posts/**",
-                        "/addresses/search",
-                        "/posts/**/comments"
-                        )
-                .permitAll()
-                .anyRequest().authenticated()
+//                .antMatchers(
+//                        "/auth/**"
+//                ).permitAll()
+//                .antMatchers(HttpMethod.GET,
+//                        "/boards/**/posts",
+//                        "/posts/**",
+//                        "/addresses/search",
+//                        "/posts/**/comments"
+//                        )
+//                .permitAll()
+                .anyRequest().permitAll()
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider,accessRequestMatcher));
 
