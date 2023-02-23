@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.net.URI;
 
@@ -93,5 +94,17 @@ public class PostController {
         PostsResponse postsResponse = postService.findBookmarks(currentMember.getId(), pageable);
         return ResponseEntity.ok(postsResponse);
     }
+
+    /**
+     * 게시글 검색
+     */
+    @GetMapping("/posts/search")
+    public ResponseEntity<PostsResponse> searchPost(@RequestParam @Nullable String keyword,
+                                                    @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable){
+        log.info("게시글 검색 시작");
+        PostsResponse postsResponse = postService.searchPosts(keyword, pageable);
+        return ResponseEntity.ok(postsResponse);
+    }
+
 
 }

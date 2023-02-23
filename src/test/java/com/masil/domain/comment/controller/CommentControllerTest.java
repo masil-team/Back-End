@@ -54,7 +54,9 @@ class CommentControllerTest extends ControllerMockApiTest{
             .content("대댓글")
             .postId(1L)
             .member(MEMBER_RESPONSE2)
+            .isOwner(false)
             .likeCount(0)
+            .isLiked(false)
             .createDate(LocalDateTime.now())
             .modifyDate(LocalDateTime.now())
             .build();
@@ -76,9 +78,12 @@ class CommentControllerTest extends ControllerMockApiTest{
                     .postId(1L)
                     .content("댓글")
                     .member(MEMBER_RESPONSE1)
+                    .isOwner(false)
                     .likeCount(0)
+                    .isLiked(false)
                     .createDate(LocalDateTime.now())
                     .modifyDate(LocalDateTime.now())
+                    .isDeleted(false)
                     .replies(childrenResponseList)
                     .build());
         }

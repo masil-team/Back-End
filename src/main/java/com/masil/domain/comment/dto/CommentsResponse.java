@@ -22,12 +22,12 @@ public class CommentsResponse {
         this.totalPage = totalPage;
     }
 
-    public static CommentsResponse ofComment(Page<Comment> comment, Long totalCommentCount) {
+    public static CommentsResponse ofComment(Page<Comment> comment, Long totalCommentCount, int totalPage) {
         List<CommentResponse> comments = comment.stream()
                 .map(CommentResponse::of)
                 .collect(Collectors.toList());
 
 
-        return new CommentsResponse(comments, totalCommentCount, comment.getTotalPages());
+        return new CommentsResponse(comments, totalCommentCount, totalPage);
     }
 }

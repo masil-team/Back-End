@@ -122,6 +122,18 @@ include::{snippets}/post/like/selfLike/http-request.adoc[]
 
 include::{snippets}/post/like/selfLike/http-response.adoc[]
 
+== 1.7. 게시글 검색
+
+=== 1.7.1 게시글 검색 성공
+
+==== HTTP request
+
+include::{snippets}/post/search/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/post/search/http-response.adoc[]
+
 = 2. 즐겨찾기
 
 == 2.1. 즐겨찾기 추가하기

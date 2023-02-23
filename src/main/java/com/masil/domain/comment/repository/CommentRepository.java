@@ -15,7 +15,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "and p.post_id = :postId " +
             "GROUP BY p.id, c.parent_id " +
             "Order By p.id DESC ",
-            countQuery = "SELECT * from comment c where c.parent_id is null",
+            countQuery = "SELECT * from comment c where c.parent_id is null and c.post_id = :postId",
             nativeQuery = true)
     Page<Comment> findAllByPostId(@Param("postId")Long postId, Pageable pageable);
 
