@@ -5,26 +5,35 @@ import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
+import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.post.entity.SearchQuery;
 import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
+import com.masil.domain.post.exception.PostSearchInputException;
 import com.masil.domain.post.repository.PostRepository;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nullable;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
+
+    private static final int MIN_LENGTH = 2;
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
@@ -98,6 +107,18 @@ public class PostService {
         return PostsResponse.ofBookmarks(bookmarks);
     }
 
+    /**
+     * 검색 쿼리 추가
+     */
+    public PostsResponse searchPosts(@Nullable String keyword, Pageable pageable){
+        validateLength(keyword);
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.Direction.DESC, "createDate");
+        SearchQuery searchQuery = new SearchQuery(keyword);
+        Slice<Post> posts = postRepository.findByContentContainingIgnoreCase(searchQuery.getValue(), pageable);
+
+        return PostsResponse.ofPosts(posts);
+    }
+
     private Slice<Post> findMatchingPosts(PostFilterRequest postFilterRequest) {
         if (postFilterRequest.isEmdAddress()) {
             return findAllPostByEmdId(postFilterRequest);
@@ -130,6 +151,15 @@ public class PostService {
     private void validateOwner(Long memberId, Post post) {
         if (!post.isOwner(memberId)) {
             throw new PostAccessDeniedException();
+        }
+    }
+
+    /**
+     * 글자 수 초과 exception
+     */
+    public void validateLength(String content) {
+        if (content.length() < MIN_LENGTH) {
+            throw new PostSearchInputException();
         }
     }
 

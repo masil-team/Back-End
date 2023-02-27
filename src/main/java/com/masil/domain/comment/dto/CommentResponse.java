@@ -47,7 +47,6 @@ public class CommentResponse {
 
     public static CommentResponse of(Comment comment) {
         List<Comment> children = comment.getChildren(); // comment에서 children 을 받아온다.
-        log.info("comment = {}", comment.getId());
         List<ChildrenResponse> replies = children.stream()
                 .map(ChildrenResponse::of)
                 .collect(Collectors.toList());

@@ -21,6 +21,7 @@ public enum ErrorCode {
     // post
     POST_NOT_FOUND(NOT_FOUND, 3001, "존재하지 않는 게시글입니다."),
     POST_ACCESS_DENIED(FORBIDDEN, 3002, "해당 게시글에 대한 권한이 없습니다"),
+    POST_SEARCH_INPUT_EXCEPTION(LENGTH_REQUIRED, 3003, "검색은 최소 2글자 이상이어야 합니다."),
 
     // post like
     POST_NOT_SELF_LIKE(FORBIDDEN, 4001, "본인 글에는 좋아요를 누를 수 없습니다."),

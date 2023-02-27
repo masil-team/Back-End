@@ -39,6 +39,8 @@ public class CommentService {
         
         Long totalCommentCount = commentRepository.countByPostId(postId);
 
+        int totalPage = comments.getTotalPages();
+
         for (Comment comment : comments) {
             log.info("comment id = {}", comment.getId());
             updateCommentPermissionsForMember(memberId, comment);
@@ -47,7 +49,7 @@ public class CommentService {
             }
         }
 
-        return CommentsResponse.ofComment(comments, totalCommentCount);
+        return CommentsResponse.ofComment(comments, totalCommentCount, totalPage);
     }
 
     /**
