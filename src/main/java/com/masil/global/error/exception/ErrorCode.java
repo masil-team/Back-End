@@ -49,9 +49,11 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(BAD_REQUEST,6003,"잘못된 리프레쉬 토큰입니다"),
     REFRESH_TOKEN_EXPIRED(BAD_REQUEST, 6005, "리프레쉬 토큰 유효기간이 지났습니다."),
 
-    UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다.");
+    UNAUTHENTICATED_LOGIN_USER(UNAUTHORIZED,6004,"로그인 유저가 존재하지 않습니다."),
 
-
+    // notification
+    NOTIFICATION_NOT_FOUND(NOT_FOUND, 7001, "존재하지 않는 알람입니다."),
+    NOTIFICATION_ACCESS_DENIED(FORBIDDEN, 7002, "해당 알람에 대한 권한이 없습니다");
     private HttpStatus status;
     private final int code;
     private final String message;

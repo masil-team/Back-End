@@ -5,9 +5,10 @@ import com.masil.domain.notification.dto.NotificationDto;
 import com.masil.domain.notification.dto.NotificationResponse;
 import com.masil.domain.notification.dto.NotificationsResponse;
 import com.masil.domain.notification.entity.Notification;
+import com.masil.domain.notification.exception.NotificationAccessDeniedException;
+import com.masil.domain.notification.exception.NotificationNotFoundException;
 import com.masil.domain.notification.repository.EmitterRepository;
 import com.masil.domain.notification.repository.NotificationRepository;
-import com.masil.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class NotificationService {
 
     private static final Long DEFAULT_TIMEOUT = 60 * 1000L * 5; // sse 연결 시간, 임시로 5분
-
+    private static final int NUM_LATEST_NOTIFICATION = 15;
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
@@ -70,17 +71,34 @@ public class NotificationService {
         }
     }
 
+    /**
+     * 최신 15개 알람 조회
+     */
     @Transactional(readOnly = true)
     public NotificationsResponse findNotifications(Long receiverId) {
         List<Notification> notifications = notificationRepository.findAllByReceiverId(receiverId);
         return NotificationsResponse.ofNotifications(notifications);
     }
 
-    @Transactional(readOnly = true)
-    public void readNotification(Long id) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 알람은 존재하지 않습니다."));
+    /**
+     * 알람 읽음 처리
+     * @return 알림 표시여부 반환
+     */
+    @Transactional
+    public boolean readNotification(Long notificationId, Long memberId) {
+
+        Notification notification = findNotificationById(notificationId);
+
+        // 해당 알람을 읽을 권한이 있는지 체크
+        validateOwner(memberId, notification);
+
         notification.read();
+
+        // 최신 15개의 알람 중 안 읽은 알람이 하나라도 존재할 경우 : 1=true
+        // 최신 15개의 모든 알람을 읽었을 경우 : 0=false
+        int isDisplay = notificationRepository.existsTop15UnreadByReceiverId(memberId, NUM_LATEST_NOTIFICATION);
+
+        return isDisplay == 1;
     }
 
     private boolean hasLostData(String lastEventId) {
@@ -119,5 +137,16 @@ public class NotificationService {
                 .build();
         notificationRepository.save(notification);
         return notification;
+    }
+
+    private void validateOwner(Long memberId, Notification notification) {
+        if (!notification.isOwner(memberId)) {
+            throw new NotificationAccessDeniedException();
+        }
+    }
+
+    private Notification findNotificationById(Long notificationId) {
+        return notificationRepository.findById(notificationId)
+                .orElseThrow(NotificationNotFoundException::new);
     }
 }

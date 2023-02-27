@@ -52,8 +52,8 @@ class AuthServiceTest {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void saveAuthority() {

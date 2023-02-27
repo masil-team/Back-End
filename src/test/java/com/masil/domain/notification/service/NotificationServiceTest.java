@@ -42,6 +42,7 @@ class NotificationServiceTest extends ServiceTest {
     @Autowired
     private EmdAddressRepository emdAddressRepository;
 
+
     @Test
     @DisplayName("클라이언트의 알림 연결을 성공한다.")
     void createConnection_success() {
@@ -140,11 +141,12 @@ class NotificationServiceTest extends ServiceTest {
         postLikeService.toggleLikePost(post.getId(), KK.getId());
 
         // when
-        notificationService.readNotification(1L);
+        boolean isDisplay = notificationService.readNotification(1L, JJ.getId());
 
         // then
         Notification notification = notificationRepository.findById(1L).get();
         assertThat(notification.getIsRead()).isTrue();
+        assertThat(isDisplay).isFalse();
     }
 
 }

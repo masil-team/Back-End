@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,9 +47,11 @@ public class NotificationController {
      */
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/notifications/{id}")
-    public ResponseEntity<Void> readNotification(@PathVariable Long id) {
-        notificationService.readNotification(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, Boolean>> readNotification(@PathVariable Long id,
+                                                                 @LoginUser CurrentMember currentMember) {
+
+        boolean isDisplay = notificationService.readNotification(id, currentMember.getId());
+        return ResponseEntity.ok(Map.of("isDisplay", isDisplay));
     }
 
 }
