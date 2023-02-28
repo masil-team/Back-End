@@ -9,5 +9,7 @@ public interface EmitterRepository {
     
     void deleteById(String id);
 
+    void deleteAllEmitterStartWithId(String memberId);
+
     Map<String, SseEmitter> findAllStartWithById(String id);
 }

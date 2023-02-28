@@ -24,10 +24,26 @@ public class EmitterRepositoryImpl implements EmitterRepository{
     }
 
     @Override
+    public void deleteAllEmitterStartWithId(String memberId) {
+        emitters.forEach((key, emitter) -> {
+            if (isEqualStartWithById(key, memberId)) {
+                emitters.remove(key);
+            }
+        });
+    }
+
+    @Override
     public Map<String, SseEmitter> findAllStartWithById(String id) {
         return emitters.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(id))
+                .filter(entry -> isEqualStartWithById(entry.getKey(), id))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private boolean isEqualStartWithById(String emitterId, String id) {
+        int index = emitterId.indexOf("_");
+        if (index == -1)
+            return false;
+        return emitterId.substring(0, index).equals(id);
     }
 
 }
