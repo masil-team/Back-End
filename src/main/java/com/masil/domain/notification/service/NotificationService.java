@@ -2,7 +2,6 @@ package com.masil.domain.notification.service;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.notification.dto.NotificationDto;
-import com.masil.domain.notification.dto.NotificationResponse;
 import com.masil.domain.notification.dto.NotificationsResponse;
 import com.masil.domain.notification.entity.Notification;
 import com.masil.domain.notification.exception.NotificationAccessDeniedException;
@@ -23,8 +22,10 @@ import java.util.Map;
 @Service
 public class NotificationService {
 
-    private static final Long DEFAULT_TIMEOUT = 60 * 1000L * 5; // sse 연결 시간, 임시로 5분
+    private static final Long DEFAULT_TIMEOUT = 1000L * 60 * 5; // sse 연결 시간, 임시로 5분
     private static final int NUM_LATEST_NOTIFICATION = 15;
+    private static final String 알림도착 = "알림도착";
+
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
@@ -41,13 +42,19 @@ public class NotificationService {
 
         // SseEmitter 의 유효 시간동안 어느 데이터도 전송되지 않는다면 503 에러 발생
         // 이를 방지하기 위한 더미 이벤트 전송
-        sendToClient(emitter, emitterId, "EventStream Created. [memberId=" + memberId + "]");
+        sendToClient(emitter, emitterId, emitterId, "EventStream Created. [memberId=" + memberId + "]");
 
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
-        if (hasLostData(lastEventId)) {
-            sendLostData(lastEventId, memberId, emitterId, emitter);
+        // 클라이언트가 미수신한 Event 가 존재할 경우 전송하여 Event 유실을 예방
+        if (!lastEventId.isEmpty()) {
+
+            emitterRepository.findEventIdsStartWithById(String.valueOf(memberId))
+                    .stream()
+                    .filter(eventId -> lastEventId.compareTo(eventId) <= 0)
+                    .forEach(eventId -> {
+                        sendToClient(emitter, emitterId, emitterId, 알림도착);
+                        emitterRepository.deleteByEventId(eventId);
+                    });
         }
-
         return emitter;
     }
 
@@ -57,17 +64,16 @@ public class NotificationService {
     @Transactional
     public void send(Member sender, Member receiver, NotificationDto notificationDto) {
 
-        Notification notification = addNotification(sender, receiver, notificationDto);
+        addNotification(sender, receiver, notificationDto);
 
         String receiverId = String.valueOf(receiver.getId());
-        String eventId = receiverId + "_" + System.currentTimeMillis();
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(receiverId);
 
-        // 연결된 클라이언트가 없는 경우 EventCache 에 저장하고 연결된 클라이언트가 있는 경우 데이터 전송
-        if (sseEmitters.isEmpty()) {
-            emitterRepository.saveEventCache(eventId, notification);
-        } else {
-            sseEmitters.forEach((id, emitter) -> sendToClient(emitter, id, NotificationResponse.of(notification)));
+        // eventId 에 저장하고 연결된 클라이언트가 있는 경우 데이터 전송
+        String eventId = receiverId + "_" + System.currentTimeMillis();
+        emitterRepository.saveEventId(eventId);
+        if (!sseEmitters.isEmpty()) {
+            sseEmitters.forEach((id, emitter) -> sendToClient(emitter, id, eventId, 알림도착));
         }
     }
 
@@ -101,26 +107,13 @@ public class NotificationService {
         return isDisplay == 1;
     }
 
-    private boolean hasLostData(String lastEventId) {
-        return !lastEventId.isEmpty();
-    }
-
     /**
-     * lastEventId 이전에 발생한 알람리스트 전송
+     * 실제 클라이언트로 알람 전송하는 로직
      */
-    private void sendLostData(String lastEventId, Long memberId, String emitterId, SseEmitter emitter) {
-        Map<String, Notification> eventCaches = emitterRepository.findAllEventCacheStartWithById(String.valueOf(memberId));
-
-        eventCaches.entrySet().stream()
-                .filter(entry -> lastEventId.compareTo(entry.getKey()) <= 0)
-                .forEach(entry -> sendToClient(emitter, emitterId, NotificationResponse.of(entry.getValue())));
-    }
-
-    // TODO : send 할 때 id값 나중에 체크
-    private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
+    private void sendToClient(SseEmitter emitter, String emitterId, String eventId, Object data) {
         try {
             emitter.send(SseEmitter.event()
-                    .id(emitterId)
+                    .id(eventId)
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);

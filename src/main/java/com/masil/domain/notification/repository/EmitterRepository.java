@@ -1,18 +1,20 @@
 package com.masil.domain.notification.repository;
 
-import com.masil.domain.notification.entity.Notification;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Map;
 
 public interface EmitterRepository {
     SseEmitter save(String id, SseEmitter sseEmitter);
     
-    void saveEventCache(String id, Notification data);
+    void saveEventId(String id);
     
     void deleteById(String id);
-    
-    Map<String, Notification> findAllEventCacheStartWithById(String id);
+
+    void deleteByEventId(String id);
+
+    List<String> findEventIdsStartWithById(String id);
 
     Map<String, SseEmitter> findAllStartWithById(String id);
 }
