@@ -87,7 +87,7 @@ class NotificationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("알림 목록 조회를 성공한다.")
+    @DisplayName("최신 알림 목록 조회를 성공한다.")
     void findNotifications_success() {
         /**
          * KK가 JJ의 게시글을 좋아요를 할 경우
@@ -105,7 +105,9 @@ class NotificationServiceTest extends ServiceTest {
         Member KK = MemberFixture.일반_회원_KK.엔티티_생성();
         memberRepository.save(KK);
 
-        postLikeService.toggleLikePost(post.getId(), KK.getId());
+        for (int i = 0; i < 40; i++) {
+            postLikeService.toggleLikePost(post.getId(), KK.getId());
+        }
 
         // when
         NotificationsResponse notifications = notificationService.findNotifications(JJ.getId());
@@ -113,8 +115,9 @@ class NotificationServiceTest extends ServiceTest {
         NotificationResponse notificationResponse = notificationResponses.get(0);
 
         // then
+        assertThat(notificationResponses.size()).isEqualTo(15);
         assertThat(notificationResponse.getIsRead()).isFalse();
-        assertThat(notificationResponse.getId()).isEqualTo(1L);
+        assertThat(notificationResponse.getId()).isEqualTo(20L);
         assertThat(notificationResponse.getSender().getId()).isEqualTo(KK.getId());
     }
 
@@ -148,5 +151,4 @@ class NotificationServiceTest extends ServiceTest {
         assertThat(notification.getIsRead()).isTrue();
         assertThat(isDisplay).isFalse();
     }
-
 }

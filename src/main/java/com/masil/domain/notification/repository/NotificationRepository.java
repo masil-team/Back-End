@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findAllByReceiverId(Long receiverId);
+    List<Notification> findTop15ByReceiverIdOrderByCreateDateDesc(Long receiverId);
 
 
     @Query(value = "SELECT count(n1.id) > 0 " +

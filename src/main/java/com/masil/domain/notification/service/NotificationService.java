@@ -76,7 +76,7 @@ public class NotificationService {
      */
     @Transactional(readOnly = true)
     public NotificationsResponse findNotifications(Long receiverId) {
-        List<Notification> notifications = notificationRepository.findAllByReceiverId(receiverId);
+        List<Notification> notifications = notificationRepository.findTop15ByReceiverIdOrderByCreateDateDesc(receiverId);
         return NotificationsResponse.ofNotifications(notifications);
     }
 
