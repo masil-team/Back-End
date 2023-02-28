@@ -9,6 +9,9 @@ import com.masil.domain.commentlike.exception.SelfCommentLikeException;
 import com.masil.domain.commentlike.repository.CommentLikeRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
+import com.masil.domain.notification.dto.NotificationDto;
+import com.masil.domain.notification.entity.NotificationType;
+import com.masil.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,8 @@ public class CommentLikeService {
     private final CommentRepository commentRepository;
 
     private final MemberRepository memberRepository;
+
+    private final NotificationService notificationService;
 
     @Transactional
     public CommentLikeResponse updateLikeOfComment(Long commentId, Long memberId) {
@@ -47,6 +52,8 @@ public class CommentLikeService {
     public CommentLikeResponse addLike(Comment comment, Member member) {
         CommentLike commentLike = new CommentLike(comment, member);
         commentLikeRepository.save(commentLike); // true 처리
+
+        notificationService.send(member, comment.getMember(), NotificationDto.of(NotificationType.COMMENT_LIKE, comment.getPost()));
         return CommentLikeResponse.of(comment.getLikeCount(), true);
     }
 
