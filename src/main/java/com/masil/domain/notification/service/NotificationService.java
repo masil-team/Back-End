@@ -24,7 +24,6 @@ public class NotificationService {
 
     private static final Long DEFAULT_TIMEOUT = 1000L * 60 * 5; // sse 연결 시간, 임시로 5분
     private static final int NUM_LATEST_NOTIFICATION = 15;
-    private static final String 알림도착 = "알림도착";
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
@@ -32,7 +31,7 @@ public class NotificationService {
     /**
      * 클라이언트와 sse 연결
      */
-    public SseEmitter createConnection(Long memberId, String lastEventId) {
+    public SseEmitter createConnection(Long memberId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
@@ -42,19 +41,9 @@ public class NotificationService {
 
         // SseEmitter 의 유효 시간동안 어느 데이터도 전송되지 않는다면 503 에러 발생
         // 이를 방지하기 위한 더미 이벤트 전송
-        sendToClient(emitter, emitterId, emitterId, "EventStream Created. [memberId=" + memberId + "]");
+        // + 읽지 않은 알림이 있는지 여부에 대한 결과값 전송(true/false)
+        sendToClient(emitter, emitterId, isDisplay(memberId));
 
-        // 클라이언트가 미수신한 Event 가 존재할 경우 전송하여 Event 유실을 예방
-        if (!lastEventId.isEmpty()) {
-
-            emitterRepository.findEventIdsStartWithById(String.valueOf(memberId))
-                    .stream()
-                    .filter(eventId -> lastEventId.compareTo(eventId) <= 0)
-                    .forEach(eventId -> {
-                        sendToClient(emitter, emitterId, emitterId, 알림도착);
-                        emitterRepository.deleteByEventId(eventId);
-                    });
-        }
         return emitter;
     }
 
@@ -70,10 +59,8 @@ public class NotificationService {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(receiverId);
 
         // eventId 에 저장하고 연결된 클라이언트가 있는 경우 데이터 전송
-        String eventId = receiverId + "_" + System.currentTimeMillis();
-        emitterRepository.saveEventId(eventId);
         if (!sseEmitters.isEmpty()) {
-            sseEmitters.forEach((id, emitter) -> sendToClient(emitter, id, eventId, 알림도착));
+            sseEmitters.forEach((id, emitter) -> sendToClient(emitter, id, true));
         }
     }
 
@@ -99,21 +86,26 @@ public class NotificationService {
         validateOwner(memberId, notification);
 
         notification.read();
+        
+        return isDisplay(memberId);
+    }
 
-        // 최신 15개의 알람 중 안 읽은 알람이 하나라도 존재할 경우 : 1=true
-        // 최신 15개의 모든 알람을 읽었을 경우 : 0=false
-        int isDisplay = notificationRepository.existsTop15UnreadByReceiverId(memberId, NUM_LATEST_NOTIFICATION);
-
-        return isDisplay == 1;
+    /**
+     * 알림 표시여부 체크
+     *  - 최신 15개의 알람 중 안 읽은 알람이 하나라도 존재할 경우 : 1=true
+     *  - 최신 15개의 모든 알람을 읽었을 경우 : 0=false
+     */
+    private boolean isDisplay(Long memberId) {
+        return notificationRepository.existsTop15UnreadByReceiverId(memberId, NUM_LATEST_NOTIFICATION) == 1;
     }
 
     /**
      * 실제 클라이언트로 알람 전송하는 로직
      */
-    private void sendToClient(SseEmitter emitter, String emitterId, String eventId, Object data) {
+    private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
-                    .id(eventId)
+                    .id(emitterId)
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);

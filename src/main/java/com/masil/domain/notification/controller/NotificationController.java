@@ -26,10 +26,9 @@ public class NotificationController {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/sse", produces = "text/event-stream")
-    public SseEmitter createConnection(@LoginUser CurrentMember currentMember,
-                                       @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
-        log.info("sse 연결 시작, lastEventId={}", lastEventId);
-        return notificationService.createConnection(currentMember.getId(), lastEventId);
+    public SseEmitter createConnection(@LoginUser CurrentMember currentMember) {
+        log.info("sse 연결 시작");
+        return notificationService.createConnection(currentMember.getId());
     }
 
 

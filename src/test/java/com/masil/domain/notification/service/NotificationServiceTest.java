@@ -48,10 +48,9 @@ class NotificationServiceTest extends ServiceTest {
     void createConnection_success() {
         //given
         Member member = MemberFixture.일반_회원_JJ.엔티티_생성();
-        String lastEventId = "";
 
         // when
-        SseEmitter subscribe = notificationService.createConnection(member.getId(), lastEventId);
+        SseEmitter subscribe = notificationService.createConnection(member.getId());
 
         // then
         assertThat(subscribe).isNotNull();
