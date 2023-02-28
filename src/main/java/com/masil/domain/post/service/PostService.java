@@ -110,11 +110,11 @@ public class PostService {
     /**
      * 검색 쿼리 추가
      */
-    public PostsResponse searchPosts(@Nullable String keyword, Pageable pageable){
+    public PostsResponse searchPosts(@Nullable String keyword, Integer rCode, Pageable pageable){
         validateLength(keyword);
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.Direction.DESC, "createDate");
         SearchQuery searchQuery = new SearchQuery(keyword);
-        Slice<Post> posts = postRepository.findByContentContainingIgnoreCase(searchQuery.getValue(), pageable);
+        Slice<Post> posts = postRepository.findByContentContainingIgnoreCaseAndEmdAddressId(searchQuery.getValue(), rCode, pageable);
 
         return PostsResponse.ofPosts(posts);
     }
