@@ -159,3 +159,41 @@ include::{snippets}/post/findBookmarks/http-request.adoc[]
 ==== HTTP response
 
 include::{snippets}/post/findBookmarks/http-response.adoc[]
+
+= 3. 알림
+
+== 3.1. 알림 see 연결
+
+=== 3.1.1 알림 see 연결 성공
+
+==== HTTP request
+
+include::{snippets}/notification/sse/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/notification/sse/http-response.adoc[]
+
+== 3.2. navbar 알림 조회
+
+=== 3.2.1 navbar 알림 조회 성공
+
+==== HTTP request
+
+include::{snippets}/notification/find/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/notification/find/http-response.adoc[]
+
+== 3.3. 알람 읽음 처리
+
+=== 3.3.1 알람 읽음 처리 성공
+
+==== HTTP request
+
+include::{snippets}/notification/read/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/notification/read/http-response.adoc[]

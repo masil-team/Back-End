@@ -110,7 +110,7 @@ class NotificationServiceTest extends ServiceTest {
 
         // when
         NotificationsResponse notifications = notificationService.findNotifications(JJ.getId());
-        List<NotificationResponse> notificationResponses = notifications.getNotificationResponses();
+        List<NotificationResponse> notificationResponses = notifications.getNotifications();
         NotificationResponse notificationResponse = notificationResponses.get(0);
 
         // then
