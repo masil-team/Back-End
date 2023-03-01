@@ -208,6 +208,20 @@ public class PostServiceTest extends ServiceTest {
             );
         }
 
+        @Test
+        @DisplayName("카테고리가 2인 게시글은 없다.")
+        void findPosts_no_post_with_boardId2() {
+            // given
+            PostFilterRequest postFilterRequest = PostFilterRequestBuilder.build(2L);
+
+            // when
+            PostsResponse postsResponse = postService.findPosts(postFilterRequest, post.getMember().getId());
+            List<PostsElementResponse> postsElementResponseList = postsResponse.getPosts();
+
+            // then
+            assertThat(postsElementResponseList.size()).isEqualTo(0);
+        }
+
         @DisplayName("상태가 DELETE 인 게시글은 제외하고 조회한다.")
         @Test
         void findPosts_isDeleted() {

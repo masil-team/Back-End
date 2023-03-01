@@ -16,7 +16,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //            + "or "
 //            + "(content regexp :query) ";
 
+    Slice<Post> findAllByEmdAddressId(Integer rCode, Pageable pageable);
+
     Slice<Post> findAllByBoardIdAndEmdAddressId(Long boardId, Integer emdAddressId, Pageable pageable);
+
+    Slice<Post> findAllByEmdAddressSggAddressId(Integer rCode, Pageable pageable);
 
     Slice<Post> findAllByBoardIdAndEmdAddressSggAddressId(Long boardId, Integer sggAddressId, Pageable pageable);
 
@@ -27,4 +31,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query(value = "UPDATE Post p set p.viewCount = p.viewCount + 1 where p.id = :postId")
     void increaseViewCount(Long postId);
+
 }

@@ -9,4 +9,8 @@ public class PostFilterRequestBuilder {
     public static PostFilterRequest build() {
         return new PostFilterRequest(1L, 11110111, PageRequest.of(0, 8, DESC, "createDate"));
     }
+
+    public static PostFilterRequest build(Long boardId) {
+        return new PostFilterRequest(boardId, 11110111, PageRequest.of(0, 8, DESC, "createDate"));
+    }
 }
