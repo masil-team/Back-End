@@ -101,7 +101,7 @@ public class PostController {
     @GetMapping("/posts/search")
     public ResponseEntity<PostsResponse> searchPost(@RequestParam @Nullable String keyword,
                                                     @RequestParam("rCode") Integer rCode, // rCode 추가
-                                                    @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable){
+                                                    @PageableDefault(sort = "createDate", direction = DESC, size = 8) Pageable pageable){
         log.info("게시글 검색 시작");
         PostsResponse postsResponse = postService.searchPosts(keyword, rCode, pageable);
         return ResponseEntity.ok(postsResponse);
