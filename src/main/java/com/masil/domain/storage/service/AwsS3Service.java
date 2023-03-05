@@ -1,9 +1,9 @@
 package com.masil.domain.storage.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.masil.domain.storage.dto.FileInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.UUID;
 
 @Service
@@ -32,9 +31,9 @@ public class AwsS3Service {
      * AWS S3에 이미지 파일 업로드
      * @param multipartFile : 파일
      * @param dirName : 폴더 이름
-     * @return : cdn URL
+     * @return : FileInfoDto (path, cdn URL)
      */
-    public String upload(MultipartFile multipartFile, String dirName){
+    public FileInfoDto upload(MultipartFile multipartFile, String dirName){
 
         String fileName = createFileName(multipartFile.getOriginalFilename(), dirName);
 
@@ -51,10 +50,10 @@ public class AwsS3Service {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
         }
 
-        // s3에 저장된 파일 url 얻어옴.
-        URL url = amazonS3.getUrl(bucket, fileName);
+        // s3에 저장된 파일 path 얻어옴.
+        String path = amazonS3.getUrl(bucket, fileName).getPath();
 
-        return createUrlName(url.getPath());
+        return FileInfoDto.of(path, createUrlName(path));
     }
 
     /**
