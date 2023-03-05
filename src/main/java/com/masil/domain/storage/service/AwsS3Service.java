@@ -60,12 +60,12 @@ public class AwsS3Service {
      * cdn 호스트 붙인 url 반환
      * ex) https://dmpoeindaa9de.cloudfront.net + /post-image/filename.jpg
      */
-    public String createUrlName(String path) {
+    private String createUrlName(String path) {
         return cdnDomain + path;
     }
 
     // 먼저 파일 업로드시, 파일명을 난수화하기 위해 UUID 를 활용하여 난수를 돌린다.
-    public String createFileName(String fileName, String dirName){
+    private String createFileName(String fileName, String dirName){
         return dirName + "/" + UUID.randomUUID() + fileName;
     }
 

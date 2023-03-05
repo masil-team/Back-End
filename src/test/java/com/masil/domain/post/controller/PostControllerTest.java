@@ -74,7 +74,8 @@ public class PostControllerTest extends ControllerMockApiTest {
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("content").description("내용"),
-                                fieldWithPath("boardId").description("카테고리Id")
+                                fieldWithPath("boardId").description("카테고리Id"),
+                                fieldWithPath("fileIds.[]").description("파일 id")
                         )
                 ));
     }
@@ -327,6 +328,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .thumbnail(FILE_RESPONSE)
                 .build());
 
 
@@ -357,6 +359,9 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
+                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
+                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));
@@ -383,6 +388,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .thumbnail(FILE_RESPONSE)
                 .build());
 
 
@@ -414,6 +420,9 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
+                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
+                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));

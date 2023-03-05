@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter
 @NoArgsConstructor
 public class PostCreateRequest {
@@ -26,9 +27,10 @@ public class PostCreateRequest {
     private List<Long> fileIds = new ArrayList<>();
 
     @Builder
-    public PostCreateRequest(String content, Long boardId){
+    public PostCreateRequest(String content, Long boardId, List<Long> fileIds){
         this.content = content;
         this.boardId = boardId;
+        this.fileIds = fileIds;
     }
 
     public Post toEntity(Member member, Board board){

@@ -6,6 +6,7 @@ import com.masil.domain.storage.dto.FileInfoResponse;
 import com.masil.domain.storage.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ public class AwsS3Controller {
     private final AwsS3Service awsS3Service;
     private final PostFileService postFileService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/post-image")
     public ResponseEntity<FileInfoResponse> upload(@RequestPart("file") MultipartFile multipartFile) {
         FileInfoDto fileInfoDto = awsS3Service.upload(multipartFile, "post-image");
