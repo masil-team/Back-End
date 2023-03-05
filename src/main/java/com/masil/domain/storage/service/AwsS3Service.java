@@ -32,7 +32,7 @@ public class AwsS3Service {
      * AWS S3에 이미지 파일 업로드
      * @param multipartFile : 파일
      * @param dirName : 폴더 이름
-     * @return : S3에 저장한 파일 URL
+     * @return : cdn URL
      */
     public String upload(MultipartFile multipartFile, String dirName){
 
