@@ -63,7 +63,7 @@ public class Post extends BaseEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostFile> postFiles = new ArrayList<>();
 
     @Builder.Default
@@ -128,5 +128,10 @@ public class Post extends BaseEntity {
 
     public String getNotificationPreview() {
         return this.content.substring(0, Math.min(NOTIFICATION_PREVIEW_LENGTH, content.length())) + "...";
+    }
+
+    public void addPostFiles(PostFile postFile) {
+        this.postFiles.add(postFile);
+        postFile.addPost(this);
     }
 }

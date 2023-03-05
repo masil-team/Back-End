@@ -45,4 +45,8 @@ public class PostFile extends BaseEntity {
         this.width = width;
         this.height = height;
     }
+
+    public void addPost(Post post) {
+        this.post = post;
+    }
 }

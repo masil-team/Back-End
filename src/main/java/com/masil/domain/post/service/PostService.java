@@ -5,7 +5,6 @@ import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
-import com.masil.domain.comment.exception.CommentInputException;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
@@ -17,6 +16,7 @@ import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.exception.PostSearchInputException;
 import com.masil.domain.post.repository.PostRepository;
+import com.masil.domain.postFile.repository.PostFileRepository;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +40,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final BoardRepository boardRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final PostFileRepository postFileRepository;
 
     @Transactional
     public PostDetailResponse findDetailPost(Long postId, Long memberId) {
@@ -72,6 +73,13 @@ public class PostService {
         Member member = findMemberById(memberId);
         Board board = findBoardById(postCreateRequest.getBoardId());
         Post post = postCreateRequest.toEntity(member, board);
+
+        // TODO : update 문 여러번 발생함, 추후 개선
+        postFileRepository.findByIdIn(postCreateRequest.getFileIds())
+                .stream()
+                .forEach(postFile -> post.addPostFiles(postFile));
+
+
         return postRepository.save(post).getId();
     }
 
