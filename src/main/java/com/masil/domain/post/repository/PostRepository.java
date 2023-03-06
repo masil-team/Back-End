@@ -23,7 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    @Query(value = "select * from Post p Where p.content LIKE %:keyword%",
 //            countQuery = "select * from Post p ",
 //            nativeQuery = true)
-    Slice<Post> findByContentContainingIgnoreCase(String keyword, Pageable pageable);
+    Slice<Post> findByContentContainingIgnoreCaseAndEmdAddressId(String keyword, Integer emdAddressId, Pageable pageable);
+
     @Modifying
     @Query(value = "UPDATE Post p set p.viewCount = p.viewCount + 1 where p.id = :postId")
     void increaseViewCount(Long postId);

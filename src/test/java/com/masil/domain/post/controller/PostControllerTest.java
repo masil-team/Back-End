@@ -356,8 +356,8 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .id(1L)
                 .member(MEMBER_RESPONSE)
                 .boardId(1L)
-                .address("옥천동")
-                .content("내용")
+                .address("용문동")
+                .content("잠실")
                 .viewCount(0)
                 .likeCount(0)
                 .commentCount(0)
@@ -371,10 +371,10 @@ public class PostControllerTest extends ControllerMockApiTest {
 
         PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
 
-        given(postService.searchPosts(any(), any())).willReturn(postsResponse);
+        given(postService.searchPosts(any(), any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = searchPost("/posts/search?keyword=내용");
+        ResultActions resultActions = searchPost("/posts/search?keyword=내용&&rCode=11170122");
 
         // then
         resultActions
