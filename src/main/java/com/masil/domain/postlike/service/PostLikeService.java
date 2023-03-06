@@ -1,11 +1,13 @@
 package com.masil.domain.postlike.service;
 
+import com.masil.domain.member.dto.request.MyFindRequest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.notification.dto.NotificationDto;
 import com.masil.domain.notification.entity.NotificationType;
 import com.masil.domain.notification.service.NotificationService;
+import com.masil.domain.post.dto.PostsResponse;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -14,6 +16,8 @@ import com.masil.domain.postlike.entity.PostLike;
 import com.masil.domain.postlike.exception.SelfPostLikeException;
 import com.masil.domain.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,5 +79,9 @@ public class PostLikeService {
         return memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
     }
-    
+
+    public PostsResponse findLikesByMemberId(MyFindRequest request, Pageable pageable) {
+        Slice<PostLike> postLikes = postLikeRepository.findAllByMemberId(request.getMemberId());
+        return PostsResponse.ofPostLikes(postLikes);
+    }
 }

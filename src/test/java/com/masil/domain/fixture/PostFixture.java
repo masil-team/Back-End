@@ -38,6 +38,7 @@ public enum PostFixture {
         return Post.builder()
                 .content(this.content)
                 .member(this.member)
+                .board(this.board)
                 .build();
     }
 

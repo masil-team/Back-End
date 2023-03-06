@@ -2,6 +2,7 @@ package com.masil.domain.post.dto;
 
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.post.entity.Post;
+import com.masil.domain.postlike.entity.PostLike;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 
@@ -37,4 +38,12 @@ public class PostsResponse {
         return new PostsResponse(postsResponse, bookmarks.isLast());
     }
 
+    public static PostsResponse ofPostLikes(Slice<PostLike> postLikes) {
+        List<PostsElementResponse> postsResponse = postLikes
+                .stream()
+                .map(postLike -> PostsElementResponse.of(postLike.getPost()))
+                .collect(Collectors.toList());
+
+        return new PostsResponse(postsResponse, postLikes.isLast());
+    }
 }

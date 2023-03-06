@@ -1,5 +1,6 @@
 package com.masil.domain.commentlike.service;
 
+import com.masil.domain.comment.dto.CommentsResponse;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.comment.exception.CommentNotFoundException;
 import com.masil.domain.comment.repository.CommentRepository;
@@ -7,6 +8,7 @@ import com.masil.domain.commentlike.dto.CommentLikeResponse;
 import com.masil.domain.commentlike.entity.CommentLike;
 import com.masil.domain.commentlike.exception.SelfCommentLikeException;
 import com.masil.domain.commentlike.repository.CommentLikeRepository;
+import com.masil.domain.member.dto.request.MyFindRequest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.notification.dto.NotificationDto;
@@ -14,6 +16,7 @@ import com.masil.domain.notification.entity.NotificationType;
 import com.masil.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,5 +79,9 @@ public class CommentLikeService {
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(RuntimeException::new);
+    }
+
+    public CommentsResponse findLikesByMemberId(MyFindRequest request, Pageable pageable) {
+        return CommentsResponse.ofCommentLike(commentLikeRepository.findAllByMemberId(request.getMemberId(), pageable));
     }
 }
