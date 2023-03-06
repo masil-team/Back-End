@@ -4,6 +4,7 @@ import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.comment.entity.Comment;
 import com.masil.domain.member.entity.Member;
+import com.masil.domain.postFile.entity.PostFile;
 import com.masil.global.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -60,6 +61,10 @@ public class Post extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostFile> postFiles = new ArrayList<>();
 
     @Builder.Default
     @Transient
@@ -123,5 +128,10 @@ public class Post extends BaseEntity {
 
     public String getNotificationPreview() {
         return this.content.substring(0, Math.min(NOTIFICATION_PREVIEW_LENGTH, content.length())) + "...";
+    }
+
+    public void addPostFiles(PostFile postFile) {
+        this.postFiles.add(postFile);
+        postFile.addPost(this);
     }
 }
