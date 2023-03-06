@@ -7,6 +7,7 @@ import com.masil.domain.post.dto.*;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.service.PostService;
+import com.masil.domain.storage.dto.FileResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,19 +45,11 @@ public class PostControllerTest extends ControllerMockApiTest {
             .id(1L)
             .nickname("닉네임1")
             .build();
-    private static final PostDetailResponse POST_RESPONSE_1 = PostDetailResponse.builder()
-            .id(1L)
-            .member(MEMBER_RESPONSE)
-            .boardId(1L)
-            .address("옥천동")
-            .content("내용1")
-            .viewCount(0)
-            .likeCount(0)
-            .isOwner(false)
-            .isLiked(false)
-            .isScrap(false)
-            .createDate(LocalDateTime.now())
-            .modifyDate(LocalDateTime.now())
+
+    private static final FileResponse FILE_RESPONSE = FileResponse.builder()
+            .url("https://hello.net/post-image/hello.jpg")
+            .height(240)
+            .width(240)
             .build();
 
     private static final String AUTHORIZATION_HEADER_VALUE = "Bearer aaaaaaaa.bbbbbbbb.cccccccc";
@@ -81,7 +74,8 @@ public class PostControllerTest extends ControllerMockApiTest {
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("content").description("내용"),
-                                fieldWithPath("boardId").description("카테고리Id")
+                                fieldWithPath("boardId").description("카테고리Id"),
+                                fieldWithPath("fileIds.[]").description("파일 id")
                         )
                 ));
     }
@@ -91,6 +85,23 @@ public class PostControllerTest extends ControllerMockApiTest {
     void findPost_success() throws Exception {
 
         // given
+        List<FileResponse> files = new ArrayList<>();
+        files.add(FILE_RESPONSE);
+        PostDetailResponse POST_RESPONSE_1 = PostDetailResponse.builder()
+                .id(1L)
+                .member(MEMBER_RESPONSE)
+                .boardId(1L)
+                .address("옥천동")
+                .content("내용1")
+                .viewCount(0)
+                .likeCount(0)
+                .isOwner(false)
+                .isLiked(false)
+                .isScrap(false)
+                .createDate(LocalDateTime.now())
+                .modifyDate(LocalDateTime.now())
+                .files(files)
+                .build();
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
@@ -115,7 +126,10 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("isLiked").description("게시글 좋아요 여부"),
                                 fieldWithPath("isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("createDate").description("생성 날짜"),
-                                fieldWithPath("modifyDate").description("수정 날짜")
+                                fieldWithPath("modifyDate").description("수정 날짜"),
+                                fieldWithPath("files.[].url").description("이미지 주소"),
+                                fieldWithPath("files.[].width").description("너비"),
+                                fieldWithPath("files.[].height").description("높이")
                         )
                 ));
     }
@@ -163,6 +177,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .thumbnail(FILE_RESPONSE)
                 .build());
 
 
@@ -194,6 +209,9 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
+                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
+                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));
@@ -310,6 +328,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .thumbnail(FILE_RESPONSE)
                 .build());
 
 
@@ -340,6 +359,9 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
+                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
+                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));
@@ -366,6 +388,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .thumbnail(FILE_RESPONSE)
                 .build());
 
 
@@ -397,6 +420,9 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
+                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
+                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )
                 ));

@@ -57,7 +57,6 @@ public class PostController {
     public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest,
                                            @LoginUser CurrentMember currentMember) {
         log.info("게시글 생성 시작");
-
         Long postId = postService.createPost(postCreateRequest, currentMember.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId)).build();
     }
