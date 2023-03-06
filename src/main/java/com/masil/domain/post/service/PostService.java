@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 public class PostService {
 
     private static final int MIN_LENGTH = 2;
+    private static final int ALL_CATEGORY = 1;
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
@@ -128,10 +129,16 @@ public class PostService {
     }
 
     private Slice<Post> findAllPostBySggId(PostFilterRequest request) {
+        if (request.getBoardId() == ALL_CATEGORY) {
+            return postRepository.findAllByEmdAddressSggAddressId(request.getRCode(), request.getPageable());
+        }
         return postRepository.findAllByBoardIdAndEmdAddressSggAddressId(request.getBoardId(), request.getRCode(), request.getPageable());
     }
 
     private Slice<Post> findAllPostByEmdId(PostFilterRequest request) {
+        if (request.getBoardId() == ALL_CATEGORY) {
+            return postRepository.findAllByEmdAddressId(request.getRCode(), request.getPageable());
+        }
         return postRepository.findAllByBoardIdAndEmdAddressId(request.getBoardId(), request.getRCode(), request.getPageable());
     }
 
