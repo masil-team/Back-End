@@ -57,4 +57,8 @@ public class Notification extends BaseEntity {
     public void read() {
         this.isRead = true;
     }
+
+    public boolean isOwner(Long memberId) {
+        return receiver.getId() == memberId;
+    }
 }

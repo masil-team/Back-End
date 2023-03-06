@@ -42,15 +42,15 @@ class NotificationServiceTest extends ServiceTest {
     @Autowired
     private EmdAddressRepository emdAddressRepository;
 
+
     @Test
     @DisplayName("클라이언트의 알림 연결을 성공한다.")
     void createConnection_success() {
         //given
         Member member = MemberFixture.일반_회원_JJ.엔티티_생성();
-        String lastEventId = "";
 
         // when
-        SseEmitter subscribe = notificationService.createConnection(member.getId(), lastEventId);
+        SseEmitter subscribe = notificationService.createConnection(member.getId());
 
         // then
         assertThat(subscribe).isNotNull();
@@ -86,7 +86,7 @@ class NotificationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("알림 목록 조회를 성공한다.")
+    @DisplayName("최신 알림 목록 조회를 성공한다.")
     void findNotifications_success() {
         /**
          * KK가 JJ의 게시글을 좋아요를 할 경우
@@ -104,16 +104,19 @@ class NotificationServiceTest extends ServiceTest {
         Member KK = MemberFixture.일반_회원_KK.엔티티_생성();
         memberRepository.save(KK);
 
-        postLikeService.toggleLikePost(post.getId(), KK.getId());
+        for (int i = 0; i < 40; i++) {
+            postLikeService.toggleLikePost(post.getId(), KK.getId());
+        }
 
         // when
         NotificationsResponse notifications = notificationService.findNotifications(JJ.getId());
-        List<NotificationResponse> notificationResponses = notifications.getNotificationResponses();
+        List<NotificationResponse> notificationResponses = notifications.getNotifications();
         NotificationResponse notificationResponse = notificationResponses.get(0);
 
         // then
+        assertThat(notificationResponses.size()).isEqualTo(15);
         assertThat(notificationResponse.getIsRead()).isFalse();
-        assertThat(notificationResponse.getId()).isEqualTo(1L);
+        assertThat(notificationResponse.getId()).isEqualTo(20L);
         assertThat(notificationResponse.getSender().getId()).isEqualTo(KK.getId());
     }
 
@@ -140,11 +143,11 @@ class NotificationServiceTest extends ServiceTest {
         postLikeService.toggleLikePost(post.getId(), KK.getId());
 
         // when
-        notificationService.readNotification(1L);
+        boolean isDisplay = notificationService.readNotification(1L, JJ.getId());
 
         // then
         Notification notification = notificationRepository.findById(1L).get();
         assertThat(notification.getIsRead()).isTrue();
+        assertThat(isDisplay).isFalse();
     }
-
 }

@@ -8,8 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Map;
 
 
 @Slf4j
@@ -24,10 +29,9 @@ public class NotificationController {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/sse", produces = "text/event-stream")
-    public SseEmitter createConnection(@LoginUser CurrentMember currentMember,
-                                       @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
-        log.info("sse 연결 시작, lastEventId={}", lastEventId);
-        return notificationService.createConnection(currentMember.getId(), lastEventId);
+    public SseEmitter createConnection(@LoginUser CurrentMember currentMember) {
+        log.info("sse 연결 시작");
+        return notificationService.createConnection(currentMember.getId());
     }
 
 
@@ -45,9 +49,11 @@ public class NotificationController {
      */
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/notifications/{id}")
-    public ResponseEntity<Void> readNotification(@PathVariable Long id) {
-        notificationService.readNotification(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, Boolean>> readNotification(@PathVariable Long id,
+                                                                 @LoginUser CurrentMember currentMember) {
+
+        boolean isDisplay = notificationService.readNotification(id, currentMember.getId());
+        return ResponseEntity.ok(Map.of("isDisplay", isDisplay));
     }
 
 }

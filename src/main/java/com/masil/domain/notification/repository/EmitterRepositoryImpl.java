@@ -1,6 +1,5 @@
 package com.masil.domain.notification.repository;
 
-import com.masil.domain.notification.entity.Notification;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,16 +11,11 @@ import java.util.stream.Collectors;
 public class EmitterRepositoryImpl implements EmitterRepository{
 
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final Map<String, Notification> eventCache = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter save(String id, SseEmitter sseEmitter) {
         emitters.put(id, sseEmitter);
         return sseEmitter;
-    }
-    @Override
-    public void saveEventCache(String id, Notification event) {
-        eventCache.put(id, event);
     }
 
     @Override
@@ -30,17 +24,26 @@ public class EmitterRepositoryImpl implements EmitterRepository{
     }
 
     @Override
-    public Map<String, Notification> findAllEventCacheStartWithById(String id) {
-        return eventCache.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(id))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public void deleteAllEmitterStartWithId(String memberId) {
+        emitters.forEach((key, emitter) -> {
+            if (isEqualStartWithById(key, memberId)) {
+                emitters.remove(key);
+            }
+        });
     }
 
     @Override
     public Map<String, SseEmitter> findAllStartWithById(String id) {
         return emitters.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(id))
+                .filter(entry -> isEqualStartWithById(entry.getKey(), id))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private boolean isEqualStartWithById(String emitterId, String id) {
+        int index = emitterId.indexOf("_");
+        if (index == -1)
+            return false;
+        return emitterId.substring(0, index).equals(id);
     }
 
 }

@@ -19,7 +19,7 @@ public class NotificationDto {
         String content = notificationType.getMessage()
                 .replace("*", post.getNotificationPreview());
 
-        String url = "/posts/" + post.getId();
+        String url = "/post/" + post.getId();
 
         return NotificationDto.builder()
                 .notificationType(notificationType)

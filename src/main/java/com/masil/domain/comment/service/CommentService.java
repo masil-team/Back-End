@@ -8,6 +8,9 @@ import com.masil.domain.comment.repository.CommentRepository;
 import com.masil.domain.commentlike.repository.CommentLikeRepository;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
+import com.masil.domain.notification.dto.NotificationDto;
+import com.masil.domain.notification.entity.NotificationType;
+import com.masil.domain.notification.service.NotificationService;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.repository.PostRepository;
@@ -27,8 +30,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
     private final CommentLikeRepository commentLikeRepository;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 조회
@@ -65,6 +68,7 @@ public class CommentService {
         comment.validateLength(comment.getContent());
         validateOwner(memberId, comment);
 
+        notificationService.send(member, post.getMember(), NotificationDto.of(NotificationType.POST_COMMENT_REPLY, post));
 
         return commentRepository.save(comment).getId();
     }
@@ -80,6 +84,8 @@ public class CommentService {
         Member member = findMemberById(memberId);
 
         Comment reply = childrenCreateRequest.toEntity(post, parent, member);
+
+        notificationService.send(member, parent.getMember(), NotificationDto.of(NotificationType.COMMENT_REPLY, post));
 
         return commentRepository.save(reply).getId();
     }

@@ -2,6 +2,7 @@ package com.masil.global.auth.service;
 
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.repository.MemberRepository;
+import com.masil.domain.notification.repository.EmitterRepository;
 import com.masil.global.auth.dto.request.AuthTokenRequest;
 import com.masil.global.auth.dto.request.LoginRequest;
 import com.masil.global.auth.dto.request.SignupRequest;
@@ -40,6 +41,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmitterRepository emitterRepository;
 
     @Transactional
     public void signUp(SignupRequest signupRequest) {
@@ -168,6 +170,9 @@ public class AuthService {
             RefreshToken refreshToken = refreshTokenRepository.findByKey(member.getEmail())
                     .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
             refreshTokenRepository.delete(refreshToken);
+
+            // see 연결 종료
+            emitterRepository.deleteAllEmitterStartWithId(String.valueOf(memberId));
         } else {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
