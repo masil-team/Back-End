@@ -154,4 +154,7 @@ public class CommentService {
                 .orElseThrow(RuntimeException::new);
     }
 
+    public CommentsResponse findCommentsByMemberId(Long memberId, Pageable pageable) {
+        return CommentsResponse.ofComment(commentRepository.findAllByMemberId(memberId, pageable));
+    }
 }
