@@ -4,13 +4,18 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.masil.domain.storage.dto.FileInfoDto;
+import com.masil.domain.storage.exception.FileNotFoundException;
+import com.masil.domain.storage.exception.InvalidImageExtensionException;
+import com.masil.domain.storage.exception.InvalidImageFileException;
+import com.masil.global.error.exception.BusinessException;
+import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -35,6 +40,9 @@ public class AwsS3Service {
      */
     public FileInfoDto upload(MultipartFile multipartFile, String dirName){
 
+        // 이미지 파일 유효성 체크 후 bufferedImage 반환
+        BufferedImage bufferedImage = getValidBufferedImage(multipartFile);
+
         String fileName = createFileName(multipartFile.getOriginalFilename(), dirName);
 
         // 메타데이터 지정, TODO : 필요여부 체크
@@ -47,13 +55,39 @@ public class AwsS3Service {
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
         } catch (IOException e){
             // TODO : 추주 예외 변경
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+            throw new BusinessException("파일 업로드에 실패하였습니다.", ErrorCode.SERVER_ERROR);
         }
 
         // s3에 저장된 파일 path 얻어옴.
         String path = amazonS3.getUrl(bucket, fileName).getPath();
 
-        return FileInfoDto.of(path, createUrlName(path));
+        return FileInfoDto.of(path, createUrlName(path), bufferedImage.getWidth(), bufferedImage.getHeight());
+    }
+
+    /**
+     * 이미지 유효성 체크 후 BufferedImage 반환
+     */
+    public BufferedImage getValidBufferedImage(MultipartFile multipartFile) {
+        try {
+            // 업로드된 파일의 BufferedImage 를 가져온다.
+            BufferedImage read = ImageIO.read(multipartFile.getInputStream());
+
+            // 업로드된 파일이 이미지가 아닐 경우를 체크한다.
+            if (read == null) {
+                throw new InvalidImageFileException();
+            }
+
+            // 파일 확장자 체크 [jpeg, jpg, png, gif]
+            if (!isValidImageExtension(multipartFile.getContentType())) {
+                throw new InvalidImageExtensionException();
+            }
+
+            return read;
+        } catch (IOException e) {
+            throw new BusinessException("파일 업로드에 실패하였습니다.", ErrorCode.SERVER_ERROR);
+        } catch (NullPointerException e) {
+            throw new FileNotFoundException();
+        }
     }
 
     /**
@@ -64,18 +98,14 @@ public class AwsS3Service {
         return cdnDomain + path;
     }
 
-    // 먼저 파일 업로드시, 파일명을 난수화하기 위해 UUID 를 활용하여 난수를 돌린다.
     private String createFileName(String fileName, String dirName){
+        // 파일명을 다르게 하기 위해 UUID 를 붙임
         return dirName + "/" + UUID.randomUUID() + fileName;
     }
 
-    // file 형식이 잘못된 경우를 확인하기 위해 만들어진 로직이며, 파일 타입과 상관없이 업로드할 수 있게 하기위해, "."의 존재 유무만 판단하였습니다.
-//    private String getFileExtension(String fileName){
-//        try{
-//            return fileName.substring(fileName.lastIndexOf("."));
-//        } catch (StringIndexOutOfBoundsException e){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일" + fileName + ") 입니다.");
-//        }
-//    }
+    private boolean isValidImageExtension(String contentType) {
+        // 유효한 이미지 확장자.
+        return contentType.matches("^image/(jpeg|jpg|png|gif)$");
+    }
 
 }

@@ -54,7 +54,13 @@ public enum ErrorCode {
 
     // notification
     NOTIFICATION_NOT_FOUND(NOT_FOUND, 7001, "존재하지 않는 알람입니다."),
-    NOTIFICATION_ACCESS_DENIED(FORBIDDEN, 7002, "해당 알람에 대한 권한이 없습니다");
+    NOTIFICATION_ACCESS_DENIED(FORBIDDEN, 7002, "해당 알람에 대한 권한이 없습니다"),
+
+    // file
+    FILE_NOT_FOUND(NOT_FOUND, 10001, "존재하지 않는 파일입니다"),
+    INVALID_IMAGE_FILE(BAD_REQUEST, 10002, "유효하지 않은 이미지 형태입니다."),
+    INVALID_IMAGE_EXTENSION(BAD_REQUEST, 10003, "사진 파일만 업로드할 수 있습니다."),
+    ;
     private HttpStatus status;
     private final int code;
     private final String message;
