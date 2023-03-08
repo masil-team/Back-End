@@ -209,3 +209,36 @@ include::{snippets}/notification/read/http-request.adoc[]
 ==== HTTP response
 
 include::{snippets}/notification/read/http-response.adoc[]
+
+= 4. 이미지
+
+== 4.1. 이미지 업로드
+
+=== 4.1.1 이미지 업로드 성공
+
+==== HTTP request
+
+include::{snippets}/s3/post-image/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/s3/post-image/http-response.adoc[]
+
+=== 4.1.2 이미지 업로드 실패
+==== 이미지 확장자가 아닐 경우
+==== HTTP request
+
+include::{snippets}/s3/post-image/invalidImageExtension/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/s3/post-image/invalidImageExtension/http-response.adoc[]
+
+==== 이미지 파일이 아닌 경우
+==== HTTP request
+
+include::{snippets}/s3/post-image/invalidImageFile/http-request.adoc[]
+
+==== HTTP response
+
+include::{snippets}/s3/post-image/invalidImageFile/http-response.adoc[]
