@@ -10,6 +10,8 @@ import com.masil.domain.post.service.PostService;
 import com.masil.domain.postlike.service.PostLikeService;
 import com.masil.global.auth.annotaion.LoginUser;
 import com.masil.global.auth.dto.response.CurrentMember;
+import com.masil.global.error.exception.BusinessException;
+import com.masil.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -44,13 +46,23 @@ public class MyController {
     public ResponseEntity<PostsResponse> findMyPosts(@LoginUser CurrentMember currentMember,
                                                      @RequestBody MyFindRequest request,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        validateMember(currentMember, request);
         return ResponseEntity.ok(postService.findPostsByMember(request, pageable));
+    }
+
+    private static void validateMember(CurrentMember currentMember, MyFindRequest request) {
+        if (currentMember == null) {
+            throw new BusinessException(ErrorCode.ACCEESS_DENIED_MEMBER);
+        } else if (!currentMember.getId().equals(request.getMemberId())) {
+            throw new BusinessException(ErrorCode.ACCEESS_DENIED_MEMBER);
+        }
     }
 
     @GetMapping("/post-likes")
     public ResponseEntity<PostsResponse> findMyLikesAboutPost(@LoginUser CurrentMember currentMember,
                                                         @RequestBody MyFindRequest request,
                                                         @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        validateMember(currentMember, request);
         return ResponseEntity.ok(postLikeService.findLikesByMemberId(request, pageable));
     }
 
@@ -58,6 +70,7 @@ public class MyController {
     public ResponseEntity<CommentsResponse> findMyLikesAboutComment(@LoginUser CurrentMember currentMember,
                                                                     @RequestBody MyFindRequest request,
                                                                     @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        validateMember(currentMember, request);
         return ResponseEntity.ok(commentLikeService.findLikesByMemberId(request,pageable));
     }
 
@@ -65,6 +78,7 @@ public class MyController {
     public ResponseEntity<PostsResponse> findMyBookmarks(@LoginUser CurrentMember currentMember,
                                                          @RequestBody MyFindRequest request,
                                                          @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        validateMember(currentMember, request);
         return ResponseEntity.ok(bookmarkService.findBookmarksByMember(request, pageable));
     }
 
@@ -72,6 +86,7 @@ public class MyController {
     public ResponseEntity<CommentsResponse> findMyComments(@LoginUser CurrentMember currentMember,
                                                            @RequestBody MyFindRequest request,
                                                            @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        validateMember(currentMember, request);
         return ResponseEntity.ok(commentService.findCommentsByMemberId(request.getMemberId(), pageable));
     }
 
