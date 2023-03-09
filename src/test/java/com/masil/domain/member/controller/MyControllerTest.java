@@ -31,6 +31,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -118,7 +121,30 @@ class MyControllerTest extends ControllerMockApiTest {
                         everyItem(equalTo(1))))
                 .andExpect(jsonPath("$.posts[*].member.nickname",
                         everyItem(equalTo("회원A"))))
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("my/findMyPosts",            //문서 생성 위치
+                        preprocessRequest(prettyPrint()),  // 이쁘게 줄바꿈 되도록
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("memberId").description("로그인 멤버 id")
+                        ),
+                        responseFields(   // 응답 필드 지정 , (요청이 있을 경우에는 requestFields)
+                                fieldWithPath("posts.[].id").description("게시글 id"),
+                                fieldWithPath("posts.[].member.id").description("작성자 id"),
+                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
+                                fieldWithPath("posts.[].boardId").description("카테고리Id"),
+                                fieldWithPath("posts.[].address").description("주소"),
+                                fieldWithPath("posts.[].content").description("내용"),
+                                fieldWithPath("posts.[].viewCount").description("조회수"),
+                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
+                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].isOwner").description("본인 게시글 여부"),
+                                fieldWithPath("posts.[].isLiked").description("게시글 좋아요 여부"),
+                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
+                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("isLast").description("마지막 페이지 여부")
+                        )));
 
         verify(postService, times(1)).findPostsByMember(any(), any());
     }
@@ -145,7 +171,40 @@ class MyControllerTest extends ControllerMockApiTest {
                         everyItem(equalTo(1))))
                 .andExpect(jsonPath("$.comments[1].replies[*].member.nickname",
                         everyItem(equalTo("회원A"))))
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("my/findMyComments",            //문서 생성 위치
+                        preprocessRequest(prettyPrint()),  // 이쁘게 줄바꿈 되도록
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("memberId").description("로그인 멤버 id")
+                        ),
+                        responseFields(   // 응답 필드 지정 , (요청이 있을 경우에는 requestFields)
+                                fieldWithPath("comments.[].id").description("댓글 id"),
+                                fieldWithPath("comments.[].content").description("댓글 내용"),
+                                fieldWithPath("comments.[].postId").description("게시글 id"),
+                                fieldWithPath("comments.[].member.id").description("댓글 작성자 id"),
+                                fieldWithPath("comments.[].member.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("comments.[].isOwner").description("본인 댓글 여부"),
+                                fieldWithPath("comments.[].likeCount").description("댓글 좋아요 개수"),
+                                fieldWithPath("comments.[].isLiked").description("댓글 좋아요 여부"),
+                                fieldWithPath("comments.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("comments.[].isDeleted").description("대댓글이 있는 댓글 삭제 여부"),
+                                fieldWithPath("comments.[].replies").description("대댓글 목록").optional(),
+                                fieldWithPath("comments.[].replies.[].id").description("대댓글 댓글 id"),
+                                fieldWithPath("comments.[].replies.[].content").description("대댓글 댓글 내용"),
+                                fieldWithPath("comments.[].replies.[].postId").description("대댓글 게시글 id"),
+                                fieldWithPath("comments.[].replies.[].member.id").description("대댓글 댓글 작성자 id"),
+                                fieldWithPath("comments.[].replies.[].member.nickname").description("대댓글 댓글 작성자 닉네임"),
+                                fieldWithPath("comments.[].replies.[].isOwner").description("본인 대댓글 여부"),
+                                fieldWithPath("comments.[].replies.[].likeCount").description("대댓글 좋아요 개수"),
+                                fieldWithPath("comments.[].replies.[].isLiked").description("대댓글 좋아요 여부"),
+                                fieldWithPath("comments.[].replies.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].replies.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("totalCommentCount").description("총 부모댓글 수"),
+                                fieldWithPath("totalPage").description("전체 페이지 수"),
+                                fieldWithPath("last").description("마지막 페이지 여부")
+                        )));
 
         verify(commentService, times(1)).findCommentsByMemberId(any(), any());
     }
@@ -166,7 +225,30 @@ class MyControllerTest extends ControllerMockApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.posts[*].isLiked",
                         everyItem(equalTo(true))))
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("my/findMyLikedPosts",            //문서 생성 위치
+                        preprocessRequest(prettyPrint()),  // 이쁘게 줄바꿈 되도록
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("memberId").description("로그인 멤버 id")
+                        ),
+                        responseFields(   // 응답 필드 지정 , (요청이 있을 경우에는 requestFields)
+                                fieldWithPath("posts.[].id").description("게시글 id"),
+                                fieldWithPath("posts.[].member.id").description("작성자 id"),
+                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
+                                fieldWithPath("posts.[].boardId").description("카테고리Id"),
+                                fieldWithPath("posts.[].address").description("주소"),
+                                fieldWithPath("posts.[].content").description("내용"),
+                                fieldWithPath("posts.[].viewCount").description("조회수"),
+                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
+                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].isOwner").description("본인 게시글 여부"),
+                                fieldWithPath("posts.[].isLiked").description("게시글 좋아요 여부"),
+                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
+                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("isLast").description("마지막 페이지 여부")
+                        )));
 
         verify(postLikeService, times(1)).findLikesByMemberId(any(), any());
 
@@ -188,7 +270,40 @@ class MyControllerTest extends ControllerMockApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.comments[*].isLiked",
                         everyItem(equalTo(true))))
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("my/findMyLikesComments",            //문서 생성 위치
+                        preprocessRequest(prettyPrint()),  // 이쁘게 줄바꿈 되도록
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("memberId").description("로그인 멤버 id")
+                        ),
+                        responseFields(   // 응답 필드 지정 , (요청이 있을 경우에는 requestFields)
+                                fieldWithPath("comments.[].id").description("댓글 id"),
+                                fieldWithPath("comments.[].content").description("댓글 내용"),
+                                fieldWithPath("comments.[].postId").description("게시글 id"),
+                                fieldWithPath("comments.[].member.id").description("댓글 작성자 id"),
+                                fieldWithPath("comments.[].member.nickname").description("댓글 작성자 닉네임"),
+                                fieldWithPath("comments.[].isOwner").description("본인 댓글 여부"),
+                                fieldWithPath("comments.[].likeCount").description("댓글 좋아요 개수"),
+                                fieldWithPath("comments.[].isLiked").description("댓글 좋아요 여부"),
+                                fieldWithPath("comments.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("comments.[].isDeleted").description("대댓글이 있는 댓글 삭제 여부"),
+                                fieldWithPath("comments.[].replies").description("대댓글 목록").optional(),
+                                fieldWithPath("comments.[].replies.[].id").description("대댓글 댓글 id"),
+                                fieldWithPath("comments.[].replies.[].content").description("대댓글 댓글 내용"),
+                                fieldWithPath("comments.[].replies.[].postId").description("대댓글 게시글 id"),
+                                fieldWithPath("comments.[].replies.[].member.id").description("대댓글 댓글 작성자 id"),
+                                fieldWithPath("comments.[].replies.[].member.nickname").description("대댓글 댓글 작성자 닉네임"),
+                                fieldWithPath("comments.[].replies.[].isOwner").description("본인 대댓글 여부"),
+                                fieldWithPath("comments.[].replies.[].likeCount").description("대댓글 좋아요 개수"),
+                                fieldWithPath("comments.[].replies.[].isLiked").description("대댓글 좋아요 여부"),
+                                fieldWithPath("comments.[].replies.[].createDate").description("생성 날짜"),
+                                fieldWithPath("comments.[].replies.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("totalCommentCount").description("총 부모댓글 수"),
+                                fieldWithPath("totalPage").description("전체 페이지 수"),
+                                fieldWithPath("last").description("마지막 페이지 여부")
+                        )));
 
         verify(commentLikeService, times(1)).findLikesByMemberId(any(), any());
 
@@ -210,7 +325,30 @@ class MyControllerTest extends ControllerMockApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.posts[*].isScrap",
                         everyItem(equalTo(true))))
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("my/findMyBookmarks",            //문서 생성 위치
+                        preprocessRequest(prettyPrint()),  // 이쁘게 줄바꿈 되도록
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("memberId").description("로그인 멤버 id")
+                        ),
+                        responseFields(   // 응답 필드 지정 , (요청이 있을 경우에는 requestFields)
+                                fieldWithPath("posts.[].id").description("게시글 id"),
+                                fieldWithPath("posts.[].member.id").description("작성자 id"),
+                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
+                                fieldWithPath("posts.[].boardId").description("카테고리Id"),
+                                fieldWithPath("posts.[].address").description("주소"),
+                                fieldWithPath("posts.[].content").description("내용"),
+                                fieldWithPath("posts.[].viewCount").description("조회수"),
+                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
+                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
+                                fieldWithPath("posts.[].isOwner").description("본인 게시글 여부"),
+                                fieldWithPath("posts.[].isLiked").description("게시글 좋아요 여부"),
+                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
+                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
+                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("isLast").description("마지막 페이지 여부")
+                        )));
 
         verify(bookmarkService, times(1)).findBookmarksByMember(any(), any());
     }
