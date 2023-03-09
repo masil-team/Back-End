@@ -100,6 +100,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                 .isScrap(false)
                 .createDate(LocalDateTime.now())
                 .modifyDate(LocalDateTime.now())
+                .imageCount(files.size())
                 .files(files)
                 .build();
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
@@ -127,6 +128,7 @@ public class PostControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("createDate").description("생성 날짜"),
                                 fieldWithPath("modifyDate").description("수정 날짜"),
+                                fieldWithPath("imageCount").description("이미지 개수"),
                                 fieldWithPath("files.[].url").description("이미지 주소"),
                                 fieldWithPath("files.[].width").description("너비"),
                                 fieldWithPath("files.[].height").description("높이")

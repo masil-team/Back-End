@@ -27,6 +27,7 @@ public class PostDetailResponse {
     private Boolean isScrap;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+    private int imageCount;
     private List<FileResponse> files;
 
     public static PostDetailResponse of(Post post) {
@@ -49,6 +50,7 @@ public class PostDetailResponse {
                 .isScrap(post.getIsScrap())
                 .createDate(post.getCreateDate())
                 .modifyDate(post.getModifyDate())
+                .imageCount(filesResponse.size())
                 .files(filesResponse)
                 .build();
     }

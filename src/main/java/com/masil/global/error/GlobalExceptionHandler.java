@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RestControllerAdvice
@@ -100,6 +101,14 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(errorCode);
         return ResponseEntity.status(errorCode.getStatus())
                 .body(response);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    protected ResponseEntity<String> handleException(ResponseStatusException e) {
+        log.error("ResponseStatusException", e);
+
+        return ResponseEntity.status(e.getStatus())
+                .body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
