@@ -198,6 +198,9 @@ public class PostService {
     }
 
     public PostsResponse findPostsByMember(MyFindRequest request, Pageable pageable) {
-        return PostsResponse.ofPosts(postRepository.findAllByMemberId(request.getMemberId(), pageable));
+        Slice<Post> myPosts = postRepository.findAllByMemberId(request.getMemberId(), pageable);
+        myPosts.forEach(myPost
+                -> updatePostPermissionsForMember(request.getMemberId(), myPost));
+        return PostsResponse.ofPosts(myPosts);
     }
 }

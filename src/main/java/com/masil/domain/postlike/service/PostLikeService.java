@@ -1,5 +1,6 @@
 package com.masil.domain.postlike.service;
 
+import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.dto.request.MyFindRequest;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
@@ -33,6 +34,8 @@ public class PostLikeService {
     private final MemberRepository memberRepository;
 
     private final NotificationService notificationService;
+
+    private final BookmarkRepository bookmarkRepository;
 
     @Transactional
     public PostLikeResponse toggleLikePost(Long postId, Long memberId) {
@@ -82,6 +85,18 @@ public class PostLikeService {
 
     public PostsResponse findLikesByMemberId(MyFindRequest request, Pageable pageable) {
         Slice<PostLike> postLikes = postLikeRepository.findAllByMemberId(request.getMemberId());
+        postLikes.forEach(myPostLike
+                -> updatePostPermissionsForMember(request.getMemberId(), myPostLike.getPost()));
         return PostsResponse.ofPostLikes(postLikes);
     }
+
+    private void updatePostPermissionsForMember(Long memberId, Post post) {
+        boolean isOwnPost = post.isOwner(memberId);
+        boolean isLiked = true;
+        boolean isScrap = bookmarkRepository.existsByPostAndMemberId(post, memberId);
+        post.updatePostPermissions(isOwnPost, isLiked, isScrap);
+    }
+
+
+
 }

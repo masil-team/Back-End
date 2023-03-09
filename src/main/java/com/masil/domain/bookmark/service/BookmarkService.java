@@ -89,7 +89,7 @@ public class BookmarkService {
     private void updatePostPermissionsForMember(Long memberId, Post post) {
         boolean isOwnPost = post.isOwner(memberId);
         boolean isLiked = postLikeRepository.existsByPostAndMemberId(post, memberId);
-        boolean isScrap = bookmarkRepository.existsByPostAndMemberId(post, memberId);
+        boolean isScrap = true;
         post.updatePostPermissions(isOwnPost, isLiked, isScrap);
     }
 }
