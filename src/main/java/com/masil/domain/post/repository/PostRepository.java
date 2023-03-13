@@ -33,4 +33,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "UPDATE Post p set p.viewCount = p.viewCount + 1 where p.id = :postId")
     void increaseViewCount(Long postId);
 
+    Slice<Post> findAllByMemberId(Long memberId, Pageable pageable);
 }

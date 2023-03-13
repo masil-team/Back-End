@@ -1,6 +1,5 @@
 package com.masil.domain.fixture;
 
-import com.masil.domain.address.entity.EmdAddress;
 import com.masil.domain.member.entity.Member;
 
 public enum MemberFixture {

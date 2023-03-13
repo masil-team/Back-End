@@ -3,6 +3,7 @@ package com.masil.domain.comment.repository;
 import com.masil.domain.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostId(@Param("postId")Long postId, Pageable pageable);
 
     Long countByPostId(Long postId);
+
+    Slice<Comment> findAllByMemberId(Long memberId, Pageable pageable);
 }
