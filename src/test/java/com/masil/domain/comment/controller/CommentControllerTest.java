@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-class CommentControllerTest extends ControllerMockApiTest{
+class CommentControllerTest extends ControllerMockApiTest {
 
     @MockBean
     private CommentService commentService;
@@ -88,7 +88,11 @@ class CommentControllerTest extends ControllerMockApiTest{
                     .build());
         }
 
-        CommentsResponse commentResponseList = new CommentsResponse(commentResponses, 2L ,1);
+        CommentsResponse commentResponseList = CommentsResponse.builder()
+                .comments(commentResponses)
+                .totalCommentCount(2L)
+                .totalPage(1)
+                .build();
 
         given(commentService.findComments(any(), any(), any())).willReturn(commentResponseList);
 
@@ -185,7 +189,7 @@ class CommentControllerTest extends ControllerMockApiTest{
         // given
         CommentCreateRequest commentCreateRequest = CommentCreate411RequestBuilder.build();
 
-        willThrow(new CommentInputException()).given(commentService).createComment(any(),any(),any());
+        willThrow(new CommentInputException()).given(commentService).createComment(any(), any(), any());
 
         // when
         ResultActions resultActions = requestCreateComment(commentCreateRequest);
@@ -210,7 +214,7 @@ class CommentControllerTest extends ControllerMockApiTest{
         // given
         CommentModifyRequest commentModifyRequest = CommentModifyRequestBuilder.build();
 
-        willDoNothing().given(commentService).modifyComment(any(),any(),any(), any());
+        willDoNothing().given(commentService).modifyComment(any(), any(), any(), any());
 
         // when
         ResultActions resultActions = requestModifyComment(commentModifyRequest);
@@ -233,7 +237,7 @@ class CommentControllerTest extends ControllerMockApiTest{
         // given
         CommentModifyRequest commentModifyRequest = CommentModifyRequestBuilder.build();
 
-        willThrow(new CommentAccessDeniedException()).given(commentService).modifyComment(any(),any(),any(), any());
+        willThrow(new CommentAccessDeniedException()).given(commentService).modifyComment(any(), any(), any(), any());
 
         // when
         ResultActions resultActions = requestModifyComment(commentModifyRequest);
@@ -273,7 +277,7 @@ class CommentControllerTest extends ControllerMockApiTest{
     @DisplayName("댓글 삭제 권한이 없을 경우 예외가 발생한다.")
     void deleteComment_access_denied() throws Exception {
         // given
-        willThrow(new CommentAccessDeniedException()).given(commentService).deleteComment(any(),any(),any());
+        willThrow(new CommentAccessDeniedException()).given(commentService).deleteComment(any(), any(), any());
 
         // when
         ResultActions resultActions = requestDeleteComment("/posts/1/comments/1");

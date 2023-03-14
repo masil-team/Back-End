@@ -5,6 +5,8 @@ import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
+import com.masil.domain.member.dto.request.MyFindRequest;
+import com.masil.domain.member.dto.response.MyFindResponse;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
@@ -25,6 +27,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -85,7 +89,7 @@ public class PostService {
     }
 
     @Transactional
-    public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long memberId){
+    public void modifyPost(Long postId, PostModifyRequest postModifyRequest, Long memberId) {
         Post post = findPostById(postId);
         findMemberById(memberId);
         Board board = findBoardById(postModifyRequest.getBoardId());
@@ -191,5 +195,12 @@ public class PostService {
     private Board findBoardById(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);
+    }
+
+    public PostsResponse findPostsByMember(MyFindRequest request, Pageable pageable) {
+        Slice<Post> myPosts = postRepository.findAllByMemberId(request.getMemberId(), pageable);
+        myPosts.forEach(myPost
+                -> updatePostPermissionsForMember(request.getMemberId(), myPost));
+        return PostsResponse.ofPosts(myPosts);
     }
 }
