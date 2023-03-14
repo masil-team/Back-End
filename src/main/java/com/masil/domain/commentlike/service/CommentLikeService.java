@@ -16,6 +16,7 @@ import com.masil.domain.notification.entity.NotificationType;
 import com.masil.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,17 @@ public class CommentLikeService {
     }
 
     public CommentsResponse findLikesByMemberId(MyFindRequest request, Pageable pageable) {
-        return CommentsResponse.ofCommentLike(commentLikeRepository.findAllByMemberId(request.getMemberId(), pageable));
+        Page<CommentLike> mylikeComments = commentLikeRepository.findAllByMemberId(request.getMemberId(), pageable);
+        for (CommentLike myLikeComment : mylikeComments) {
+            updateCommentPermissionsForMember(request.getMemberId(), myLikeComment.getComment());
+        }
+        return CommentsResponse.ofCommentLike(mylikeComments);
+    }
+
+    private void updateCommentPermissionsForMember(Long memberId, Comment comment) {
+        boolean isOwner = comment.isCommentWriter(memberId);
+        boolean isLiked = true;
+        comment.updateIsCommentWriter(isOwner);
+        comment.updateCommentLiked(isLiked);
     }
 }
