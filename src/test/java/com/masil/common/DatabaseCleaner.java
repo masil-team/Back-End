@@ -36,7 +36,10 @@ public class DatabaseCleaner {
         entityManager.createNativeQuery("SET foreign_key_checks = 0").executeUpdate();
 
         for (String tableName : tableNames) {
-            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+            // 주소 데이터는 초기화 X
+            if (!tableName.matches("(sgg|emd|sido)_address")) {
+                entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+            }
         }
 
         entityManager.createNativeQuery("SET foreign_key_checks = 1").executeUpdate();

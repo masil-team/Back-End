@@ -34,11 +34,11 @@ public enum PostFixture {
                 .build();
     }
     public Post 엔티티_생성() {
-
+        // 카테고리 필요없는 테스트에 사용
         return Post.builder()
                 .content(this.content)
                 .member(this.member)
-                .board(this.board)
+//                .board(this.board)
                 .build();
     }
 
