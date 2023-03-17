@@ -20,11 +20,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
-@RequestMapping("/my")
+@RequestMapping("/members/{memberId}/my")
 @RequiredArgsConstructor
 public class MyController {
 
@@ -44,8 +45,11 @@ public class MyController {
 
     @GetMapping("/posts")
     public ResponseEntity<PostsResponse> findMyPosts(@LoginUser CurrentMember currentMember,
-                                                     @RequestBody MyFindRequest request,
+                                                     @PathVariable Long memberId,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+
+        MyFindRequest request = MyFindRequest.builder()
+                .memberId(memberId).build();
         validateMember(currentMember, request);
         return ResponseEntity.ok(postService.findPostsByMember(request, pageable));
     }
@@ -60,32 +64,40 @@ public class MyController {
 
     @GetMapping("/post-likes")
     public ResponseEntity<PostsResponse> findMyLikesAboutPost(@LoginUser CurrentMember currentMember,
-                                                        @RequestBody MyFindRequest request,
+                                                              @PathVariable Long memberId,
                                                         @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        MyFindRequest request = MyFindRequest.builder()
+                .memberId(memberId).build();
         validateMember(currentMember, request);
         return ResponseEntity.ok(postLikeService.findLikesByMemberId(request, pageable));
     }
 
     @GetMapping("/comment-likes")
     public ResponseEntity<CommentsResponse> findMyLikesAboutComment(@LoginUser CurrentMember currentMember,
-                                                                    @RequestBody MyFindRequest request,
+                                                                    @PathVariable Long memberId,
                                                                     @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        MyFindRequest request = MyFindRequest.builder()
+                .memberId(memberId).build();
         validateMember(currentMember, request);
         return ResponseEntity.ok(commentLikeService.findLikesByMemberId(request,pageable));
     }
 
     @GetMapping("/bookmarks")
     public ResponseEntity<PostsResponse> findMyBookmarks(@LoginUser CurrentMember currentMember,
-                                                         @RequestBody MyFindRequest request,
+                                                         @PathVariable Long memberId,
                                                          @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        MyFindRequest request = MyFindRequest.builder()
+                .memberId(memberId).build();
         validateMember(currentMember, request);
         return ResponseEntity.ok(bookmarkService.findBookmarksByMember(request, pageable));
     }
 
     @GetMapping("/comments")
     public ResponseEntity<CommentsResponse> findMyComments(@LoginUser CurrentMember currentMember,
-                                                           @RequestBody MyFindRequest request,
+                                                           @PathVariable Long memberId,
                                                            @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
+        MyFindRequest request = MyFindRequest.builder()
+                .memberId(memberId).build();
         validateMember(currentMember, request);
         return ResponseEntity.ok(commentService.findCommentsByMemberId(request.getMemberId(), pageable));
     }
