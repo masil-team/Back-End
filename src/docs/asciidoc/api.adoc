@@ -160,18 +160,6 @@ include::{snippets}/bookmark/delete/http-request.adoc[]
 
 include::{snippets}/bookmark/delete/http-response.adoc[]
 
-== 2.3. 즐겨찾기 조회하기
-
-=== 2.3.1 즐겨찾기 조회하기 성공
-
-==== HTTP request
-
-include::{snippets}/post/findBookmarks/http-request.adoc[]
-
-==== HTTP response
-
-include::{snippets}/post/findBookmarks/http-response.adoc[]
-
 = 3. 알림
 
 == 3.1. 알림 see 연결

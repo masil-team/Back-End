@@ -310,67 +310,6 @@ public class PostControllerTest extends ControllerMockApiTest {
     }
 
     @Test
-    @DisplayName("즐겨찾기를 성공적으로 조회한다")
-    void findBookmarks() throws Exception {
-
-        // given
-        List<PostsElementResponse> postsElementResponseList = new ArrayList<>();
-
-        postsElementResponseList.add(PostsElementResponse.builder()
-                .id(1L)
-                .member(MEMBER_RESPONSE)
-                .boardId(1L)
-                .address("옥천동")
-                .content("내용")
-                .viewCount(0)
-                .likeCount(0)
-                .commentCount(0)
-                .isOwner(false)
-                .isLiked(false)
-                .isScrap(false)
-                .createDate(LocalDateTime.now())
-                .modifyDate(LocalDateTime.now())
-                .thumbnail(FILE_RESPONSE)
-                .build());
-
-
-        PostsResponse postsResponse = new PostsResponse(postsElementResponseList, true);
-        given(postService.findBookmarks(any(), any())).willReturn(postsResponse);
-
-        // when
-        ResultActions resultActions = requestFindBookmarks("/bookmarks");
-
-        // then
-        resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("post/findBookmarks",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        responseFields(
-                                fieldWithPath("posts.[].id").description("게시글 id"),
-                                fieldWithPath("posts.[].member.id").description("작성자 id"),
-                                fieldWithPath("posts.[].member.nickname").description("닉네임"),
-                                fieldWithPath("posts.[].boardId").description("카테고리Id"),
-                                fieldWithPath("posts.[].address").description("주소"),
-                                fieldWithPath("posts.[].content").description("내용"),
-                                fieldWithPath("posts.[].viewCount").description("조회수"),
-                                fieldWithPath("posts.[].likeCount").description("좋아요 개수"),
-                                fieldWithPath("posts.[].commentCount").description("댓글 개수"),
-                                fieldWithPath("posts.[].isOwner").description("본인 글 여부"),
-                                fieldWithPath("posts.[].isLiked").description("좋아요 여부"),
-                                fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
-                                fieldWithPath("posts.[].createDate").description("생성 날짜"),
-                                fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
-                                fieldWithPath("posts.[].thumbnail.url").description("이미지 주소"),
-                                fieldWithPath("posts.[].thumbnail.width").description("너비"),
-                                fieldWithPath("posts.[].thumbnail.height").description("높이"),
-                                fieldWithPath("isLast").description("마지막 페이지 여부")
-                        )
-                ));
-
-    }
-
-    @Test
     @DisplayName("게시글 검색 조회를 성공한다.")
     void searchPost_success() throws Exception {
         // given

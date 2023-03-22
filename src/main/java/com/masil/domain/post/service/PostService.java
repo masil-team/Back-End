@@ -107,17 +107,6 @@ public class PostService {
         post.tempDelete();
     }
 
-    public PostsResponse findBookmarks(Long memberId, Pageable pageable) {
-        Member member = findMemberById(memberId);
-        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberAndPostState(member, State.NORMAL, pageable);
-
-        for (Bookmark bookmark : bookmarks) {
-            updatePostPermissionsForMember(memberId, bookmark.getPost());
-        }
-
-        return PostsResponse.ofBookmarks(bookmarks);
-    }
-
     /**
      * 검색 쿼리 추가
      */

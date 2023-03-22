@@ -19,8 +19,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     Optional<Bookmark> findByPostAndMember(Post post, Member member);
 
     @EntityGraph(attributePaths = {"post"}) // fetch 조인 후 조회
-    Slice<Bookmark> findAllByMemberAndPostState(Member member, State state, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"post"}) // fetch 조인 후 조회
     Slice<Bookmark> findAllByMemberIdAndPostState(Long memberId, State state, Pageable pageable);
 }
