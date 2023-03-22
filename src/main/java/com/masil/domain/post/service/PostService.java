@@ -6,7 +6,6 @@ import com.masil.domain.board.repository.BoardRepository;
 import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.dto.request.MyFindRequest;
-import com.masil.domain.member.dto.response.MyFindResponse;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
@@ -28,7 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 import javax.annotation.Nullable;
 
