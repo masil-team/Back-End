@@ -69,6 +69,7 @@ public class CommentService {
         comment.validateLength(comment.getContent());
         validateOwner(memberId, comment);
 
+        post.increaseComment();
         notificationService.send(member, post.getMember(), NotificationDto.of(NotificationType.POST_COMMENT_REPLY, post));
 
         return commentRepository.save(comment).getId();
@@ -86,6 +87,7 @@ public class CommentService {
 
         Comment reply = childrenCreateRequest.toEntity(post, parent, member);
 
+        post.increaseComment();
         notificationService.send(member, parent.getMember(), NotificationDto.of(NotificationType.COMMENT_REPLY, post));
 
         return commentRepository.save(reply).getId();
@@ -113,12 +115,12 @@ public class CommentService {
     public void deleteComment(Long postId, Long commentId, Long memberId) {
         Comment comment = findCommentById(commentId);
         findMemberById(memberId);
-        findPostById(postId);
+        Post post = findPostById(postId);
 
         validateOwner(memberId, comment);
 
         comment.tempDelete();
-
+        post.decreaseLike();
     }
 
     /**

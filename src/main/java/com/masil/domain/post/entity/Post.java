@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -42,6 +43,9 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int likeCount;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int commentCount;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private State state = State.NORMAL;
@@ -62,6 +66,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @BatchSize(size=100)
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostFile> postFiles = new ArrayList<>();
@@ -106,17 +111,18 @@ public class Post extends BaseEntity {
         return this.member.getId() == memberId;
     }
 
-    public void plusLike() {
+    public void increaseLike() {
         this.likeCount++;
     }
-    public void minusLike() {
+    public void decreaseLike() {
         this.likeCount--;
     }
-    public int getCommentCount() {
-        if (comments == null) {
-            return 0;
-        }
-        return comments.size();
+
+    public void increaseComment() {
+        this.commentCount++;
+    }
+    public void decreaseComment() {
+        this.commentCount--;
     }
 
     public boolean isDeleted() {

@@ -370,58 +370,5 @@ public class PostServiceTest extends ServiceTest {
                     .isInstanceOf(PostAccessDeniedException.class);
         }
     }
-    @Nested
-    @DisplayName("유저가 북마크한 게시글 목록 조회를 할 때")
-    class FindBookmarks {
-
-        private List<Post> posts;
-        private Post post;
-        private Member JJ;
-
-        @BeforeEach
-        void setUp() {
-            // TODO : emd 추후 제거
-            EmdAddress emdAddress = emdAddressRepository.findById(11110111).get();
-            posts = 일반_게시글_JJ.엔티티_여러개_생성(emdAddress);
-            post = posts.get(0);
-
-            JJ = memberRepository.save(post.getMember());
-            boardRepository.save(post.getBoard());
-            postRepository.saveAll(posts);
-        }
-        @Test
-        @DisplayName("성공적으로 조회한다.")
-        void findBookmarks_success() {
-
-            // given
-            bookmarkService.addBookmark(post.getId(), JJ.getId());
-
-            // when
-            PostsResponse postsResponse = postService.findBookmarks(JJ.getId(), PageRequest.of(0, 8, DESC, "createDate"));
-            PostsElementResponse postsElementResponse = postsResponse.getPosts().get(0);
-
-            // then
-            assertAll(
-                    () -> assertThat(postsResponse.getPosts().size()).isEqualTo(1),
-                    () -> assertThat(postsElementResponse.getId()).isEqualTo(post.getId()),
-                    () -> assertThat(postsResponse.getIsLast()).isTrue()
-            );
-        }
-
-        @Test
-        @DisplayName("상태가 DELETE 인 게시글은 제외하고 조회한다.")
-        void findBookmarks_isDeleted() {
-            // given
-            bookmarkService.addBookmark(post.getId(), JJ.getId());
-            postService.deletePost(post.getId(), JJ.getId());
-
-            // when
-            PostsResponse postsResponse = postService.findBookmarks(JJ.getId(), PageRequest.of(0, 8, DESC, "createDate"));
-
-            // then
-            assertThat(postsResponse.getPosts().size()).isEqualTo(0);
-        }
-
-    }
 
 }

@@ -3,23 +3,22 @@ package com.masil.domain.post.service;
 import com.masil.domain.board.entity.Board;
 import com.masil.domain.board.exception.BoardNotFoundException;
 import com.masil.domain.board.repository.BoardRepository;
-import com.masil.domain.bookmark.entity.Bookmark;
 import com.masil.domain.bookmark.repository.BookmarkRepository;
 import com.masil.domain.member.dto.request.MyFindRequest;
-import com.masil.domain.member.dto.response.MyFindResponse;
 import com.masil.domain.member.entity.Member;
 import com.masil.domain.member.exception.MemberNotFoundException;
 import com.masil.domain.member.repository.MemberRepository;
 import com.masil.domain.post.dto.*;
 import com.masil.domain.post.entity.Post;
 import com.masil.domain.post.entity.SearchQuery;
-import com.masil.domain.post.entity.State;
 import com.masil.domain.post.exception.PostAccessDeniedException;
 import com.masil.domain.post.exception.PostNotFoundException;
 import com.masil.domain.post.exception.PostSearchInputException;
 import com.masil.domain.post.repository.PostRepository;
+import com.masil.domain.postFile.entity.PostFile;
 import com.masil.domain.postFile.repository.PostFileRepository;
 import com.masil.domain.postlike.repository.PostLikeRepository;
+import com.masil.domain.storage.exception.InvalidImageFileException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +27,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -79,11 +78,14 @@ public class PostService {
         Board board = findBoardById(postCreateRequest.getBoardId());
         Post post = postCreateRequest.toEntity(member, board);
 
-        // TODO : update 문 여러번 발생함, 추후 개선
-        postFileRepository.findByIdIn(postCreateRequest.getFileIds())
-                .stream()
-                .forEach(postFile -> post.addPostFiles(postFile));
+        List<PostFile> postFiles = postFileRepository.findByIdIn(postCreateRequest.getFileIds());
 
+        for (PostFile postFile : postFiles) {
+            // 이미 이미지의 주인이 있는 경우 예외 반환
+            if (postFile.getPost() != null)
+                throw new InvalidImageFileException();
+            post.addPostFiles(postFile);
+        }
 
         return postRepository.save(post).getId();
     }
@@ -107,17 +109,6 @@ public class PostService {
         validateOwner(memberId, post);
 
         post.tempDelete();
-    }
-
-    public PostsResponse findBookmarks(Long memberId, Pageable pageable) {
-        Member member = findMemberById(memberId);
-        Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberAndPostState(member, State.NORMAL, pageable);
-
-        for (Bookmark bookmark : bookmarks) {
-            updatePostPermissionsForMember(memberId, bookmark.getPost());
-        }
-
-        return PostsResponse.ofBookmarks(bookmarks);
     }
 
     /**

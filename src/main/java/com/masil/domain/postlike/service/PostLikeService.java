@@ -56,14 +56,14 @@ public class PostLikeService {
                 .member(member)
                 .build();
         postLikeRepository.save(newPostLike);
-        post.plusLike();
+        post.increaseLike();
         notificationService.send(member, post.getMember(), NotificationDto.of(NotificationType.POST_LIKE, post));
         return PostLikeResponse.of(post.getLikeCount(), true);
     }
 
     private PostLikeResponse deletePostLike(Post post, PostLike postLike) {
         postLikeRepository.delete(postLike);
-        post.minusLike();
+        post.decreaseLike();
         return PostLikeResponse.of(post.getLikeCount(), false);
     }
 
