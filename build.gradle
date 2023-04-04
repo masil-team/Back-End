@@ -54,6 +54,9 @@ dependencies {
 
 	// testcontainers
 	testImplementation "org.testcontainers:mysql:1.17.6"
+
+	// Spring AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {
