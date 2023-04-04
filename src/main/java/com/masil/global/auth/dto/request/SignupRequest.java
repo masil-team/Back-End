@@ -4,6 +4,7 @@ import com.masil.domain.member.entity.Member;
 import com.masil.global.auth.entity.Authority;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
+@ToString
 public class SignupRequest {
 
     private final String NORMAL_STATE = "NORMAL";
@@ -24,24 +26,27 @@ public class SignupRequest {
     private String passwordConfirm;
     @NotBlank(message = "잘못된 닉네임 값입니다.")
     private String nickname;
-    private String profileImage;
 
     @Builder
-    public SignupRequest(String email, String password, String passwordConfirm, String nickname, String profileImage, List<String> roles) {
+    public SignupRequest(String email, String password, String passwordConfirm, String nickname) {
         this.email = email;
         this.password = password;
         this.passwordConfirm = passwordConfirm;
         this.nickname = nickname;
-        this.profileImage = profileImage;
     }
 
-    public Member convertMember(PasswordEncoder encoder , Set<Authority> authorities) {
+    public void encodePassword(PasswordEncoder encoder) {
+        password = encoder.encode(password);
+    }
+
+    public Member convertMember(Set<Authority> authorities , String profileImage) {
         return Member.builder()
                 .email(email)
-                .password(encoder.encode(password))
+                .password(password)
                 .state(NORMAL_STATE)
                 .nickname(nickname)
                 .authorities(authorities)
+                .profileImage(profileImage)
                 .build();
     }
 
