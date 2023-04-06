@@ -40,7 +40,7 @@ class PostLikeControllerTest extends ControllerMockApiTest {
                 .willReturn(PostLikeResponse.of(1, true));
 
         // when
-        ResultActions resultActions = requestLikePost("/posts/1/like");
+        ResultActions resultActions = requestLikePost("/api/posts/1/modify-like");
 
         // then
         resultActions
@@ -63,7 +63,7 @@ class PostLikeControllerTest extends ControllerMockApiTest {
                 .willThrow(new SelfPostLikeException());
 
         // when
-        ResultActions resultActions = requestLikePost("/posts/1/like");
+        ResultActions resultActions = requestLikePost("/api/posts/1/modify-like");
 
         // then
         resultActions

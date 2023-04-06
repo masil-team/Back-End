@@ -16,16 +16,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
-@RequestMapping("/members/{memberId}/my")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MyController {
 
@@ -35,15 +35,8 @@ public class MyController {
     private final CommentService commentService;
     private final BookmarkService bookmarkService;
 
-    // TODO: 2023/03/06 본인 글 조회
-    /*
-        1. 본인글 조회
-        2. 본인 좋아요 누른 글 조회
-        3. 즐겨찾기 한 게시글
-        4. 본인 댓글
-     */
-
-    @GetMapping("/posts")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/{memberId}/posts")
     public ResponseEntity<PostsResponse> findMyPosts(@LoginUser CurrentMember currentMember,
                                                      @PathVariable Long memberId,
                                                      @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
@@ -62,7 +55,8 @@ public class MyController {
         }
     }
 
-    @GetMapping("/post-likes")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/{memberId}/like-posts")
     public ResponseEntity<PostsResponse> findMyLikesAboutPost(@LoginUser CurrentMember currentMember,
                                                               @PathVariable Long memberId,
                                                         @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
@@ -72,7 +66,8 @@ public class MyController {
         return ResponseEntity.ok(postLikeService.findLikesByMemberId(request, pageable));
     }
 
-    @GetMapping("/comment-likes")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/{memberId}/like-comments")
     public ResponseEntity<CommentsResponse> findMyLikesAboutComment(@LoginUser CurrentMember currentMember,
                                                                     @PathVariable Long memberId,
                                                                     @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
@@ -82,7 +77,8 @@ public class MyController {
         return ResponseEntity.ok(commentLikeService.findLikesByMemberId(request,pageable));
     }
 
-    @GetMapping("/bookmarks")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/{memberId}/bookmarks")
     public ResponseEntity<PostsResponse> findMyBookmarks(@LoginUser CurrentMember currentMember,
                                                          @PathVariable Long memberId,
                                                          @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {
@@ -92,7 +88,8 @@ public class MyController {
         return ResponseEntity.ok(bookmarkService.findBookmarksByMember(request, pageable));
     }
 
-    @GetMapping("/comments")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/{memberId}/comments")
     public ResponseEntity<CommentsResponse> findMyComments(@LoginUser CurrentMember currentMember,
                                                            @PathVariable Long memberId,
                                                            @PageableDefault(sort = "createDate", direction = DESC) Pageable pageable) {

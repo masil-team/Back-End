@@ -67,10 +67,13 @@ class MyControllerTest extends ControllerMockApiTest {
     private PostsResponse myBookmarkPostsResponse;
 
     private CommentsResponse myCommentsResponse;
+
     private CommentsResponse myLikeCommentsResponse;
 
     private MemberResponse memberResponseA;
+
     private MemberResponse memberResponseB;
+
     @BeforeEach
     void setUp() {
         setUpMember();
@@ -112,7 +115,7 @@ class MyControllerTest extends ControllerMockApiTest {
         given(postService.findPostsByMember(any(), any())).willReturn(normalPostsResponse);
 
         //expected
-        mockMvc.perform(get("/my/posts")
+        mockMvc.perform(get("/api/members/1/posts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -143,6 +146,7 @@ class MyControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail").description("게시글 썸네일"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )));
 
@@ -158,7 +162,7 @@ class MyControllerTest extends ControllerMockApiTest {
         MyFindRequest request = MyFindRequest.builder().memberId(1L).build();
 
         //expected
-        mockMvc.perform(get("/my/comments")
+        mockMvc.perform(get("/api/members/1/comments")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -218,7 +222,7 @@ class MyControllerTest extends ControllerMockApiTest {
         MyFindRequest request = MyFindRequest.builder().memberId(1L).build();
 
         //expected
-        mockMvc.perform(get("/my/post-likes")
+        mockMvc.perform(get("/api/members/1/like-posts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -247,6 +251,7 @@ class MyControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail").description("게시글 썸네일"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )));
 
@@ -263,7 +268,7 @@ class MyControllerTest extends ControllerMockApiTest {
         MyFindRequest request = MyFindRequest.builder().memberId(1L).build();
 
         //expected
-        mockMvc.perform(get("/my/comment-likes")
+        mockMvc.perform(get("/api/members/1/like-comments")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -318,7 +323,7 @@ class MyControllerTest extends ControllerMockApiTest {
         MyFindRequest request = MyFindRequest.builder().memberId(1L).build();
 
         //expected
-        mockMvc.perform(get("/my/bookmarks")
+        mockMvc.perform(get("/api/members/1/bookmarks")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -347,6 +352,7 @@ class MyControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("posts.[].isScrap").description("즐겨찾기 여부"),
                                 fieldWithPath("posts.[].createDate").description("생성 날짜"),
                                 fieldWithPath("posts.[].modifyDate").description("수정 날짜"),
+                                fieldWithPath("posts.[].thumbnail").description("게시글 썸네일"),
                                 fieldWithPath("isLast").description("마지막 페이지 여부")
                         )));
 

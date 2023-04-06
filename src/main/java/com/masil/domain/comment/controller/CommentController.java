@@ -20,7 +20,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/posts")
+@RequestMapping("/api")
 @Slf4j
 public class CommentController {
 
@@ -30,12 +30,11 @@ public class CommentController {
      * 댓글 조회
      * 페이징 처리
      */
-    @GetMapping("/{postId}/comments")
+    @GetMapping("/guest-available/posts/{postId}/comments")
     public ResponseEntity<CommentsResponse> findComments(@PathVariable Long postId,
                                                          @PageableDefault(page = 0, size = 20) Pageable pageable,
                                                          @LoginUser CurrentMember currentMember){
 
-        log.info("댓글 조회 시작");
         Long memberId = (currentMember != null) ? currentMember.getId() : null;
         CommentsResponse comments = commentService.findComments(postId, pageable, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(comments);
@@ -45,40 +44,37 @@ public class CommentController {
      * 댓글 작성
      */
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{postId}/comments")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentCreateRequest> createComment(@PathVariable Long postId,
                                                               @Valid @RequestBody CommentCreateRequest commentCreateRequest,
                                                               @LoginUser CurrentMember currentMember){
-        log.info("댓글 생성 시작");
         commentService.createComment(postId, commentCreateRequest, currentMember.getId());
         // 01-19 create로 수정
-        return ResponseEntity.created(URI.create("/posts/" + postId + "/comments")).build();
+        return ResponseEntity.created(URI.create("/api/posts/" + postId + "/comments")).build();
     }
 
     /**
      * 대댓글 작성
      */
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{postId}/reply/{commentId}")
+    @PostMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<ChildrenCreateRequest> createChildrenComment(@PathVariable Long postId,
                                                                        @PathVariable Long commentId,
                                                                        @Valid @RequestBody ChildrenCreateRequest childrenCreateRequest,
                                                                        @LoginUser CurrentMember currentMember){
-        log.info("대댓글 생성 시작");
         commentService.createChildrenComment(postId, commentId, childrenCreateRequest, currentMember.getId());
         // 01-19 create로 수정
-        return ResponseEntity.created(URI.create("/posts/" + postId + "/reply/" + commentId)).build();
+        return ResponseEntity.created(URI.create("/api/posts/" + postId + "/comments/" + commentId)).build();
     }
 
     /**
      * 댓글 수정
      */
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{postId}/comments/{commentId}")
+    @PatchMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentModifyRequest> modifyComment(@PathVariable Long postId, @Valid @RequestBody CommentModifyRequest commentModifyRequest,
                                                               @PathVariable Long commentId,
                                                               @LoginUser CurrentMember currentMember){
-        log.info("댓글 수정 시작");
         commentService.modifyComment(postId, commentModifyRequest, commentId, currentMember.getId());
         return ResponseEntity.ok().build();
     }
@@ -87,11 +83,10 @@ public class CommentController {
      * 댓글 삭제
      */
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{postId}/comments/{commentId}")
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long postId,
                                               @PathVariable Long commentId,
                                               @LoginUser CurrentMember currentMember) {
-        log.info("댓글 삭제 시작");
         commentService.deleteComment(postId, commentId, currentMember.getId());
         return ResponseEntity.noContent().build();
     }

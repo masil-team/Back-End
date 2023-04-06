@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -63,12 +62,12 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.createPost(any(), any())).willReturn(1L);
 
         // when
-        ResultActions resultActions = requestCreatePost("/posts", postCreateRequest);
+        ResultActions resultActions = requestCreatePost("/api/posts", postCreateRequest);
 
         // then
         resultActions
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/posts/1"))
+                .andExpect(header().string("Location", "/api/posts/1"))
                 .andDo(document("post/create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -106,7 +105,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.findDetailPost(any(), any())).willReturn(POST_RESPONSE_1);
 
         // when
-        ResultActions resultActions = requestFindPost("/posts/1");
+        ResultActions resultActions = requestFindPost("/api/guest-available/posts/1");
 
         // then
         resultActions
@@ -143,7 +142,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.findDetailPost(any(), any())).willThrow(new PostNotFoundException());
 
         // when
-        ResultActions resultActions = requestFindPost("/posts/99");
+        ResultActions resultActions = requestFindPost("/api/guest-available/posts/99");
 
         // then
         resultActions
@@ -188,7 +187,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.findPosts(any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = requestFindAllPost("/boards/1/posts?rCode=11680&page=0&size=8");
+        ResultActions resultActions = requestFindAllPost("/api/guest-available/boards/1/posts?rCode=11680&page=0&size=8");
 
         // then
         resultActions
@@ -228,7 +227,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willDoNothing().given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/api/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -252,7 +251,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).modifyPost(any(),any(),any());
 
         // when
-        ResultActions resultActions = requestModifyPost("/posts/1" ,postModifyRequest);
+        ResultActions resultActions = requestModifyPost("/api/posts/1" ,postModifyRequest);
 
         // then
         resultActions
@@ -274,7 +273,7 @@ public class PostControllerTest extends ControllerMockApiTest {
 
         willDoNothing().given(postService).deletePost(any(), any());
         // when
-        ResultActions resultActions = requestDeletePost("/posts/1");
+        ResultActions resultActions = requestDeletePost("/api/posts/1");
 
         // then
         resultActions
@@ -293,7 +292,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         willThrow(new PostAccessDeniedException()).given(postService).deletePost(any(), any());
 
         // when
-        ResultActions resultActions = requestDeletePost("/posts/1");
+        ResultActions resultActions = requestDeletePost("/api/posts/1");
 
         // then
         resultActions
@@ -338,7 +337,7 @@ public class PostControllerTest extends ControllerMockApiTest {
         given(postService.searchPosts(any(), any(), any())).willReturn(postsResponse);
 
         // when
-        ResultActions resultActions = searchPost("/posts/search?keyword=내용&&rCode=11170122");
+        ResultActions resultActions = searchPost("/api/guest-available/posts/search?keyword=내용&&rCode=11170122");
 
         // then
         resultActions
@@ -407,15 +406,6 @@ public class PostControllerTest extends ControllerMockApiTest {
 //                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
                 .andDo(print());
     }
-
-    private ResultActions requestFindBookmarks(String url) throws Exception {
-        return mockMvc.perform(get(url)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE))
-                .andDo(print());
-    }
-
     private ResultActions searchPost(String url) throws Exception {
         return mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON)

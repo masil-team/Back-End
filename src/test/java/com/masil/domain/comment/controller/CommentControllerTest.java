@@ -98,7 +98,7 @@ class CommentControllerTest extends ControllerMockApiTest {
 
 
         //when
-        mockMvc.perform(get("/posts/1/comments?page=0")
+        mockMvc.perform(get("/api/guest-available/posts/1/comments?page=0")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -130,7 +130,8 @@ class CommentControllerTest extends ControllerMockApiTest {
                                 fieldWithPath("comments.[].isLiked").description("좋아요 여부"),
                                 fieldWithPath("comments.[].isOwner").description("본인 댓글 여부"),
                                 fieldWithPath("totalCommentCount").description("댓글 갯수"),
-                                fieldWithPath("totalPage").description("게시글 총 페이지")
+                                fieldWithPath("totalPage").description("댓글 총 페이지"),
+                                fieldWithPath("last").description("댓글 마지막 페이지 여부")
                         )
                 ));
     }
@@ -149,7 +150,7 @@ class CommentControllerTest extends ControllerMockApiTest {
         // then
         resultActions
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/posts/1/comments"))
+                .andExpect(header().string("Location", "/api/posts/1/comments"))
                 .andDo(document("comment/create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -173,7 +174,7 @@ class CommentControllerTest extends ControllerMockApiTest {
         // then
         resultActions
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/posts/1/reply/1"))
+                .andExpect(header().string("Location", "/api/posts/1/comments/1"))
                 .andDo(document("Comment/ChildrenCreate",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -262,7 +263,7 @@ class CommentControllerTest extends ControllerMockApiTest {
         // given
         willDoNothing().given(commentService).deleteComment(any(), any(), any());
         // when
-        ResultActions resultActions = requestDeleteComment("/posts/1/comments/1");
+        ResultActions resultActions = requestDeleteComment("/api/posts/1/comments/1");
 
         // then
         resultActions
@@ -280,7 +281,7 @@ class CommentControllerTest extends ControllerMockApiTest {
         willThrow(new CommentAccessDeniedException()).given(commentService).deleteComment(any(), any(), any());
 
         // when
-        ResultActions resultActions = requestDeleteComment("/posts/1/comments/1");
+        ResultActions resultActions = requestDeleteComment("/api/posts/1/comments/1");
 
         // then
         resultActions
@@ -297,7 +298,7 @@ class CommentControllerTest extends ControllerMockApiTest {
     }
 
     private ResultActions requestCreateComment(CommentCreateRequest dto) throws Exception {
-        return mockMvc.perform(post("/posts/1/comments")
+        return mockMvc.perform(post("/api/posts/1/comments")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
@@ -306,7 +307,7 @@ class CommentControllerTest extends ControllerMockApiTest {
     }
 
     private ResultActions requestCreateChildrenComment(ChildrenCreateRequest dto) throws Exception {
-        return mockMvc.perform(post("/posts/1/reply/1")
+        return mockMvc.perform(post("/api/posts/1/comments/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
@@ -315,7 +316,7 @@ class CommentControllerTest extends ControllerMockApiTest {
     }
 
     private ResultActions requestModifyComment(CommentModifyRequest dto) throws Exception {
-        return mockMvc.perform(patch("/posts/1/comments/1")
+        return mockMvc.perform(patch("/api/posts/1/comments/1")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
