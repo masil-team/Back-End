@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                     .antMatchers(
-                            "**/guest-available/**"
+                            "/**/guest-available/**"
                     ).anonymous()
                 .anyRequest().authenticated()
                 .and()
