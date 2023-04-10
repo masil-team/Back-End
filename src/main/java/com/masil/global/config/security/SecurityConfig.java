@@ -5,7 +5,6 @@ import com.masil.global.config.properties.AccessRequestMatcherAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -50,19 +49,11 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-
                 .authorizeRequests()
-//                .antMatchers(
-//                        "/auth/**"
-//                ).permitAll()
-//                .antMatchers(HttpMethod.GET,
-//                        "/boards/**/posts",
-//                        "/posts/**",
-//                        "/addresses/search",
-//                        "/posts/**/comments"
-//                        )
-//                .permitAll()
-                .anyRequest().permitAll()
+                    .antMatchers(
+                            "/**/guest-available/**"
+                    ).anonymous()
+                .anyRequest().authenticated()
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider,accessRequestMatcher));
 

@@ -45,8 +45,7 @@ class CommentLikeControllerTest extends ControllerMockApiTest {
         given(commentLikeService.updateLikeOfComment(any(), any())).willReturn(CommentLikeResponse.of(1, true));
 
         // when
-        ResultActions resultActions = requestLikeComment("/comments/1/addLike");
-
+        ResultActions resultActions = requestLikeComment("/api/comments/1/modify-like");
         // then
         resultActions
                 .andExpect(status().is2xxSuccessful())
@@ -66,7 +65,7 @@ class CommentLikeControllerTest extends ControllerMockApiTest {
         willThrow(new SelfCommentLikeException()).given(commentLikeService).updateLikeOfComment(any(),any());
 
         // when
-        ResultActions resultActions = requestLikeComment("/comments/1/addLike");
+        ResultActions resultActions = requestLikeComment("/api/comments/1/modify-like");
 
         // then
         resultActions

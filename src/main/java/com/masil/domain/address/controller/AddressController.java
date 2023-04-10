@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/addresses")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AddressController {
 
     private final AddressService addressService;
 
-    @GetMapping("/search")
+    @GetMapping("/guest-available/addresses/search")
     public List<AddressSearchResponse> search(String keyword) {
         return addressService.search(keyword);
     }

@@ -41,7 +41,7 @@ class BookmarkControllerTest extends ControllerMockApiTest {
         given(bookmarkService.addBookmark(any(), any())).willReturn(BookmarkResponse.of(true));
 
         // when
-        ResultActions resultActions = requestAddBookmark("/posts/1/bookmark");
+        ResultActions resultActions = requestAddBookmark("/api/posts/1/bookmark");
 
         // then
         resultActions
@@ -63,7 +63,7 @@ class BookmarkControllerTest extends ControllerMockApiTest {
         given(bookmarkService.deleteBookmark(any(), any())).willReturn(BookmarkResponse.of(false));
 
         // when
-        ResultActions resultActions = requestDeleteBookmark("/posts/1/bookmark");
+        ResultActions resultActions = requestDeleteBookmark("/api/posts/1/bookmark");
 
         // then
         resultActions

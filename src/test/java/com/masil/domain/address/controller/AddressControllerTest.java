@@ -52,7 +52,7 @@ class AddressControllerTest extends ControllerMockApiTest {
 
         //expected
         String json = objectMapper.writeValueAsString(result);
-        mockMvc.perform(get("/addresses/search")
+        mockMvc.perform(get("/api/guest-available/addresses/search")
                         .param("keyword", keyword))
                 .andExpect(status().isOk())
                 .andExpect(content().json(json))
